@@ -82,6 +82,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LootItem
   itemName: Burger
   value: 300
+  weight: 10
   collectSound: {fileID: 8300000, guid: 49e20f02e3a4d2e4a99e78d422b47915, type: 3}
 --- !u!65 &-4737309978646037319
 BoxCollider:

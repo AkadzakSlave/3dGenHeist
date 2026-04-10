@@ -78,21 +78,25 @@ public class PlayerMovement : MonoBehaviour
 
         // Логика расчета скорости с учетом веса
         float currentMaxSpeed = walkSpeed;
-        if (GameManager.Instance != null && GameManager.Instance.bagMoney > 0)
+        bool isOverweight = false;
+
+        if (GameManager.Instance != null)
         {
-            int penaltyTicks = GameManager.Instance.bagMoney / 100;
-            currentMaxSpeed -= (penaltyTicks * weightSpeedPenalty);
-            currentMaxSpeed = Mathf.Max(currentMaxSpeed, minWeightSpeed);
+            if (GameManager.Instance.currentWeight > GameManager.Instance.maxWeight)
+            {
+                isOverweight = true;
+                currentMaxSpeed = minWeightSpeed;
+            }
         }
 
         float applySpeed = currentMaxSpeed;
         bool isSprinting = false;
 
         // Логика Стамины и Спринта
-        if (isSprintPressed && isMoving && currentStamina > 0)
+        if (!isOverweight && isSprintPressed && isMoving && currentStamina > 0)
         {
             isSprinting = true;
-            applySpeed = Mathf.Max(currentMaxSpeed + (sprintSpeed - walkSpeed), minWeightSpeed + 1f); 
+            applySpeed = sprintSpeed; 
             currentStamina -= staminaDrainRate * Time.deltaTime;
         }
         else

@@ -13,6 +13,14 @@ public class GameManager : MonoBehaviour
     [Header("Economy Data (Read Only)")]
     public int bagMoney = 0;
     public int depositedMoney = 0;
+    public int currentWeight = 0;
+    public int maxWeight = 40;
+
+    [Header("Timer Settings")]
+    public float heistTimer = 300f; // 5 минут
+    public bool isHeistActive = false;
+    private int reinforcementCount = 0;
+    private bool timerFinished = false;
 
     [Header("Audio")]
     public AudioSource audioSource;
@@ -36,10 +44,54 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void AddMoneyToBag(int amount)
+    private float zeroTimerDelay = 3f;
+    private float currentZeroDelay = 0f;
+
+    private void Update()
+    {
+        if (isHeistActive)
+        {
+            if (heistTimer > 0)
+            {
+                heistTimer -= Time.deltaTime;
+            }
+            else
+            {
+                heistTimer = 0;
+                currentZeroDelay += Time.deltaTime;
+                
+                if (currentZeroDelay >= zeroTimerDelay)
+                {
+                    currentZeroDelay = 0;
+                    OnTimerReachZero();
+                }
+            }
+        }
+    }
+
+    public void StartHeist()
+    {
+        if (!isHeistActive)
+        {
+            isHeistActive = true;
+            Debug.Log("<color=red>[Alarm] Тишина закончилась! Таймер запущен.</color>");
+        }
+    }
+
+    private void OnTimerReachZero()
+    {
+        reinforcementCount++;
+        Debug.Log($"<color=red>[Backup] Прибыло подкрепление! (#{reinforcementCount})</color>");
+        
+        // Перезапускаем таймер на 1 минуту
+        heistTimer = 60f;
+    }
+
+    public void AddMoneyToBag(int amount, int weight)
     {
         bagMoney += amount;
-        Debug.Log($"[Economy] Собрано: ${amount}. В сумке теперь: ${bagMoney}");
+        currentWeight += weight;
+        Debug.Log($"[Economy] Собрано: ${amount} (Вес: {weight}). Всего в сумке: ${bagMoney} (Вес: {currentWeight}/{maxWeight})");
         onMoneyChanged?.Invoke();
     }
 
@@ -50,6 +102,7 @@ public class GameManager : MonoBehaviour
         depositedMoney += bagMoney;
         Debug.Log($"[Economy] Деньги сданы! Квота: {depositedMoney} / {targetQuota}");
         bagMoney = 0;
+        currentWeight = 0;
         
         if (audioSource != null && depositSound != null)
         {

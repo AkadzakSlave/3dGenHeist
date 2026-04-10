@@ -14,6 +14,10 @@ public class DestructibleWall : MonoBehaviour
         
         if (health <= 0)
         {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.StartHeist();
+            }
             BreakWall();
         }
     }
