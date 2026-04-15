@@ -17,9 +17,10 @@ public class SocketData
 
 public class LevelGenerator : MonoBehaviour
 {
-    [Header("Settings")]
-    public RoomTemplate startRoom;
-    public List<RoomTemplate> availableRooms;
+    [Header("Generation Settings (Dynamic)")]
+    // Текущий выбранный пресет карты (позже будет передаваться из Лобби)
+    public LevelPreset activePreset; 
+    
     public int minRooms = 10;
     public int maxRooms = 20;
     [Tooltip("Retry count if generated rooms are less than minRooms")]
@@ -29,8 +30,7 @@ public class LevelGenerator : MonoBehaviour
     public Vector3 boundsCenter = Vector3.zero;
     public Vector3 boundsSize = new Vector3(50, 20, 50);
 
-    [Header("Special Zones")]
-    public GameObject vanZonePrefab;
+    [Header("Sockets and Rules")]
     public string streetSocketName = "Socket_Street";
     public LayerMask roomLayerMask;
 
@@ -131,17 +131,21 @@ public class LevelGenerator : MonoBehaviour
 
     IEnumerator BuildSimulation()
     {
-        if (startRoom == null || startRoom.prefab == null) yield break;
+        if (activePreset == null || activePreset.startRoom == null) 
+        {
+            Debug.LogError("<color=red>[Gen] ОШИБКА: Active Preset не назначен в LevelGenerator!</color>");
+            yield break;
+        }
 
         // 1. Стартовая комната
-        GameObject startObj = Instantiate(startRoom.prefab, Vector3.zero, Quaternion.identity, transform);
+        GameObject startObj = Instantiate(activePreset.startRoom.prefab, Vector3.zero, Quaternion.identity, transform);
         generatedRoomsCount++;
         spawnedRooms.Add(startObj);
-        Debug.Log($"<color=cyan>[Gen] Заспавнена стартовая комната: {startObj.name}</color>");
+        Debug.Log($"<color=cyan>[Gen] Заспавнена стартовая комната: {startObj.name} (Локация: {activePreset.levelName})</color>");
 
         // 2. Фургон
         RoomSocket streetSocket = FindSocketByName(startObj, streetSocketName);
-        if (streetSocket != null && vanZonePrefab != null)
+        if (streetSocket != null && activePreset.vanZonePrefab != null)
         {
             SpawnVan(streetSocket);
         }
@@ -247,7 +251,7 @@ public class LevelGenerator : MonoBehaviour
 
     private void SpawnVan(RoomSocket streetSocket)
     {
-        GameObject vanObj = Instantiate(vanZonePrefab);
+        GameObject vanObj = Instantiate(activePreset.vanZonePrefab);
         vanObj.SetActive(true); // Форсируем включение, если префаб был случайно сохранен выключенным
         
         RoomSocket vanSocket = FindFirstFreeSocket(vanObj);
@@ -273,7 +277,7 @@ public class LevelGenerator : MonoBehaviour
     private List<RoomTemplate> GetValidTemplates(int depth)
     {
         List<RoomTemplate> valid = new List<RoomTemplate>();
-        foreach (var t in availableRooms)
+        foreach (var t in activePreset.availableRooms)
         {
             if (t.category == RoomCategory.Vault)
             {

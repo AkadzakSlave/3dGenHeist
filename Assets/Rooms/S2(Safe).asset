@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 255e8612309ed9c4e931687918b51698, type: 3}
-  m_Name: S1Safe
+  m_Name: S2(Safe)
   m_EditorClassIdentifier: Assembly-CSharp::RoomTemplate
   prefab: {fileID: 3154867799244154002, guid: 0592313d8ead6c347a91aea6e7566e2e, type: 3}
   category: 0
