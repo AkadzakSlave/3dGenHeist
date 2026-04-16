@@ -73,16 +73,21 @@ MonoBehaviour:
   EditorEvents:
   - {fileID: -6456050216900641682}
   - {fileID: -6396979049143179688}
+  - {fileID: 1402490668483442293}
   EditorParameters: []
   MasterBanks:
   - {fileID: 8583605926927674162}
   StringsBanks:
   - {fileID: 647930217249224942}
   cacheVersion: 131859
-  cacheTime: 639119649081025393
+  cacheTime: 639119772613517250
   SerializableEventsDict:
   - key: event:/Player/Player_Footstep
     index: 0
+  - key: event:/Wall/WallHit
+    index: 1
+  - key: event:/Player/Land
+    index: 2
 --- !u!114 &303226313494757975
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -122,11 +127,38 @@ MonoBehaviour:
   Path: ../fmod_projects/Wild_Bunch-Ocup/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 639119649081025393
+  lastModified: 639119772613517250
   FileSizes:
   - Name: Desktop
-    Value: 890
+    Value: 936
   Exists: 1
+--- !u!114 &1402490668483442293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Player/Land
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Player/Land
+  Guid:
+    Data1: 1438176865
+    Data2: 1271092848
+    Data3: 1778597818
+    Data4: -1934231790
+  Banks:
+  - {fileID: 8583605926927674162}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 230
 --- !u!114 &8583605926927674162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -142,8 +174,8 @@ MonoBehaviour:
   Path: ../fmod_projects/Wild_Bunch-Ocup/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 639119649081015407
+  lastModified: 639119772613507280
   FileSizes:
   - Name: Desktop
-    Value: 82688
+    Value: 86304
   Exists: 1

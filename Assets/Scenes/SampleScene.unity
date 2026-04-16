@@ -4823,6 +4823,17 @@ MonoBehaviour:
       Data3: 1016496260
       Data4: -1767202063
     Path: event:/Player/Player_Footstep
+  landEvent:
+    Guid:
+      Data1: 1438176865
+      Data2: 1271092848
+      Data3: 1778597818
+      Data4: -1934231790
+    Path: event:/Player/Land
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 64
+  rayLength: 1.5
   stepInterval: 0.4
 --- !u!1001 &1590342146
 PrefabInstance:
