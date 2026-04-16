@@ -27,6 +27,34 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 205
+--- !u!114 &-6396979049143179688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Wall/WallHit
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Wall/WallHit
+  Guid:
+    Data1: 725909081
+    Data2: 1320208053
+    Data3: -1624142683
+    Data4: -2043165746
+  Banks:
+  - {fileID: 8583605926927674162}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters:
+  - {fileID: 303226313494757975}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -44,16 +72,41 @@ MonoBehaviour:
   - {fileID: 8583605926927674162}
   EditorEvents:
   - {fileID: -6456050216900641682}
+  - {fileID: -6396979049143179688}
   EditorParameters: []
   MasterBanks:
   - {fileID: 8583605926927674162}
   StringsBanks:
   - {fileID: 647930217249224942}
   cacheVersion: 131859
-  cacheTime: 639118821362628419
+  cacheTime: 639119649081025393
   SerializableEventsDict:
   - key: event:/Player/Player_Footstep
     index: 0
+--- !u!114 &303226313494757975
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/WallHit/HitNumber
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: HitNumber
+  StudioPath: 
+  Min: 1
+  Max: 3
+  Default: 1
+  ID:
+    data1: 1542698969
+    data2: 4091370544
+  Type: 1
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &647930217249224942
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -69,10 +122,10 @@ MonoBehaviour:
   Path: ../fmod_projects/Wild_Bunch-Ocup/Build/Desktop/Master.strings.bank
   Name: Master.strings
   StudioPath: bank:/Master.strings
-  lastModified: 639118821362628419
+  lastModified: 639119649081025393
   FileSizes:
   - Name: Desktop
-    Value: 784
+    Value: 890
   Exists: 1
 --- !u!114 &8583605926927674162
 MonoBehaviour:
@@ -89,8 +142,8 @@ MonoBehaviour:
   Path: ../fmod_projects/Wild_Bunch-Ocup/Build/Desktop/Master.bank
   Name: Master
   StudioPath: bank:/Master
-  lastModified: 639118821362608511
+  lastModified: 639119649081015407
   FileSizes:
   - Name: Desktop
-    Value: 7648
+    Value: 82688
   Exists: 1

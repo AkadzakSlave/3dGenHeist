@@ -3144,6 +3144,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1576915817}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1576915818}
     - targetCorrespondingSourceObject: {fileID: 1981717426785045538, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1657124865}
@@ -4801,6 +4804,26 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1576915818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1576915809}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39c221c808ae3ad40b1db9052514f269, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::FootstepOnMove
+  footstepEvent:
+    Guid:
+      Data1: -1315216641
+      Data2: 1151331948
+      Data3: 1016496260
+      Data4: -1767202063
+    Path: event:/Player/Player_Footstep
+  stepInterval: 0.4
 --- !u!1001 &1590342146
 PrefabInstance:
   m_ObjectHideFlags: 0
