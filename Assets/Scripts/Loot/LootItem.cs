@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class LootItem : MonoBehaviour
+public class LootItem : MonoBehaviour, IInteractable
 {
     public string itemName = "Cash Bundle";
     public int value = 100;
@@ -8,6 +8,16 @@ public class LootItem : MonoBehaviour
     
     [Header("Audio")]
     public AudioClip collectSound;
+
+    public void Interact()
+    {
+        Collect();
+    }
+
+    public string GetInteractText()
+    {
+        return $"Collect {itemName} (${value})";
+    }
 
     public void Collect()
     {

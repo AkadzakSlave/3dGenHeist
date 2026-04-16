@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bb4f188d8b8907648b76dabbfa786528, type: 3}
+  m_Name: Bank_Base
+  m_EditorClassIdentifier: Assembly-CSharp::LevelPreset
+  levelName: Bank
+  startRoom: {fileID: 11400000, guid: b87174c73af0ae541802031f0962c28f, type: 2}
+  vanZonePrefab: {fileID: 2218685468410544309, guid: 2006e2e306c223847acb5fec4837a0c4, type: 3}
+  availableRooms:
+  - {fileID: 11400000, guid: d438b2b7197600d42b2f1e380e7e60c0, type: 2}
+  - {fileID: 11400000, guid: 0f715591f2ee6b543bb8aad7a076accf, type: 2}
+  - {fileID: 11400000, guid: 2f9ce1e3606c0034c98434fee73d085a, type: 2}
+  - {fileID: 11400000, guid: e7e8771726512a74d866a50b3215a0a1, type: 2}
+  - {fileID: 11400000, guid: becc93c83389cdd45b2430bdeefaee97, type: 2}
+  - {fileID: 11400000, guid: 9271a53e1714c8046aa49e295c608f75, type: 2}
+  - {fileID: 11400000, guid: 2a4ff5e1901fa7f49a40fbfcf1b3bff4, type: 2}
+  - {fileID: 11400000, guid: 0d196d9390cc98b45a3aaa89ab599002, type: 2}
+  - {fileID: 11400000, guid: 0d196d9390cc98b45a3aaa89ab599002, type: 2}

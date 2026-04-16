@@ -93,6 +93,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5792297645877810096}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7785190712137380246}
   m_SourcePrefab: {fileID: 100100000, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
 --- !u!1 &1214243730013476256 stripped
 GameObject:
@@ -169,3 +172,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0.67, z: 0}
+--- !u!114 &7785190712137380246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1214243730013476256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adc21f5581ed1394cb6a915450f25597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootItem
+  itemName: Fixik
+  value: 500
+  weight: 1
+  collectSound: {fileID: 0}

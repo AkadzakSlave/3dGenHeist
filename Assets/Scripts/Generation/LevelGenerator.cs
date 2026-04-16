@@ -53,7 +53,7 @@ public class LevelGenerator : MonoBehaviour
     void Start()
     {
         buildingBounds = new Bounds(boundsCenter, boundsSize);
-        StartCoroutine(GenerateLevelWithRetries());
+        // Generation is now triggered manually by the GameManager
     }
 
     private void OnDrawGizmosSelected()
@@ -62,7 +62,7 @@ public class LevelGenerator : MonoBehaviour
         Gizmos.DrawWireCube(boundsCenter, boundsSize);
     }
 
-    private void ClearLevel()
+    public void ClearLevel()
     {
         foreach (var room in spawnedRooms) 
         {
@@ -89,6 +89,18 @@ public class LevelGenerator : MonoBehaviour
         vaultSpawned = false;
         securitySpawned = false;
         vipSpawned = false;
+    }
+
+    public void GenerateAsync(LevelPreset preset, System.Action onComplete)
+    {
+        activePreset = preset;
+        StartCoroutine(GenerateWrapper(onComplete));
+    }
+
+    private IEnumerator GenerateWrapper(System.Action onComplete)
+    {
+        yield return StartCoroutine(GenerateLevelWithRetries());
+        onComplete?.Invoke();
     }
 
     IEnumerator GenerateLevelWithRetries()

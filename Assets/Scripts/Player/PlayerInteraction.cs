@@ -28,16 +28,11 @@ public class PlayerInteraction : MonoBehaviour
         // Пускаем луч из камеры
         if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, interactDistance, interactLayer))
         {
-            // Ищем лут
-            LootItem loot = hit.collider.GetComponentInParent<LootItem>();
-            if (loot != null)
+            IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
+            if (interactable != null)
             {
-                loot.Collect();
-                return;
+                interactable.Interact();
             }
-
-            // Можно добавить другие взаимодействия (рычаги, двери) в будущем
-            Debug.Log($"[Interaction] Посмотрели на {hit.collider.name}, но взаимодействовать не с чем.");
         }
     }
 }

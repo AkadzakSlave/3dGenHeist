@@ -16,6 +16,9 @@ public class HeistUI : MonoBehaviour
     public GameObject inventoryPlaceholder;
     public GameObject universalSlotPlaceholder;
 
+    [Header("Transitions")]
+    public GameObject loadingScreenPanel;
+
     private float timerBlinkSpeed = 5f;
 
     void Start()
@@ -82,6 +85,16 @@ public class HeistUI : MonoBehaviour
             else
                 weightText.color = Color.white;
         }
+    }
+
+    public void ShowLoadingScreen()
+    {
+        if (loadingScreenPanel != null) loadingScreenPanel.SetActive(true);
+    }
+
+    public void HideLoadingScreen()
+    {
+        if (loadingScreenPanel != null) loadingScreenPanel.SetActive(false);
     }
 
     // Этот метод будет вызываться из PlayerMovement
