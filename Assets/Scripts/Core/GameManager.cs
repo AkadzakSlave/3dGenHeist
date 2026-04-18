@@ -7,12 +7,15 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
 
-    [Header("Global Economy")]
+    [Header("Global Progression")]
     public int globalBankBalance = 0;
-    public int currentDay = 1;
+    public int completedQuotas = 0;
 
-    [Header("Heist Settings")]
-    public int targetQuota = 1000;
+    [Header("Operation Settings (Campaign)")]
+    public int currentDay = 1;
+    public int operationTargetQuota = 3000;
+    public int accumulatedOperationMoney = 0;
+    public LevelPreset activeOperationPreset;
     
     [Header("Current Heist Data (Read Only)")]
     public int bagMoney = 0;
@@ -24,7 +27,6 @@ public class GameManager : MonoBehaviour
     public float heistTimer = 300f; // 5 минут
     public bool isHeistActive = false;
     private int reinforcementCount = 0;
-    private bool timerFinished = false;
 
     [Header("Audio")]
     public AudioSource audioSource;
@@ -32,17 +34,20 @@ public class GameManager : MonoBehaviour
 
     [Header("Events")]
     public UnityEvent onMoneyChanged;
-    public UnityEvent onQuotaMet;
+    public UnityEvent onHeistStarted;
 
     [Header("State & Teleportation")]
     public bool isInLobby = true;
     public Transform playerTransform;
     public CharacterController playerController;
-    public Transform lobbySpawnPoint;
     public LevelGenerator levelGenerator;
     public HeistUI heistUI;
+    
+    [Header("Spawn Points")]
+    public Transform lobbySpawnPoint;
+    public Transform motelSpawnPoint;
+    public Transform bossRoomSpawnPoint;
 
-    private bool quotaMetTriggered = false;
     private float zeroTimerDelay = 3f;
     private float currentZeroDelay = 0f;
 
@@ -66,7 +71,8 @@ public class GameManager : MonoBehaviour
         }
         else if (!isInLobby && levelGenerator != null && levelGenerator.activePreset != null)
         {
-            // Для удобства тестов: если стартуем сразу на уровне, генерируем его автоматически
+            // Для удобства тестов
+            activeOperationPreset = levelGenerator.activePreset;
             levelGenerator.GenerateAsync(levelGenerator.activePreset, null);
         }
     }
@@ -94,35 +100,57 @@ public class GameManager : MonoBehaviour
     }
 
     // ============================================
-    // ЦИКЛ ОГРАБЛЕНИЯ (HEIST LOOP)
+    // ЦИКЛ ОПЕРАЦИИ (КАМПАНИЯ 3 ДНЯ)
     // ============================================
 
-    public void StartLoadingHeist(LevelPreset preset)
+    public void StartOperation(LevelPreset preset)
+    {
+        activeOperationPreset = preset;
+        currentDay = 1;
+        accumulatedOperationMoney = 0;
+        
+        // Масштабирование сложности (пример: базовая квота 3000 растет с каждой победой)
+        operationTargetQuota = 3000 + (completedQuotas * 1500); 
+        
+        Debug.Log($"<color=cyan>[GameManager] Операция начата! Штат: {preset.levelName}. Квота: {operationTargetQuota}</color>");
+        StartLoadingHeist(preset);
+    }
+
+    public void StartNextDay()
+    {
+        if (activeOperationPreset != null)
+        {
+            currentDay++;
+            StartLoadingHeist(activeOperationPreset);
+        }
+        else
+        {
+            Debug.LogError("[GameManager] Нет активного пресета операции!");
+        }
+    }
+
+    private void StartLoadingHeist(LevelPreset preset)
     {
         if (!isInLobby) return;
-        Debug.Log($"<color=cyan>[GameManager] Начинаем загрузку локации: {preset.levelName}</color>");
         StartCoroutine(HeistLoadingRoutine(preset));
     }
 
     private IEnumerator HeistLoadingRoutine(LevelPreset preset)
     {
-        // 1. Показываем экран загрузки
         if (heistUI != null) heistUI.ShowLoadingScreen();
 
-        // 2. Сбрасываем старые значения
         bagMoney = 0;
         depositedMoney = 0;
         currentWeight = 0;
-        heistTimer = 300f; // TODO: Брать из настроек сложности
+        // Чуть меньше времени с каждым днем (для сложности)
+        heistTimer = 300f - ((currentDay - 1) * 30f); 
         isHeistActive = false;
-        quotaMetTriggered = false;
         reinforcementCount = 0;
         currentZeroDelay = 0f;
         onMoneyChanged?.Invoke();
 
         if (heistUI != null) heistUI.UpdateUI();
 
-        // 3. Чистим старый уровень (если был) и строим новый
         if (levelGenerator != null)
         {
             levelGenerator.ClearLevel();
@@ -131,77 +159,101 @@ public class GameManager : MonoBehaviour
             bool isGenerationDone = false;
             levelGenerator.GenerateAsync(preset, () => { isGenerationDone = true; });
 
-            // Ждем пока строится уровень
             yield return new WaitUntil(() => isGenerationDone);
         }
 
-        // 4. Телепортируем игрока на старт уровня (например, координаты (0,0,0) - это всегда старт)
-        // В идеале берем из startObj, но пока просто в ноль.
-        yield return StartCoroutine(TeleportPlayer(new Vector3(0, 1, 0), Quaternion.identity));
+        Vector3 targetPos = new Vector3(0, 1, 0);
+        if (levelGenerator != null && levelGenerator.vanSpawnPoint != null)
+        {
+            targetPos = levelGenerator.vanSpawnPoint.position + Vector3.up * 1.5f;
+        }
+        
+        yield return StartCoroutine(TeleportPlayer(targetPos, Quaternion.identity));
 
-        // 5. Завершаем загрузку
         isInLobby = false;
         if (heistUI != null) heistUI.HideLoadingScreen();
-        Debug.Log("<color=green>[GameManager] Ограбление началось (Таймер еще спит)</color>");
     }
 
     public void ExtractFromHeist()
     {
         if (isInLobby) return;
-        Debug.Log("<color=yellow>[GameManager] Эвакуация из ограбления...</color>");
         StartCoroutine(ExtractionRoutine());
     }
 
     private IEnumerator ExtractionRoutine()
     {
-        // 1. Экран загрузки
         if (heistUI != null) heistUI.ShowLoadingScreen();
 
-        if (depositedMoney < targetQuota)
+        accumulatedOperationMoney += depositedMoney;
+        Debug.Log($"<color=orange>[Economy] День {currentDay} завершен. Накоплено: ${accumulatedOperationMoney} / ${operationTargetQuota}</color>");
+
+        if (levelGenerator != null) levelGenerator.ClearLevel();
+
+        isInLobby = true;
+        isHeistActive = false;
+
+        if (currentDay < 3)
         {
-            Debug.Log("<color=red>[Economy] Игрок уехал раньше собранной квоты!</color>");
+            // Переход на следующий день (отдых в мотеле)
+            if (motelSpawnPoint != null)
+            {
+                yield return StartCoroutine(TeleportPlayer(motelSpawnPoint.position, motelSpawnPoint.rotation));
+            }
+            if (heistUI != null) heistUI.HideLoadingScreen();
+        }
+        else
+        {
+            // Переход к боссу
+            if (bossRoomSpawnPoint != null)
+            {
+                yield return StartCoroutine(TeleportPlayer(bossRoomSpawnPoint.position, bossRoomSpawnPoint.rotation));
+            }
+            if (heistUI != null) heistUI.HideLoadingScreen();
+        }
+    }
+
+    // ============================================
+    // БОСС И ОПЛАТА
+    // ============================================
+
+    public void PayBoss()
+    {
+        StartCoroutine(PayBossRoutine());
+    }
+
+    private IEnumerator PayBossRoutine()
+    {
+        if (heistUI != null) heistUI.ShowLoadingScreen(); // Используем черный экран для транзиции
+
+        Debug.Log($"<color=magenta>[Boss] Проверка квоты... У вас: {accumulatedOperationMoney}, Требуется: {operationTargetQuota}</color>");
+
+        // Имитация ожидания (подсчет денег)
+        yield return new WaitForSeconds(3f);
+
+        if (accumulatedOperationMoney >= operationTargetQuota)
+        {
+            // Успех
+            int profit = accumulatedOperationMoney - operationTargetQuota;
+            globalBankBalance += profit;
+            completedQuotas++;
+            Debug.Log($"<color=green>[Boss] Квота принята. Ваша доля: ${profit}. Идем дальше!</color>");
+        }
+        else
+        {
+            // Провал
+            Debug.Log($"<color=red>[Boss] Квота НЕ ВЫПОЛНЕНА! GAME OVER.</color>");
+            globalBankBalance = 0;
+            completedQuotas = 0;
+            // Можно проиграть какой-то звук или показать Game Over UI здесь
         }
 
-        globalBankBalance += depositedMoney;
-        Debug.Log($"[Economy] Заработано за ограбление: ${depositedMoney}. Общий банк: ${globalBankBalance}");
-
-        // TODO: Логика повышения сложности, если квота выполнена
-
-        // 3. Телепорт в Лобби
+        // Возвращаемся в Главное Лобби
         if (lobbySpawnPoint != null)
         {
             yield return StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));
         }
 
-        // 4. Очистка локации из памяти
-        if (levelGenerator != null)
-        {
-            levelGenerator.ClearLevel();
-        }
-
-        isInLobby = true;
-        isHeistActive = false;
-        
-        // 5. Убираем экран
         if (heistUI != null) heistUI.HideLoadingScreen();
-    }
-
-    // Хелпер для телепорта (отключает контроллер, чтобы физика не мешала)
-    private IEnumerator TeleportPlayer(Vector3 pos, Quaternion rot)
-    {
-        if (playerController != null)
-        {
-            playerController.enabled = false;
-            playerTransform.position = pos;
-            playerTransform.rotation = rot;
-            yield return new WaitForEndOfFrame();
-            playerController.enabled = true;
-        }
-        else if (playerTransform != null)
-        {
-            playerTransform.position = pos;
-            playerTransform.rotation = rot;
-        }
     }
 
 
@@ -215,6 +267,7 @@ public class GameManager : MonoBehaviour
         {
             isHeistActive = true;
             Debug.Log("<color=red>[Alarm] Тишина закончилась! Таймер запущен.</color>");
+            onHeistStarted?.Invoke();
         }
     }
 
@@ -229,7 +282,6 @@ public class GameManager : MonoBehaviour
     {
         bagMoney += amount;
         currentWeight += weight;
-        Debug.Log($"[Economy] Собрано: ${amount} (Вес: {weight}). Всего в сумке: ${bagMoney} (Вес: {currentWeight}/{maxWeight})");
         onMoneyChanged?.Invoke();
     }
 
@@ -238,7 +290,6 @@ public class GameManager : MonoBehaviour
         if (bagMoney <= 0) return;
 
         depositedMoney += bagMoney;
-        Debug.Log($"[Economy] Деньги сданы! Квота: {depositedMoney} / {targetQuota}");
         bagMoney = 0;
         currentWeight = 0;
         
@@ -248,17 +299,17 @@ public class GameManager : MonoBehaviour
         }
 
         onMoneyChanged?.Invoke();
-
-        if (depositedMoney >= targetQuota && !quotaMetTriggered)
-        {
-            quotaMetTriggered = true;
-            Debug.Log("<color=green>[Победа] Квота выполнена! Живем!</color>");
-            onQuotaMet?.Invoke();
-        }
     }
 
-    public bool IsQuotaMet()
+    private IEnumerator TeleportPlayer(Vector3 pos, Quaternion rot)
     {
-        return depositedMoney >= targetQuota;
+        if (playerController != null)
+        {
+            playerController.enabled = false;
+            playerTransform.position = pos;
+            playerTransform.rotation = rot;
+            yield return new WaitForEndOfFrame();
+            playerController.enabled = true;
+        }
     }
 }

@@ -27,7 +27,6 @@ public class HeistUI : MonoBehaviour
         if (GameManager.Instance != null)
         {
             GameManager.Instance.onMoneyChanged.AddListener(UpdateUI);
-            GameManager.Instance.onQuotaMet.AddListener(ShowQuotaMetBanner);
         }
         
         if (quotaMetBanner != null)
@@ -40,7 +39,18 @@ public class HeistUI : MonoBehaviour
     {
         if (GameManager.Instance == null) return;
 
-        // Обновление таймера
+        bool isInLobby = GameManager.Instance.isInLobby;
+
+        // Показываем/скрываем элементы в зависимости от лобби
+        if (timerText != null)
+        {
+            // Таймер виден только если мы НЕ в лобби
+            timerText.gameObject.SetActive(!isInLobby);
+        }
+
+        if (isInLobby) return;
+
+        // Обновление таймера (только на уровне)
         if (timerText != null)
         {
             float t = GameManager.Instance.heistTimer;
@@ -72,7 +82,7 @@ public class HeistUI : MonoBehaviour
 
         if (quotaText != null)
         {
-            quotaText.text = $"Quota: ${GameManager.Instance.depositedMoney} / ${GameManager.Instance.targetQuota}";
+            quotaText.text = $"Day {GameManager.Instance.currentDay}/3\nVan: ${GameManager.Instance.depositedMoney}\nProgress: ${GameManager.Instance.accumulatedOperationMoney} / ${GameManager.Instance.operationTargetQuota}";
         }
 
         if (weightText != null)

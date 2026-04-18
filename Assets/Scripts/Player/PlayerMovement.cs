@@ -48,6 +48,8 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (controller != null && !controller.enabled) return;
+
         bool isGrounded = controller.isGrounded || Physics.Raycast(transform.position, Vector3.down, (controller.height / 2f) + 0.2f);
         
         if (isGrounded && velocity.y < 0)

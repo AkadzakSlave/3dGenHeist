@@ -43,6 +43,9 @@ public class LevelGenerator : MonoBehaviour
     private List<GameObject> spawnedRooms = new List<GameObject>();
     private List<GameObject> spawnedWalls = new List<GameObject>();
 
+    [HideInInspector]
+    public Transform vanSpawnPoint;
+
     // Лимиты уникальных комнат
     private bool vaultSpawned = false;
     private bool securitySpawned = false;
@@ -275,6 +278,7 @@ public class LevelGenerator : MonoBehaviour
             vanSocket.isConnected = true;
             vanObj.transform.SetParent(transform);
             spawnedRooms.Add(vanObj);
+            vanSpawnPoint = vanObj.transform;
             Debug.Log("<color=green>[Gen] Фургон успешно припаркован к Socket_Street!</color>");
         }
         else

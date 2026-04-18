@@ -9,7 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7625761298336659646}
-  - component: {fileID: 7383260653445261074}
+  - component: {fileID: 6469000969873983758}
+  - component: {fileID: 1663680938882767887}
   - component: {fileID: 1497262934185469385}
   - component: {fileID: 8603573584380687867}
   - component: {fileID: 7059355420960199670}
@@ -35,7 +36,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7383260653445261074
+--- !u!114 &6469000969873983758
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -47,7 +48,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cf88221fa33a1b4eb6ceb8a1ac563ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LobbyTerminal
-  targetPreset: {fileID: 11400000, guid: 94e2c7645c98368439015818d678f76e, type: 2}
+  targetPreset: {fileID: 0}
+--- !u!114 &1663680938882767887
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6342681645461226543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2653d2e68ef0964db590c26dbfebe08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BossConsole
 --- !u!33 &1497262934185469385
 MeshFilter:
   m_ObjectHideFlags: 0

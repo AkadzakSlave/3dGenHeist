@@ -10,9 +10,8 @@ public class LobbyTerminal : MonoBehaviour, IInteractable
     {
         if (GameManager.Instance != null && targetPreset != null)
         {
-            Debug.Log($"[Lobby] Запуск ограбления: {targetPreset.levelName}");
-            // Call GameManager to handle the transition
-            GameManager.Instance.StartLoadingHeist(targetPreset);
+            Debug.Log($"[Lobby] Запуск операции! Выбран штат: {targetPreset.levelName}");
+            GameManager.Instance.StartOperation(targetPreset);
         }
         else
         {
