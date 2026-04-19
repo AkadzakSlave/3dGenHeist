@@ -86,22 +86,35 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 7785190712137380246}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 1853178194005265501}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4236163008823264124}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 5792297645877810096}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7785190712137380246}
   m_SourcePrefab: {fileID: 100100000, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
 --- !u!1 &1214243730013476256 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
   m_PrefabInstance: {fileID: 2024568061247351025}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7785190712137380246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1214243730013476256}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adc21f5581ed1394cb6a915450f25597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootItem
+  itemName: Fixik
+  value: 500
+  weight: 1
+  collectSound: {fileID: 0}
 --- !u!95 &1853178194005265501
 Animator:
   serializedVersion: 7
@@ -124,33 +137,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!54 &4236163008823264124
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1214243730013476256}
-  serializedVersion: 5
-  m_Mass: 0.2
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 64
-  m_CollisionDetection: 0
 --- !u!65 &5792297645877810096
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -172,19 +158,3 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0.67, z: 0}
---- !u!114 &7785190712137380246
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1214243730013476256}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adc21f5581ed1394cb6a915450f25597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LootItem
-  itemName: Fixik
-  value: 500
-  weight: 1
-  collectSound: {fileID: 0}

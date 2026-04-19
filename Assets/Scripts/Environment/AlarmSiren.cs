@@ -17,6 +17,11 @@ public class AlarmSiren : MonoBehaviour
 
     void Start()
     {
+        if (audioSource != null)
+        {
+            audioSource.Stop(); // Принудительно глушим при спавне локации, если в префабе стояла галочка PlayOnAwake
+        }
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.onHeistStarted.AddListener(StartSiren);

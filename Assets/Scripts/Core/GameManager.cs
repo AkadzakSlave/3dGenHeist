@@ -142,8 +142,7 @@ public class GameManager : MonoBehaviour
         bagMoney = 0;
         depositedMoney = 0;
         currentWeight = 0;
-        // Чуть меньше времени с каждым днем (для сложности)
-        heistTimer = 300f - ((currentDay - 1) * 30f); 
+        heistTimer = 300f; 
         isHeistActive = false;
         reinforcementCount = 0;
         currentZeroDelay = 0f;
@@ -216,38 +215,33 @@ public class GameManager : MonoBehaviour
     // БОСС И ОПЛАТА
     // ============================================
 
-    public void PayBoss()
+    public void ProcessBossResult(bool isSuccess)
     {
-        StartCoroutine(PayBossRoutine());
+        StartCoroutine(ProcessBossResultRoutine(isSuccess));
     }
 
-    private IEnumerator PayBossRoutine()
+    private IEnumerator ProcessBossResultRoutine(bool isSuccess)
     {
-        if (heistUI != null) heistUI.ShowLoadingScreen(); // Используем черный экран для транзиции
-
-        Debug.Log($"<color=magenta>[Boss] Проверка квоты... У вас: {accumulatedOperationMoney}, Требуется: {operationTargetQuota}</color>");
-
-        // Имитация ожидания (подсчет денег)
-        yield return new WaitForSeconds(3f);
-
-        if (accumulatedOperationMoney >= operationTargetQuota)
+        if (isSuccess)
         {
-            // Успех
             int profit = accumulatedOperationMoney - operationTargetQuota;
             globalBankBalance += profit;
             completedQuotas++;
-            Debug.Log($"<color=green>[Boss] Квота принята. Ваша доля: ${profit}. Идем дальше!</color>");
+            Debug.Log($"<color=green>[Economy] Прибыль после уплаты квоты: ${profit}. Общий баланс: ${globalBankBalance}</color>");
+            
+            // Если мы выиграли, покажем черный экран для перехода в Лобби, так как BossRoomManager его не показывал
+            if (heistUI != null) heistUI.ShowLoadingScreen();
         }
         else
         {
             // Провал
-            Debug.Log($"<color=red>[Boss] Квота НЕ ВЫПОЛНЕНА! GAME OVER.</color>");
             globalBankBalance = 0;
             completedQuotas = 0;
-            // Можно проиграть какой-то звук или показать Game Over UI здесь
+            Debug.Log($"<color=red>[Economy] Игровой процесс сброшен. Начинаем заново.</color>");
+            // Экран уже черный (BossRoomManager затемнил его перед выстрелом)
         }
 
-        // Возвращаемся в Главное Лобби
+        // Возвращаемся в Лобби
         if (lobbySpawnPoint != null)
         {
             yield return StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));

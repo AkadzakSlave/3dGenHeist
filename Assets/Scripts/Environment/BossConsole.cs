@@ -4,10 +4,13 @@ public class BossConsole : MonoBehaviour, IInteractable
 {
     public void Interact()
     {
-        if (GameManager.Instance != null)
+        if (BossRoomManager.Instance != null)
         {
-            Debug.Log("[Boss] Оплата квоты...");
-            GameManager.Instance.PayBoss();
+            BossRoomManager.Instance.CheckConsoleInteraction();
+        }
+        else
+        {
+            Debug.LogError("[BossConsole] BossRoomManager не найден на сцене!");
         }
     }
 

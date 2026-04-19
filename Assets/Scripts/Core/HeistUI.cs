@@ -41,11 +41,11 @@ public class HeistUI : MonoBehaviour
 
         bool isInLobby = GameManager.Instance.isInLobby;
 
-        // Показываем/скрываем элементы в зависимости от лобби
+        // Показываем/скрываем элементы
         if (timerText != null)
         {
-            // Таймер виден только если мы НЕ в лобби
-            timerText.gameObject.SetActive(!isInLobby);
+            // Таймер виден только тогда, когда ограбление началось (разрушена стена)
+            timerText.gameObject.SetActive(GameManager.Instance.isHeistActive);
         }
 
         if (isInLobby) return;
