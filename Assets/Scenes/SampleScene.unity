@@ -409,6 +409,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5311347295071972441, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
   m_PrefabInstance: {fileID: 6731034799328980482}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &265209569
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 265209571}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &265209571
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 265209569}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -769,6 +800,25 @@ Transform:
   - {fileID: 127213702}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &906337320 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2033452563477103702, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+  m_PrefabInstance: {fileID: 6731034799328980482}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &906337325
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 906337320}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c6556701af9e04380698b89f691b6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioListener
+  nonRigidbodyVelocity: 0
+  attenuationObject: {fileID: 0}
 --- !u!1 &914051104
 GameObject:
   m_ObjectHideFlags: 0
@@ -2277,6 +2327,54 @@ PrefabInstance:
       propertyPath: uiRef
       value: 
       objectReference: {fileID: 2069931951}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: jumpEventPath
+      value: event:/Player/Land
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: landEvent.Path
+      value: event:/Player/Land
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: footstepEventPath
+      value: event:/Player/Player_Footstep
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: footstepEvent.Path
+      value: event:/Player/Player_Footstep
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: landEvent.Guid.Data1
+      value: 1438176865
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: landEvent.Guid.Data2
+      value: 1271092848
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: landEvent.Guid.Data3
+      value: 1778597818
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: landEvent.Guid.Data4
+      value: -1934231790
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: footstepEvent.Guid.Data1
+      value: -1315216641
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: footstepEvent.Guid.Data2
+      value: 1151331948
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: footstepEvent.Guid.Data3
+      value: 1016496260
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: footstepEvent.Guid.Data4
+      value: -1767202063
+      objectReference: {fileID: 0}
     - target: {fileID: 4827404246902077155, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
       propertyPath: m_Name
       value: PlayerModel
@@ -2345,10 +2443,14 @@ PrefabInstance:
       propertyPath: m_Avatar
       value: 
       objectReference: {fileID: 9000000, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 0}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2033452563477103702, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 906337325}
   m_SourcePrefab: {fileID: 100100000, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
@@ -2362,3 +2464,4 @@ SceneRoots:
   - {fileID: 878608470}
   - {fileID: 2069931952}
   - {fileID: 2034784925}
+  - {fileID: 265209571}
