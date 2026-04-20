@@ -1,37 +1,52 @@
 using UnityEngine;
+using FMODUnity;
+using FMOD.Studio;
 
 public class DestructibleWall : MonoBehaviour
 {
-    public int health = 3;
-
-    [Header("Audio Setup")]
-    public AudioClip destroySound;
+    public int maxHits = 3;
+    private int currentHits = 0;
+    private bool isDestroyed = false;
+    
+    [Header("FMOD")]
+    public EventReference wallHitEvent;
+    
+    [Header("Cooldown Settings")]
+    public float hitCooldown = 2.2f;   // 2.2 секунды между ударами (под анимацию молота)
+    private float lastHitTime = -1f;
 
     public void TakeDamage(int damage)
     {
-        health -= damage;
-        Debug.Log($"Стена получила {damage} урона. Осталось HP: {health}");
+        // Защита от ударов после разрушения
+        if (isDestroyed) return;
         
-        if (health <= 0)
+        // Защита от слишком частых ударов (ждём 2.2 секунды)
+        if (Time.time - lastHitTime < hitCooldown)
         {
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.StartHeist();
-            }
+            Debug.Log($"Удар проигнорирован: прошло всего {Time.time - lastHitTime:F2} секунд");
+            return;
+        }
+        
+        lastHitTime = Time.time;
+        currentHits++;
+        Debug.Log($"Удар #{currentHits} по стене в {Time.time:F2}");
+        
+        // Создаём и запускаем звук
+        EventInstance hitInstance = RuntimeManager.CreateInstance(wallHitEvent);
+        RuntimeManager.AttachInstanceToGameObject(hitInstance, transform, GetComponent<Rigidbody>());
+        hitInstance.setParameterByName("HitNumber", currentHits);
+        hitInstance.start();
+        hitInstance.release();
+        
+        if (currentHits >= maxHits)
+        {
             BreakWall();
         }
     }
-
+    
     private void BreakWall()
     {
-        Debug.Log("Стена разрушена!");
-        
-        if (destroySound != null)
-        {
-            // PlayClipAtPoint позволяет звуку доиграть даже после удаления стены
-            AudioSource.PlayClipAtPoint(destroySound, transform.position);
-        }
-
+        isDestroyed = true;
         Destroy(gameObject);
     }
 }

@@ -2277,6 +2277,46 @@ PrefabInstance:
       propertyPath: uiRef
       value: 
       objectReference: {fileID: 2069931951}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: landEvent.Path
+      value: event:/Player/Land
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: footstepEvent.Path
+      value: event:/Player/Player_Footstep
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: landEvent.Guid.Data1
+      value: 1438176865
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: landEvent.Guid.Data2
+      value: 1271092848
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: landEvent.Guid.Data3
+      value: 1778597818
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: landEvent.Guid.Data4
+      value: -1934231790
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: footstepEvent.Guid.Data1
+      value: -1315216641
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: footstepEvent.Guid.Data2
+      value: 1151331948
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: footstepEvent.Guid.Data3
+      value: 1016496260
+      objectReference: {fileID: 0}
+    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      propertyPath: footstepEvent.Guid.Data4
+      value: -1767202063
+      objectReference: {fileID: 0}
     - target: {fileID: 4827404246902077155, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
       propertyPath: m_Name
       value: PlayerModel
@@ -2345,11 +2385,35 @@ PrefabInstance:
       propertyPath: m_Avatar
       value: 
       objectReference: {fileID: 9000000, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 0}
+    - {fileID: 0}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2033452563477103702, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6731034799328980484}
   m_SourcePrefab: {fileID: 100100000, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+--- !u!1 &6731034799328980483 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2033452563477103702, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
+  m_PrefabInstance: {fileID: 6731034799328980482}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6731034799328980484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6731034799328980483}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86c6556701af9e04380698b89f691b6e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FMODUnity::FMODUnity.StudioListener
+  nonRigidbodyVelocity: 0
+  attenuationObject: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

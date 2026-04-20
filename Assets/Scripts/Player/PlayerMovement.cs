@@ -1,5 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using FMODUnity;
+using FMOD.Studio;
 
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
@@ -18,16 +20,15 @@ public class PlayerMovement : MonoBehaviour
     private float currentStamina;
 
     [Header("Weight Penalties")]
-    [Tooltip("Speed penalty per $100 in bag")]
     public float weightSpeedPenalty = 0.05f;
-    [Tooltip("Minimum speed limit regardless of weight")]
     public float minWeightSpeed = 2.0f;
 
-    [Header("Audio")]
-    public AudioSource audioSource;
-    public AudioClip jumpSound;
-    public AudioClip[] footstepSounds;
-    private float footstepTimer = 0f;
+    [Header("FMOD Audio")]
+    public EventReference footstepEvent;
+    public EventReference landEvent;
+    public EventReference jumpEvent;
+    
+    [Header("Step Timing")]
     public float walkFootstepInterval = 0.5f;
     public float sprintFootstepInterval = 0.3f;
 
@@ -39,6 +40,8 @@ public class PlayerMovement : MonoBehaviour
 
     private CharacterController controller;
     private Vector3 velocity;
+    private float footstepTimer = 0f;
+    private bool wasGrounded = true;
 
     void Start()
     {
@@ -48,9 +51,7 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (controller != null && !controller.enabled) return;
-
-        bool isGrounded = controller.isGrounded || Physics.Raycast(transform.position, Vector3.down, (controller.height / 2f) + 0.2f);
+        bool isGrounded = controller.isGrounded;
         
         if (isGrounded && velocity.y < 0)
         {
@@ -116,14 +117,16 @@ public class PlayerMovement : MonoBehaviour
             uiRef.UpdateStamina(currentStamina, maxStamina);
         }
 
-        // Звуки шагов
+        // Звуки шагов (FMOD)
+        float currentStepInterval = isSprinting ? sprintFootstepInterval : walkFootstepInterval;
+        
         if (isMoving && isGrounded)
         {
             footstepTimer -= Time.deltaTime;
             if (footstepTimer <= 0f)
             {
                 PlayFootstepSound();
-                footstepTimer = isSprinting ? sprintFootstepInterval : walkFootstepInterval;
+                footstepTimer = currentStepInterval;
             }
         }
         else
@@ -140,52 +143,62 @@ public class PlayerMovement : MonoBehaviour
                 {
                     currentStamina -= jumpStaminaCost;
                     velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-                    
-                    if (audioSource != null && jumpSound != null)
-                    {
-                        audioSource.PlayOneShot(jumpSound);
-                    }
-
-                    if (animator != null)
-                    {
-                        animator.SetTrigger("Jump");
-                    }
+                    PlayJumpSound();
                 }
-                else
-                {
-                    Debug.Log("[Player] Недостаточно стамины для прыжка!");
-                }
-            }
-            else
-            {
-                Debug.Log("[Player] Прыжок отменен: Игрок не на земле (isGrounded = false).");
             }
         }
 
         // Применяем гравитацию
         velocity.y += gravity * Time.deltaTime;
 
-        // ЕДИНЫЙ вызов Move (решает проблему мерцания isGrounded)
+        // Движение
         Vector3 finalVelocity = (move * applySpeed) + velocity;
         controller.Move(finalVelocity * Time.deltaTime);
+
+        // --- ПРИЗЕМЛЕНИЕ ---
+        if (isGrounded && !wasGrounded)
+        {
+            PlayLandSound();
+        }
 
         // --- Анимации ---
         if (animator != null)
         {
-            // Передаем скорость: 0 - стоит, 1 - идет, 2 - бежит. 
-            // 0.1f - это время сглаживания перехода.
             float animSpeed = isMoving ? (isSprinting ? 2f : 1f) : 0f;
             animator.SetFloat("Speed", animSpeed, 0.1f, Time.deltaTime);
             animator.SetBool("IsGrounded", isGrounded);
         }
+
+        wasGrounded = isGrounded;
     }
 
     private void PlayFootstepSound()
     {
-        if (audioSource != null && footstepSounds != null && footstepSounds.Length > 0)
-        {
-            int index = Random.Range(0, footstepSounds.Length);
-            audioSource.PlayOneShot(footstepSounds[index], 0.3f);
-        }
+        if (footstepEvent.IsNull) return;
+        
+        EventInstance footsteps = RuntimeManager.CreateInstance(footstepEvent);
+        RuntimeManager.AttachInstanceToGameObject(footsteps, transform, GetComponent<Rigidbody>());
+        footsteps.start();
+        footsteps.release();
+    }
+
+    private void PlayJumpSound()
+    {
+        if (jumpEvent.IsNull) return;
+        
+        EventInstance jump = RuntimeManager.CreateInstance(jumpEvent);
+        RuntimeManager.AttachInstanceToGameObject(jump, transform, GetComponent<Rigidbody>());
+        jump.start();
+        jump.release();
+    }
+
+    private void PlayLandSound()
+    {
+        if (landEvent.IsNull) return;
+        
+        EventInstance land = RuntimeManager.CreateInstance(landEvent);
+        RuntimeManager.AttachInstanceToGameObject(land, transform, GetComponent<Rigidbody>());
+        land.start();
+        land.release();
     }
 }
