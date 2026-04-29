@@ -7,7 +7,6 @@ public class ExtractionZone : MonoBehaviour
     public string vanName = "Van";
     public UnityEvent onMissionSuccess;
 
-    private bool missionComplete = false;
 
     private void OnTriggerEnter(Collider other)
     {

@@ -18,11 +18,9 @@ public class SocketData
 public class LevelGenerator : MonoBehaviour
 {
     [Header("Generation Settings (Dynamic)")]
-    // Текущий выбранный пресет карты (позже будет передаваться из Лобби)
+    public LevelPreset defaultPreset; // Пресет по умолчанию для тестов
     public LevelPreset activePreset; 
     
-    public int minRooms = 10;
-    public int maxRooms = 20;
     [Tooltip("Retry count if generated rooms are less than minRooms")]
     public int maxRetries = 3;
 
@@ -124,7 +122,8 @@ public class LevelGenerator : MonoBehaviour
 
             yield return StartCoroutine(BuildSimulation());
 
-            if (generatedRoomsCount >= minRooms)
+            int minR = activePreset != null ? activePreset.minRooms : 10;
+            if (generatedRoomsCount >= minR)
             {
                 generationSuccess = true;
                 SealDeadEnds();
@@ -132,14 +131,15 @@ public class LevelGenerator : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"<color=red>[Gen] Сбой попытки #{currentAttempt + 1}: сгенерировано {generatedRoomsCount} комнат, что меньше минимума ({minRooms}).</color>");
+                Debug.LogWarning($"<color=red>[Gen] Сбой попытки #{currentAttempt + 1}: сгенерировано {generatedRoomsCount} комнат, что меньше минимума ({minR}).</color>");
                 currentAttempt++;
             }
         }
 
         if (!generationSuccess)
         {
-            Debug.LogError($"<color=red>[Gen] ФАТАЛЬНАЯ ОШИБКА: Не удалось достичь minRooms ({minRooms}) за {maxRetries} попыток! Оставляем последний результат.</color>");
+            int minR = activePreset != null ? activePreset.minRooms : 10;
+            Debug.LogError($"<color=red>[Gen] ФАТАЛЬНАЯ ОШИБКА: Не удалось достичь minRooms ({minR}) за {maxRetries} попыток! Оставляем последний результат.</color>");
             SealDeadEnds();
         }
     }
@@ -167,8 +167,10 @@ public class LevelGenerator : MonoBehaviour
 
         AddSocketsToStack(startObj, 1);
 
+        int maxR = activePreset != null ? activePreset.maxRooms : 20;
+
         // 3. Основной цикл
-        while (openSockets.Count > 0 && generatedRoomsCount < maxRooms)
+        while (openSockets.Count > 0 && generatedRoomsCount < maxR)
         {
             SocketData currentData = openSockets.Pop();
             RoomSocket targetSocket = currentData.socket;
@@ -253,7 +255,9 @@ public class LevelGenerator : MonoBehaviour
     {
         string report = "<color=#00FF00><b>=== ОТЧЕТ ГЕНЕРАЦИИ УРОВНЯ ===</b></color>\n";
         report += $"▪ Успешно на попытке: <b>{attempts} из {maxRetries}</b>\n";
-        report += $"▪ Всего комнат: <b>{generatedRoomsCount} / {maxRooms}</b> (Мин: {minRooms})\n";
+        int minR = activePreset != null ? activePreset.minRooms : 10;
+        int maxR = activePreset != null ? activePreset.maxRooms : 20;
+        report += $"▪ Всего комнат: <b>{generatedRoomsCount} / {maxR}</b> (Мин: {minR})\n";
         report += $"▪ Уникальные комнаты:\n";
         report += $"   - Хранилище (Vault): {(vaultSpawned ? "<color=green>Да</color>" : "<color=red>Нет</color>")}\n";
         report += $"   - Охранная (Security): {(securitySpawned ? "<color=green>Да</color>" : "<color=red>Нет</color>")}\n";

@@ -2,7 +2,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class HammerTool : MonoBehaviour
+public class HammerTool : EquipableItem
 {
     [Header("References")]
     [Tooltip("Player camera for raycasting")]
@@ -21,8 +21,12 @@ public class HammerTool : MonoBehaviour
     public LayerMask hitMask = ~0;
 
     [Header("Animation Timings")]
-    public float equipDelay = 0.3f;
-    public float unequipDelay = 0.4f;
+    public float equipDelay = 0.1f;
+    public float unequipDelay = 0.2f;
+
+    [Header("Animator Layer Settings")]
+    [Tooltip("Название слоя в Аниматоре, которым управляет этот предмет (например, Hammer Layer)")]
+    public string animatorLayerName = "Hammer Layer";
 
     private float nextSwingTime = 0f;
     [SerializeField] private bool isArmed = true; 
@@ -41,47 +45,67 @@ public class HammerTool : MonoBehaviour
 
     void Update()
     {
-        // Переключение молота на Q
-        if (Keyboard.current != null && Keyboard.current.qKey.wasPressedThisFrame)
+        // Убрали старую логику Q и ЛКМ. Инвентарь теперь рулит!
+    }
+
+    public override void Equip()
+    {
+        // gameObject.SetActive(true); // БОЛЬШЕ НЕ ВЫКЛЮЧАЕМ ВЕСЬ ОБЪЕКТ
+        isTransitioning = true;
+        
+        if (animator != null) 
         {
-            if (!isTransitioning)
+            animator.SetBool("IsArmed", true);
+            int layerIndex = animator.GetLayerIndex(animatorLayerName);
+            if (layerIndex != -1) 
             {
-                ToggleHammer();
+                animator.SetLayerWeight(layerIndex, 1f);
+                Debug.Log($"[Hammer] Слой {animatorLayerName} (индекс {layerIndex}) активирован. Вес: {animator.GetLayerWeight(layerIndex)}");
             }
             else
             {
-                Debug.Log("[Hammer] Кажется, анимация еще проигрывается...");
+                Debug.LogWarning($"[Hammer] ОШИБКА: Слой с именем '{animatorLayerName}' не найден в Аниматоре!");
             }
         }
+        else
+        {
+            Debug.LogError("[Hammer] ОШИБКА: Ссылка на Animator не назначена в инспекторе!");
+        }
+        
+        if (hammerMesh != null) hammerMesh.SetActive(true); 
+        
+        StopAllCoroutines();
+        StartCoroutine(EquipRoutine());
+    }
 
-        // Удар на ЛКМ
-        if (isArmed && !isTransitioning && Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame && Time.time >= nextSwingTime)
+    public override void Unequip()
+    {
+        isTransitioning = true;
+        if (animator != null) 
+        {
+            animator.SetBool("IsArmed", false);
+        }
+        
+        // Модель скрываем после задержки или сразу, если нужно быстро. 
+        // Если есть анимация убирания 'remove', лучше скрыть в корутине.
+        StopAllCoroutines();
+        StartCoroutine(UnequipRoutine());
+    }
+
+    public override void PrimaryAction()
+    {
+        if (!isTransitioning && Time.time >= nextSwingTime)
         {
             Swing();
             nextSwingTime = Time.time + swingCooldown;
         }
     }
 
-    void ToggleHammer()
-    {
-        isArmed = !isArmed;
-        isTransitioning = true;
-        Debug.Log($"[Hammer] Нажато Q. Состояние IsArmed теперь: {isArmed}");
-
-        if (animator != null)
-        {
-            animator.SetBool("IsArmed", isArmed);
-        }
-
-        StopAllCoroutines(); // Прерываем прошлые попытки, если они были
-        if (isArmed) StartCoroutine(EquipRoutine());
-        else StartCoroutine(UnequipRoutine());
-    }
+    // Старый ToggleHammer удален, так как этим теперь занимается PlayerInventory
 
     IEnumerator EquipRoutine()
     {
         yield return new WaitForSeconds(equipDelay);
-        if (hammerMesh != null) hammerMesh.SetActive(true);
         isTransitioning = false;
         Debug.Log("[Hammer] Молот экипирован.");
     }
@@ -89,7 +113,15 @@ public class HammerTool : MonoBehaviour
     IEnumerator UnequipRoutine()
     {
         yield return new WaitForSeconds(unequipDelay);
-        if (hammerMesh != null) hammerMesh.SetActive(false);
+        if (hammerMesh != null) hammerMesh.SetActive(false); 
+        
+        // Сбрасываем вес слоя в 0, чтобы ходьба из Base Layer снова стала видна полностью
+        if (animator != null)
+        {
+            int layerIndex = animator.GetLayerIndex(animatorLayerName);
+            if (layerIndex != -1) animator.SetLayerWeight(layerIndex, 0f);
+        }
+
         isTransitioning = false;
         Debug.Log("[Hammer] Молот убран.");
     }
@@ -106,12 +138,14 @@ public class HammerTool : MonoBehaviour
             if (hasHit)
             {
                 animator.SetTrigger("Hit");
+                Debug.Log("[Hammer] Триггер Hit отправлен.");
                 DestructibleWall wall = hit.collider.GetComponentInParent<DestructibleWall>();
                 if (wall != null) wall.TakeDamage(damage);
             }
             else
             {
                 animator.SetTrigger("Miss");
+                Debug.Log("[Hammer] Триггер Miss отправлен.");
             }
         }
     }

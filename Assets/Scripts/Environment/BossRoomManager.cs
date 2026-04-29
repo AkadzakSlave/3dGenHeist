@@ -1,9 +1,10 @@
 using System.Collections;
 using UnityEngine;
-using TMPro;
 using UnityEngine.Events;
+using TMPro;
+using FMODUnity;
+using FMOD.Studio;
 
-[RequireComponent(typeof(AudioSource))]
 public class BossRoomManager : MonoBehaviour
 {
     public static BossRoomManager Instance { get; private set; }
@@ -12,10 +13,12 @@ public class BossRoomManager : MonoBehaviour
     [Tooltip("Текстовый экран за спиной босса, где крутятся цифры")]
     public TextMeshProUGUI quotaMonitorText;
 
-    [Header("Audio")]
-    public AudioClip countSound;
-    public AudioClip gunshotSound;
-    public AudioClip successSound;
+    [Header("Audio (FMOD)")]
+    public EventReference countEvent;
+    public EventReference gunshotEvent;
+    public EventReference successEvent;
+
+    private EventInstance countInstance;
 
     [Header("Animations / Hooks")]
     public float bossShootAnimDuration = 1.5f;
@@ -29,8 +32,6 @@ public class BossRoomManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
-
-        audioSource = GetComponent<AudioSource>();
     }
 
     public void CheckConsoleInteraction()
@@ -54,11 +55,11 @@ public class BossRoomManager : MonoBehaviour
         float timer = 0f;
 
         // ПУНКТ 1: Анимация счета от 0 до targetCollected
-        if (audioSource != null && countSound != null)
+        if (!countEvent.IsNull)
         {
-            audioSource.clip = countSound;
-            audioSource.loop = true;
-            audioSource.Play();
+            countInstance = RuntimeManager.CreateInstance(countEvent);
+            RuntimeManager.AttachInstanceToGameObject(countInstance, gameObject);
+            countInstance.start();
         }
 
         while (timer < animDuration)
@@ -76,10 +77,10 @@ public class BossRoomManager : MonoBehaviour
             yield return null;
         }
 
-        if (audioSource != null && audioSource.isPlaying)
+        if (countInstance.isValid())
         {
-            audioSource.Stop();
-            audioSource.loop = false;
+            countInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            countInstance.release();
         }
 
         // ПУНКТ 2: Анализ результатов (успех/провал)
@@ -88,7 +89,13 @@ public class BossRoomManager : MonoBehaviour
             // УСПЕХ
             if (quotaMonitorText != null) quotaMonitorText.color = Color.green;
             
-            if (audioSource != null && successSound != null) audioSource.PlayOneShot(successSound);
+            if (!successEvent.IsNull)
+            {
+                EventInstance success = RuntimeManager.CreateInstance(successEvent);
+                RuntimeManager.AttachInstanceToGameObject(success, gameObject);
+                success.start();
+                success.release();
+            }
             onBossSuccess?.Invoke();
             Debug.Log("[BossRoom] Квота выполнена! Текст зеленый. Ждем 3 сек...");
 
@@ -112,7 +119,13 @@ public class BossRoomManager : MonoBehaviour
             yield return new WaitForSeconds(bossShootAnimDuration);
 
             // Выстрел и моментально черный экран (имитация смерти)
-            if (audioSource != null && gunshotSound != null) audioSource.PlayOneShot(gunshotSound);
+            if (!gunshotEvent.IsNull)
+            {
+                EventInstance gunshot = RuntimeManager.CreateInstance(gunshotEvent);
+                RuntimeManager.AttachInstanceToGameObject(gunshot, gameObject);
+                gunshot.start();
+                gunshot.release();
+            }
             
             if (GameManager.Instance.heistUI != null)
             {

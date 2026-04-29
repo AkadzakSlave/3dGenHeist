@@ -12,16 +12,42 @@ public class GameManager : MonoBehaviour
     public int completedQuotas = 0;
 
     [Header("Operation Settings (Campaign)")]
-    public int currentDay = 1;
+    [SerializeField] private int _curDay = 1; public int currentDay { get => _curDay; set => _curDay = value; }
     public int operationTargetQuota = 3000;
     public int accumulatedOperationMoney = 0;
     public LevelPreset activeOperationPreset;
+    public List<LevelPreset> unlockedPresets = new List<LevelPreset>();
     
-    [Header("Current Heist Data (Read Only)")]
-    public int bagMoney = 0;
+    [Header("Current Heist Session (Live)")]
     public int depositedMoney = 0;
-    public int currentWeight = 0;
-    public int maxWeight = 40;
+    public int maxWeight = 80;
+
+    public int bagMoney
+    {
+        get
+        {
+            BagTool bag = GetHeldBag();
+            return bag != null ? bag.storedMoney : 0;
+        }
+    }
+
+    public int currentWeight
+    {
+        get
+        {
+            return PlayerInventory.Instance != null ? PlayerInventory.Instance.GetTotalWeight() : 0;
+        }
+    }
+
+    public BagTool GetHeldBag()
+    {
+        if (PlayerInventory.Instance == null) return null;
+        foreach (var item in PlayerInventory.Instance.slots)
+        {
+            if (item is BagTool bag) return bag;
+        }
+        return null;
+    }
 
     [Header("Timer Settings")]
     public float heistTimer = 300f; // 5 минут
@@ -105,14 +131,22 @@ public class GameManager : MonoBehaviour
 
     public void StartOperation(LevelPreset preset)
     {
+        // ПРОВЕРКА ДЕНЕГ (Входной билет)
+        if (globalBankBalance < preset.entryFee)
+        {
+            Debug.LogError($"[Economy] Недостаточно денег для перелета! Нужно: ${preset.entryFee}, у вас: ${globalBankBalance}");
+            return;
+        }
+
+        globalBankBalance -= preset.entryFee;
         activeOperationPreset = preset;
         currentDay = 1;
         accumulatedOperationMoney = 0;
         
-        // Масштабирование сложности (пример: базовая квота 3000 растет с каждой победой)
+        // Масштабирование сложности (квота растет с каждой победой игрока)
         operationTargetQuota = 3000 + (completedQuotas * 1500); 
         
-        Debug.Log($"<color=cyan>[GameManager] Операция начата! Штат: {preset.levelName}. Квота: {operationTargetQuota}</color>");
+        Debug.Log($"<color=cyan>[GameManager] Операция начата! Штат: {preset.levelName}. Платный вход: ${preset.entryFee}. Квота: {operationTargetQuota}</color>");
         StartLoadingHeist(preset);
     }
 
@@ -139,9 +173,13 @@ public class GameManager : MonoBehaviour
     {
         if (heistUI != null) heistUI.ShowLoadingScreen();
 
-        bagMoney = 0;
+        BagTool bag = GetHeldBag();
+        if (bag != null)
+        {
+            bag.storedMoney = 0;
+            bag.storedWeight = 0;
+        }
         depositedMoney = 0;
-        currentWeight = 0;
         heistTimer = 300f; 
         isHeistActive = false;
         reinforcementCount = 0;
@@ -228,6 +266,19 @@ public class GameManager : MonoBehaviour
             globalBankBalance += profit;
             completedQuotas++;
             Debug.Log($"<color=green>[Economy] Прибыль после уплаты квоты: ${profit}. Общий баланс: ${globalBankBalance}</color>");
+
+            // РАЗБЛОКИРОВКА НОВЫХ ШТАТОВ
+            if (activeOperationPreset != null && activeOperationPreset.unlockPresets != null)
+            {
+                foreach (var nextPreset in activeOperationPreset.unlockPresets)
+                {
+                    if (!unlockedPresets.Contains(nextPreset))
+                    {
+                        unlockedPresets.Add(nextPreset);
+                        Debug.Log($"<color=yellow>[Progression] Разблокирован новый штат: {nextPreset.levelName}!</color>");
+                    }
+                }
+            }
             
             // Если мы выиграли, покажем черный экран для перехода в Лобби, так как BossRoomManager его не показывал
             if (heistUI != null) heistUI.ShowLoadingScreen();
@@ -272,20 +323,14 @@ public class GameManager : MonoBehaviour
         heistTimer = 60f;
     }
 
-    public void AddMoneyToBag(int amount, int weight)
-    {
-        bagMoney += amount;
-        currentWeight += weight;
-        onMoneyChanged?.Invoke();
-    }
-
     public void DepositBag()
     {
-        if (bagMoney <= 0) return;
+        BagTool bag = GetHeldBag();
+        if (bag == null || bag.storedMoney <= 0) return;
 
-        depositedMoney += bagMoney;
-        bagMoney = 0;
-        currentWeight = 0;
+        depositedMoney += bag.storedMoney;
+        bag.storedMoney = 0;
+        bag.storedWeight = 0;
         
         if (audioSource != null && depositSound != null)
         {

@@ -33,7 +33,7 @@ public class DestructibleWall : MonoBehaviour
         
         // Создаём и запускаем звук
         EventInstance hitInstance = RuntimeManager.CreateInstance(wallHitEvent);
-        RuntimeManager.AttachInstanceToGameObject(hitInstance, transform, GetComponent<Rigidbody>());
+        RuntimeManager.AttachInstanceToGameObject(hitInstance, gameObject);
         hitInstance.setParameterByName("HitNumber", currentHits);
         hitInstance.start();
         hitInstance.release();
@@ -47,6 +47,13 @@ public class DestructibleWall : MonoBehaviour
     private void BreakWall()
     {
         isDestroyed = true;
+        
+        // ЗАПУСК ОГРАБЛЕНИЯ: Таймер, Сирены, Полиция
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.StartHeist();
+        }
+
         Destroy(gameObject);
     }
 }

@@ -21,17 +21,28 @@ public class LootItem : MonoBehaviour, IInteractable
 
     public void Collect()
     {
-        if (GameManager.Instance != null)
+        if (PlayerInventory.Instance != null)
         {
-            GameManager.Instance.AddMoneyToBag(value, weight);
-        }
+            EquipableItem activeItem = PlayerInventory.Instance.GetActiveItem();
+            if (activeItem is BagTool bag)
+            {
+                if (bag.AddLoot(value, weight))
+                {
+                    if (GameManager.Instance != null) GameManager.Instance.onMoneyChanged?.Invoke();
+                    
+                    if (collectSound != null)
+                    {
+                        AudioSource.PlayClipAtPoint(collectSound, transform.position);
+                    }
 
-        if (collectSound != null)
-        {
-            AudioSource.PlayClipAtPoint(collectSound, transform.position);
+                    Debug.Log($"[Loot] Собрано: {itemName} за ${value}");
+                    Destroy(gameObject);
+                }
+            }
+            else
+            {
+                Debug.Log("[Loot] Невозможно собрать: Возьмите сумку в руки!");
+            }
         }
-
-        Debug.Log($"[Loot] Собрано: {itemName} за ${value}");
-        Destroy(gameObject);
     }
 }

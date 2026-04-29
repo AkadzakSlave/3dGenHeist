@@ -324,6 +324,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08c30bfac6efaf249a836fb9585de3f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HammerTool
+  itemData: {fileID: 0}
   playerCamera: {fileID: 396266648190725249}
   hammerMesh: {fileID: 0}
   animator: {fileID: 0}
@@ -423,14 +424,13 @@ GameObject:
   - component: {fileID: 1848253652476807687}
   - component: {fileID: 3210748195382050501}
   - component: {fileID: 6625755293924811486}
-  - component: {fileID: 2101520048917844783}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5776733252562902031
 Transform:
   m_ObjectHideFlags: 0
@@ -469,11 +469,27 @@ MonoBehaviour:
   jumpStaminaCost: 5
   weightSpeedPenalty: 0.1
   minWeightSpeed: 2
-  audioSource: {fileID: 2101520048917844783}
-  jumpSound: {fileID: 8300000, guid: 75b3be8bf10e88745ae8259d06f9b5d4, type: 3}
-  footstepSounds:
-  - {fileID: 8300000, guid: 6db734844f9b04c458e719faecbc5bc1, type: 3}
-  - {fileID: 8300000, guid: fdc4173ac3531cf48a7f8f7d92c55119, type: 3}
+  footstepEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  landEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  jumpEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
   walkFootstepInterval: 0.5
   sprintFootstepInterval: 0.3
   animator: {fileID: 0}
@@ -601,103 +617,6 @@ CharacterController:
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
   m_Center: {x: 0, y: 0, z: 0}
---- !u!82 &2101520048917844783
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7797165582068785380}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
-  m_PlayOnAwake: 0
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 0
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0.01
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!1001 &232308596950715280
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -808,6 +727,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08c30bfac6efaf249a836fb9585de3f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HammerTool
+  itemData: {fileID: 0}
   playerCamera: {fileID: 396266648190725249}
   hammerMesh: {fileID: 0}
   animator: {fileID: 0}

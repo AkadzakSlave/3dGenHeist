@@ -39,6 +39,10 @@ public class PlayerMovement : MonoBehaviour
     public HeistUI uiRef;
 
     private CharacterController controller;
+    [Header("Debug Status (Read Only)")]
+    [SerializeField] private float currentSpeedDisplay;
+    [SerializeField] private float currentWeightDisplay;
+    [SerializeField] private bool isGroundedDisplay;
     private Vector3 velocity;
     private float footstepTimer = 0f;
     private bool wasGrounded = true;
@@ -51,6 +55,8 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        if (controller == null || !controller.enabled) return;
+
         bool isGrounded = controller.isGrounded;
         
         if (isGrounded && velocity.y < 0)
@@ -79,24 +85,29 @@ public class PlayerMovement : MonoBehaviour
             if (move.magnitude > 1f) move.Normalize();
         }
 
-        // Логика расчета скорости с учетом веса
+        // Логика расчета скорости с учетом веса (Плавное замедление)
         float currentMaxSpeed = walkSpeed;
-        bool isOverweight = false;
+        float weightFactor = 0f;
 
         if (GameManager.Instance != null)
         {
-            if (GameManager.Instance.currentWeight > GameManager.Instance.maxWeight)
-            {
-                isOverweight = true;
-                currentMaxSpeed = minWeightSpeed;
-            }
+            float weight = GameManager.Instance.currentWeight;
+            float max = GameManager.Instance.maxWeight;
+            
+            // Рассчитываем множитель замедления (чем тяжелее, тем медленнее)
+            // При весе 0 -> множитель 1.0. При весе Max -> множитель minWeightSpeed / walkSpeed
+            weightFactor = Mathf.Clamp01(weight / max);
+            float speedMultiplier = Mathf.Lerp(1.0f, minWeightSpeed / walkSpeed, weightFactor);
+            
+            currentMaxSpeed = walkSpeed * speedMultiplier;
         }
 
         float applySpeed = currentMaxSpeed;
         bool isSprinting = false;
 
         // Логика Стамины и Спринта
-        if (!isOverweight && isSprintPressed && isMoving && currentStamina > 0)
+        bool isTooHeavyToSprint = weightFactor >= 1.0f;
+        if (!isTooHeavyToSprint && isSprintPressed && isMoving && currentStamina > 0)
         {
             isSprinting = true;
             applySpeed = sprintSpeed; 
@@ -170,6 +181,11 @@ public class PlayerMovement : MonoBehaviour
         }
 
         wasGrounded = isGrounded;
+
+        // Обновляем дебаг-поля для Инспектора
+        currentSpeedDisplay = applySpeed;
+        currentWeightDisplay = GameManager.Instance != null ? GameManager.Instance.currentWeight : 0;
+        isGroundedDisplay = isGrounded;
     }
 
     private void PlayFootstepSound()
@@ -177,7 +193,7 @@ public class PlayerMovement : MonoBehaviour
         if (footstepEvent.IsNull) return;
         
         EventInstance footsteps = RuntimeManager.CreateInstance(footstepEvent);
-        RuntimeManager.AttachInstanceToGameObject(footsteps, transform, GetComponent<Rigidbody>());
+        RuntimeManager.AttachInstanceToGameObject(footsteps, gameObject);
         footsteps.start();
         footsteps.release();
     }
@@ -187,7 +203,7 @@ public class PlayerMovement : MonoBehaviour
         if (jumpEvent.IsNull) return;
         
         EventInstance jump = RuntimeManager.CreateInstance(jumpEvent);
-        RuntimeManager.AttachInstanceToGameObject(jump, transform, GetComponent<Rigidbody>());
+        RuntimeManager.AttachInstanceToGameObject(jump, gameObject);
         jump.start();
         jump.release();
     }
@@ -197,7 +213,7 @@ public class PlayerMovement : MonoBehaviour
         if (landEvent.IsNull) return;
         
         EventInstance land = RuntimeManager.CreateInstance(landEvent);
-        RuntimeManager.AttachInstanceToGameObject(land, transform, GetComponent<Rigidbody>());
+        RuntimeManager.AttachInstanceToGameObject(land, gameObject);
         land.start();
         land.release();
     }

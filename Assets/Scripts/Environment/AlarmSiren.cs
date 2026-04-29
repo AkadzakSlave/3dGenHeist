@@ -1,25 +1,27 @@
 using UnityEngine;
+using FMODUnity;
+using FMOD.Studio;
 
-[RequireComponent(typeof(AudioSource))]
 public class AlarmSiren : MonoBehaviour
 {
-    private AudioSource audioSource;
+    [Header("Audio (FMOD)")]
+    public EventReference sirenEvent;
+
+    private EventInstance sirenInstance;
     private bool sirenActive = false;
 
     void Awake()
     {
-        audioSource = GetComponent<AudioSource>();
-        // Настраиваем AudioSource для 3D звука по умолчанию
-        audioSource.spatialBlend = 1.0f; 
-        audioSource.loop = true;
-        audioSource.playOnAwake = false;
+        // Настройка будет происходить при создании инстанса
     }
 
     void Start()
     {
-        if (audioSource != null)
+        // Инициализируем инстанс, но не запускаем
+        if (!sirenEvent.IsNull)
         {
-            audioSource.Stop(); // Принудительно глушим при спавне локации, если в префабе стояла галочка PlayOnAwake
+            sirenInstance = RuntimeManager.CreateInstance(sirenEvent);
+            RuntimeManager.AttachInstanceToGameObject(sirenInstance, transform, GetComponent<Rigidbody>());
         }
 
         if (GameManager.Instance != null)
@@ -30,16 +32,22 @@ public class AlarmSiren : MonoBehaviour
 
     void StartSiren()
     {
-        if (audioSource != null && !sirenActive)
+        if (sirenInstance.isValid() && !sirenActive)
         {
             sirenActive = true;
-            audioSource.Play();
-            Debug.Log($"[Siren] Сирена на объекте {gameObject.name} запущена!");
+            sirenInstance.start();
+            Debug.Log($"[Siren] Сирена на объекте {gameObject.name} запущена через FMOD!");
         }
     }
 
     void OnDestroy()
     {
+        if (sirenInstance.isValid())
+        {
+            sirenInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            sirenInstance.release();
+        }
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.onHeistStarted.RemoveListener(StartSiren);

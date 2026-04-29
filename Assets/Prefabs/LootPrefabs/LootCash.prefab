@@ -49,7 +49,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LootItem
   itemName: Money Bag
   value: 100
-  collectSound: {fileID: 8300000, guid: 9e4b967a9e2359d42aaa10841d17d836, type: 3}
+  weight: 5
+  collectSound: {fileID: 0}
 --- !u!33 &8479415062954609583
 MeshFilter:
   m_ObjectHideFlags: 0

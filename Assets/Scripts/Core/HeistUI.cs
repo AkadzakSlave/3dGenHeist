@@ -39,6 +39,8 @@ public class HeistUI : MonoBehaviour
     {
         if (GameManager.Instance == null) return;
 
+        UpdateUI(); // Постоянно синхронизируем UI для плавности веса и денег
+        
         bool isInLobby = GameManager.Instance.isInLobby;
 
         // Показываем/скрываем элементы
