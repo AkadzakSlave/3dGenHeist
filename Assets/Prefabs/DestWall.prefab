@@ -164,11 +164,11 @@ MonoBehaviour:
   maxHits: 1
   wallHitEvent:
     Guid:
-      Data1: 725909081
-      Data2: 1320208053
-      Data3: -1624142683
-      Data4: -2043165746
-    Path: event:/Wall/WallHit
+      Data1: 652168666
+      Data2: 1080039679
+      Data3: 1612940952
+      Data4: -889130441
+    Path: event:/Environment/Wall/WallHit
   hitCooldown: 2.2
 --- !u!33 &2991566348619359799
 MeshFilter:

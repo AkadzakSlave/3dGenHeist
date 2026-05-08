@@ -5,11 +5,17 @@ using TMPro;
 public class HeistUI : MonoBehaviour
 {
     public TextMeshProUGUI bagText;
-    public TextMeshProUGUI quotaText;
     public TextMeshProUGUI weightText;
     public TextMeshProUGUI timerText;
     public TextMeshProUGUI staminaText;
     public GameObject quotaMetBanner;
+
+    [Header("Mission HUD Info")]
+    public TextMeshProUGUI cityNameText;
+    public UnityEngine.UI.Slider quotaProgressSlider;
+    public TextMeshProUGUI quotaText; 
+    public GameObject[] difficultySkulls; 
+
 
     [Header("Placeholders (Future)")]
     public GameObject healthBarPlaceholder;
@@ -34,12 +40,12 @@ public class HeistUI : MonoBehaviour
             quotaMetBanner.SetActive(false);
         }
     }
-
     void Update()
     {
         if (GameManager.Instance == null) return;
 
         UpdateUI(); // Постоянно синхронизируем UI для плавности веса и денег
+        UpdateMissionInfo(); // Обновляем информацию о городе и квоте
         
         bool isInLobby = GameManager.Instance.isInLobby;
 
@@ -125,6 +131,41 @@ public class HeistUI : MonoBehaviour
         if (quotaMetBanner != null)
         {
             quotaMetBanner.SetActive(true);
+        }
+    }
+    private void UpdateMissionInfo()
+    {
+        var gm = GameManager.Instance;
+        if (gm == null || gm.activeOperationPreset == null) return;
+
+        // 1. Город (из структуры CityConfig)
+        int dayIndex = Mathf.Clamp(gm.currentDay - 1, 0, gm.activeOperationPreset.cities.Count - 1);
+        string currentCity = gm.activeOperationPreset.cities[dayIndex].cityName;
+        if (cityNameText != null) cityNameText.text = $"{gm.activeOperationPreset.levelName}: {currentCity}";
+
+        // 2. Прогресс квоты
+        if (quotaProgressSlider != null)
+        {
+            quotaProgressSlider.maxValue = gm.operationTargetQuota;
+            quotaProgressSlider.value = gm.accumulatedOperationMoney + gm.depositedMoney;
+        }
+        if (quotaText != null) 
+            quotaText.text = $"${gm.accumulatedOperationMoney + gm.depositedMoney} / ${gm.operationTargetQuota}";
+
+        // 3. Черепа сложности (берем из выбранного досье)
+        int difficulty = 1;
+        if (gm.selectedDossier != null) difficulty = gm.selectedDossier.difficultyLevel;
+        UpdateSkulls(difficulty); 
+    }
+
+    private void UpdateSkulls(int level)
+    {
+        if (difficultySkulls == null || difficultySkulls.Length == 0) return;
+
+        for (int i = 0; i < difficultySkulls.Length; i++)
+        {
+            if (difficultySkulls[i] != null)
+                difficultySkulls[i].SetActive(i < level);
         }
     }
 }

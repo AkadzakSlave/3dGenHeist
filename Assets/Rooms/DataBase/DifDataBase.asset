@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5a3da3b61b31df4489a1c521a460b82, type: 3}
+  m_Name: DifDataBase
+  m_EditorClassIdentifier: Assembly-CSharp::DifficultyDatabase
+  difficultyPresets:
+  - {fileID: 11400000, guid: 20faa699c08b1044e934f5c9b5f41db3, type: 2}
+  - {fileID: 11400000, guid: 79f3328fedf56a24394b0d63fb22d651, type: 2}
+  - {fileID: 11400000, guid: 73ccb68844d215e45a20243dec5a9608, type: 2}
+  - {fileID: 11400000, guid: b21d64594c38eb047a35cb279b00ce90, type: 2}
+  - {fileID: 11400000, guid: f4ccca8e5eefa7d4bbb2a7fa39c16577, type: 2}
+  - {fileID: 11400000, guid: 6ab681c7e8790b847a6148144c4f8348, type: 2}
+  - {fileID: 11400000, guid: 2bdeb6d6284038c4e8c31b13c942648a, type: 2}
+  - {fileID: 11400000, guid: 004a351bc3a2dc8408740a6fa43b4803, type: 2}
+  - {fileID: 11400000, guid: d6677de56c458234493454ad660fb515, type: 2}
+  - {fileID: 11400000, guid: 905160308940ac14aa1a5992c8cfe80d, type: 2}

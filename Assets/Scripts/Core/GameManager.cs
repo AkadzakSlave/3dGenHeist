@@ -15,6 +15,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int _curDay = 1; public int currentDay { get => _curDay; set => _curDay = value; }
     public int operationTargetQuota = 3000;
     public int accumulatedOperationMoney = 0;
+    public int sessionMoney = 0; // Деньги для закупки внутри текущего забега
     public LevelPreset activeOperationPreset;
     public List<LevelPreset> unlockedPresets = new List<LevelPreset>();
     
@@ -49,6 +50,15 @@ public class GameManager : MonoBehaviour
         return null;
     }
 
+    [Header("UI References")]
+    public HeistUI heistUI;
+    public DonResultUI donResultUI;
+
+    [Header("Difficulty & Dossiers")]
+    public DifficultyDatabase difficultyDatabase;
+    public BankDossier[] bankDossiers; // 2 объекта в грузовике
+    public BankDossier selectedDossier;
+
     [Header("Timer Settings")]
     public float heistTimer = 300f; // 5 минут
     public bool isHeistActive = false;
@@ -67,7 +77,6 @@ public class GameManager : MonoBehaviour
     public Transform playerTransform;
     public CharacterController playerController;
     public LevelGenerator levelGenerator;
-    public HeistUI heistUI;
     
     [Header("Spawn Points")]
     public Transform lobbySpawnPoint;
@@ -143,11 +152,59 @@ public class GameManager : MonoBehaviour
         currentDay = 1;
         accumulatedOperationMoney = 0;
         
-        // Масштабирование сложности (квота растет с каждой победой игрока)
+        // Масштабирование сложности
         operationTargetQuota = 3000 + (completedQuotas * 1500); 
         
         Debug.Log($"<color=cyan>[GameManager] Операция начата! Штат: {preset.levelName}. Платный вход: ${preset.entryFee}. Квота: {operationTargetQuota}</color>");
-        StartLoadingHeist(preset);
+        
+        isInLobby = false;
+        SetupDossiers();
+
+        if (motelSpawnPoint != null)
+        {
+            StartCoroutine(TeleportPlayer(motelSpawnPoint.position, motelSpawnPoint.rotation));
+        }
+    }
+
+    public void SetupDossiers()
+    {
+        if (activeOperationPreset == null || bankDossiers == null || bankDossiers.Length == 0) return;
+
+        // Определяем город по текущему дню
+        int cityIndex = Mathf.Clamp(currentDay - 1, 0, activeOperationPreset.cities.Count - 1);
+        CityConfig currentCity = activeOperationPreset.cities[cityIndex];
+
+        foreach (var dossier in bankDossiers)
+        {
+            dossier.Setup(currentCity, difficultyDatabase, activeOperationPreset.bankNamesPool);
+        }
+        selectedDossier = null;
+    }
+
+    public void SelectDossier(BankDossier dossier)
+    {
+        foreach (var d in bankDossiers) d.Deselect();
+        dossier.Select();
+        selectedDossier = dossier;
+        Debug.Log($"<color=cyan>[Truck] Выбран банк: {selectedDossier.bankName} (Сложность: {selectedDossier.difficultyLevel})</color>");
+    }
+
+    public void ProceedToHeist()
+    {
+        if (selectedDossier == null)
+        {
+            Debug.LogWarning("[Truck] Сначала выберите досье!");
+            return;
+        }
+
+        // Применяем параметры из досье
+        heistTimer = selectedDossier.timeLimit;
+        
+        // Запускаем генерацию и телепортацию
+        if (activeOperationPreset != null)
+        {
+            StartCoroutine(HeistLoadingRoutine(activeOperationPreset));
+        }
     }
 
     public void StartNextDay()
@@ -155,18 +212,13 @@ public class GameManager : MonoBehaviour
         if (activeOperationPreset != null)
         {
             currentDay++;
-            StartLoadingHeist(activeOperationPreset);
+            SetupDossiers(); // Готовим новые досье для нового дня
+            
+            if (motelSpawnPoint != null)
+            {
+                StartCoroutine(TeleportPlayer(motelSpawnPoint.position, motelSpawnPoint.rotation));
+            }
         }
-        else
-        {
-            Debug.LogError("[GameManager] Нет активного пресета операции!");
-        }
-    }
-
-    private void StartLoadingHeist(LevelPreset preset)
-    {
-        if (!isInLobby) return;
-        StartCoroutine(HeistLoadingRoutine(preset));
     }
 
     private IEnumerator HeistLoadingRoutine(LevelPreset preset)
@@ -180,7 +232,7 @@ public class GameManager : MonoBehaviour
             bag.storedWeight = 0;
         }
         depositedMoney = 0;
-        heistTimer = 300f; 
+        // heistTimer теперь устанавливается в ProceedToHeist() перед запуском этой рутины
         isHeistActive = false;
         reinforcementCount = 0;
         currentZeroDelay = 0f;
@@ -231,7 +283,10 @@ public class GameManager : MonoBehaviour
 
         if (currentDay < 3)
         {
-            // Переход на следующий день (отдых в мотеле)
+            // Переход на следующий день (отдых в мотеле/грузовике)
+            currentDay++;
+            SetupDossiers(); // Генерируем досье для нового дня/города
+
             if (motelSpawnPoint != null)
             {
                 yield return StartCoroutine(TeleportPlayer(motelSpawnPoint.position, motelSpawnPoint.rotation));
@@ -262,10 +317,22 @@ public class GameManager : MonoBehaviour
     {
         if (isSuccess)
         {
-            int profit = accumulatedOperationMoney - operationTargetQuota;
-            globalBankBalance += profit;
+            int totalEarned = accumulatedOperationMoney;
+            int profit = totalEarned - operationTargetQuota;
+            int cleanMoney = 0;
+            int sessionShare = 0;
+
+            if (profit > 0)
+            {
+                cleanMoney = Mathf.FloorToInt(profit * 0.1f);
+                sessionShare = profit - cleanMoney;
+
+                globalBankBalance += cleanMoney;
+                sessionMoney += sessionShare;
+            }
+
             completedQuotas++;
-            Debug.Log($"<color=green>[Economy] Прибыль после уплаты квоты: ${profit}. Общий баланс: ${globalBankBalance}</color>");
+            Debug.Log($"<color=green>[Don] Profit: ${profit}. Bank: ${cleanMoney}. Session: ${sessionShare}</color>");
 
             // РАЗБЛОКИРОВКА НОВЫХ ШТАТОВ
             if (activeOperationPreset != null && activeOperationPreset.unlockPresets != null)
@@ -275,12 +342,17 @@ public class GameManager : MonoBehaviour
                     if (!unlockedPresets.Contains(nextPreset))
                     {
                         unlockedPresets.Add(nextPreset);
-                        Debug.Log($"<color=yellow>[Progression] Разблокирован новый штат: {nextPreset.levelName}!</color>");
+                        Debug.Log($"<color=yellow>[Progression] Unlocked: {nextPreset.levelName}!</color>");
                     }
                 }
             }
             
-            // Если мы выиграли, покажем черный экран для перехода в Лобби, так как BossRoomManager его не показывал
+            // ПОКАЗЫВАЕМ ЭКРАН РЕЗУЛЬТАТОВ
+            if (donResultUI != null)
+            {
+                donResultUI.ShowResults(totalEarned, operationTargetQuota, cleanMoney, sessionShare);
+            }
+
             if (heistUI != null) heistUI.ShowLoadingScreen();
         }
         else

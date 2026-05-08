@@ -4,10 +4,9 @@ public class MotelTerminal : MonoBehaviour, IInteractable
 {
     public void Interact()
     {
-        if (GameManager.Instance != null && GameManager.Instance.currentDay < 3)
+        if (GameManager.Instance != null)
         {
-            Debug.Log($"[Motel] Отправление в город #{GameManager.Instance.currentDay + 1}");
-            GameManager.Instance.StartNextDay();
+            GameManager.Instance.ProceedToHeist();
         }
     }
 

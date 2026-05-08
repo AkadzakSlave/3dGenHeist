@@ -122,7 +122,12 @@ public class LevelGenerator : MonoBehaviour
 
             yield return StartCoroutine(BuildSimulation());
 
-            int minR = activePreset != null ? activePreset.minRooms : 10;
+            int minR = 10;
+            if (GameManager.Instance != null && GameManager.Instance.selectedDossier != null)
+                minR = GameManager.Instance.selectedDossier.minRooms;
+            else if (activePreset != null)
+                minR = 8; // Базовый фолбек
+
             if (generatedRoomsCount >= minR)
             {
                 generationSuccess = true;
@@ -138,7 +143,10 @@ public class LevelGenerator : MonoBehaviour
 
         if (!generationSuccess)
         {
-            int minR = activePreset != null ? activePreset.minRooms : 10;
+            int minR = 10;
+            if (GameManager.Instance != null && GameManager.Instance.selectedDossier != null)
+                minR = GameManager.Instance.selectedDossier.minRooms;
+            
             Debug.LogError($"<color=red>[Gen] ФАТАЛЬНАЯ ОШИБКА: Не удалось достичь minRooms ({minR}) за {maxRetries} попыток! Оставляем последний результат.</color>");
             SealDeadEnds();
         }
@@ -167,7 +175,12 @@ public class LevelGenerator : MonoBehaviour
 
         AddSocketsToStack(startObj, 1);
 
-        int maxR = activePreset != null ? activePreset.maxRooms : 20;
+        int maxR = 20;
+        if (GameManager.Instance != null && GameManager.Instance.selectedDossier != null)
+            maxR = GameManager.Instance.selectedDossier.maxRooms;
+        else if (activePreset != null)
+            maxR = 12; // Базовый фолбек
+
 
         // 3. Основной цикл
         while (openSockets.Count > 0 && generatedRoomsCount < maxR)
@@ -255,8 +268,14 @@ public class LevelGenerator : MonoBehaviour
     {
         string report = "<color=#00FF00><b>=== ОТЧЕТ ГЕНЕРАЦИИ УРОВНЯ ===</b></color>\n";
         report += $"▪ Успешно на попытке: <b>{attempts} из {maxRetries}</b>\n";
-        int minR = activePreset != null ? activePreset.minRooms : 10;
-        int maxR = activePreset != null ? activePreset.maxRooms : 20;
+        int minR = 10;
+        int maxR = 20;
+        if (GameManager.Instance != null && GameManager.Instance.selectedDossier != null)
+        {
+            minR = GameManager.Instance.selectedDossier.minRooms;
+            maxR = GameManager.Instance.selectedDossier.maxRooms;
+        }
+
         report += $"▪ Всего комнат: <b>{generatedRoomsCount} / {maxR}</b> (Мин: {minR})\n";
         report += $"▪ Уникальные комнаты:\n";
         report += $"   - Хранилище (Vault): {(vaultSpawned ? "<color=green>Да</color>" : "<color=red>Нет</color>")}\n";

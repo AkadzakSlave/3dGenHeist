@@ -14,16 +14,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelPreset
   levelName: Texas
   cities:
-  - Austin
-  - Dallas
-  - Houston
-  minRooms: 10
-  maxRooms: 25
+  - cityName: "\u0414\u0430\u043B\u043B\u0430\u0441"
+    minDifficulty: 1
+    maxDifficulty: 1
+  - cityName: "\u0425\u044C\u044E\u0441\u0442\u043E\u043D"
+    minDifficulty: 1
+    maxDifficulty: 2
+  - cityName: "\u041E\u0441\u0442\u0438\u043D"
+    minDifficulty: 1
+    maxDifficulty: 2
+  bankNamesPool:
+  - Zloop Bank
+  - Mamut Raxal
+  - Go Ven Iy
+  - Iron Vault
   entryFee: 0
   unlockPresets:
   - {fileID: 11400000, guid: 06791188abd46b1499c1cf3604b00c7b, type: 2}
-  minDifficulty: 1
-  maxDifficulty: 3
+  - {fileID: 11400000, guid: 00d71cd5285925547a798a9c81134ec1, type: 2}
   startRoom: {fileID: 11400000, guid: b87174c73af0ae541802031f0962c28f, type: 2}
   vanZonePrefab: {fileID: 2218685468410544309, guid: 2006e2e306c223847acb5fec4837a0c4, type: 3}
   availableRooms:

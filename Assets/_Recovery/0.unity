@@ -4013,64 +4013,44 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2069931951}
     - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
-      propertyPath: jumpEvent.Path
-      value: event:/Player/Player_Jump
-      objectReference: {fileID: 0}
-    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
       propertyPath: landEvent.Path
-      value: event:/Player/Player_Land
+      value: event:/Player/Land
       objectReference: {fileID: 0}
     - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
       propertyPath: footstepEvent.Path
       value: event:/Player/Player_Footstep
       objectReference: {fileID: 0}
     - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
-      propertyPath: jumpEvent.Guid.Data1
-      value: -675212058
-      objectReference: {fileID: 0}
-    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
-      propertyPath: jumpEvent.Guid.Data2
-      value: 1276544780
-      objectReference: {fileID: 0}
-    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
-      propertyPath: jumpEvent.Guid.Data3
-      value: -731161419
-      objectReference: {fileID: 0}
-    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
-      propertyPath: jumpEvent.Guid.Data4
-      value: 1263539467
-      objectReference: {fileID: 0}
-    - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
       propertyPath: landEvent.Guid.Data1
-      value: -321180480
+      value: 1438176865
       objectReference: {fileID: 0}
     - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
       propertyPath: landEvent.Guid.Data2
-      value: 1138887087
+      value: 1271092848
       objectReference: {fileID: 0}
     - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
       propertyPath: landEvent.Guid.Data3
-      value: -1147107193
+      value: 1778597818
       objectReference: {fileID: 0}
     - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
       propertyPath: landEvent.Guid.Data4
-      value: -1213939127
+      value: -1934231790
       objectReference: {fileID: 0}
     - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
       propertyPath: footstepEvent.Guid.Data1
-      value: 816115802
+      value: -1315216641
       objectReference: {fileID: 0}
     - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
       propertyPath: footstepEvent.Guid.Data2
-      value: 1096623053
+      value: 1151331948
       objectReference: {fileID: 0}
     - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
       propertyPath: footstepEvent.Guid.Data3
-      value: -1493886048
+      value: 1016496260
       objectReference: {fileID: 0}
     - target: {fileID: 1227582518126737371, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
       propertyPath: footstepEvent.Guid.Data4
-      value: -1012864717
+      value: -1767202063
       objectReference: {fileID: 0}
     - target: {fileID: 3631960976485341485, guid: 58d721d9c3315d049bc92441e369ee0b, type: 3}
       propertyPath: m_Name

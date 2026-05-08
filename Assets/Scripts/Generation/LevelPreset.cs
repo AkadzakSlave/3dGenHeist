@@ -1,24 +1,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+[System.Serializable]
+public struct CityConfig
+{
+    public string cityName;
+    public int minDifficulty; // 1-10
+    public int maxDifficulty; // 1-10
+}
+
 [CreateAssetMenu(fileName = "New Level Preset", menuName = "Heist/Level Preset")]
 public class LevelPreset : ScriptableObject
 {
     [Header("Preset Information")]
     public string levelName = "Texas";
-    public List<string> cities = new List<string> { "Austin", "Dallas", "Houston" };
-    
-    [Header("Generation Settings")]
-    public int minRooms = 10;
-    public int maxRooms = 20;
+    public List<CityConfig> cities = new List<CityConfig>();
+    public List<string> bankNamesPool = new List<string> { "Zloop Bank", "Mamut Raxal", "Go Ven Iy", "Iron Vault" };
 
     [Header("Economy & Progression")]
     public int entryFee = 0;
     public List<LevelPreset> unlockPresets;
-
-    [Header("Difficulty Range")]
-    public int minDifficulty = 1;
-    public int maxDifficulty = 3;
 
     [Header("Visual Architecture Prefabs")]
     [Tooltip("The starting room where the heist begins")]
