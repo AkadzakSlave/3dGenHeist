@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 37f44dfa4cfdaf64a81b8aa9f1f761f8, type: 3}
   m_Name: 10_DF
   m_EditorClassIdentifier: Assembly-CSharp::DifficultyPreset
-  difficult: 9
+  difficult: 10
   minRooms: 21
   maxRooms: 25
   minTimerSeconds: 1020

@@ -111,10 +111,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adc21f5581ed1394cb6a915450f25597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootItem
-  itemName: Fixik
+  data: {fileID: 11400000, guid: 3ceafc5764a2d934c972b7be1c5df3ae, type: 2}
   value: 500
   weight: 1
-  collectSound: {fileID: 0}
+  pickUpSound: event:/SFX/Loot/Loot_PickUp
 --- !u!95 &1853178194005265501
 Animator:
   serializedVersion: 7

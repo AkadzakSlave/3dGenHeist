@@ -9,6 +9,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: c2f25961dbc65554fb49ff449248106d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: c2f25961dbc65554fb49ff449248106d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: c2f25961dbc65554fb49ff449248106d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.7
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: c2f25961dbc65554fb49ff449248106d, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -48,6 +60,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: c2f25961dbc65554fb49ff449248106d, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c2f25961dbc65554fb49ff449248106d, type: 3}
       propertyPath: m_Name
       value: burger
@@ -80,10 +96,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adc21f5581ed1394cb6a915450f25597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootItem
-  itemName: Burger
+  data: {fileID: 11400000, guid: 913626887ed605944a748ee81b89078b, type: 2}
   value: 300
   weight: 10
-  collectSound: {fileID: 0}
+  pickUpSound: event:/SFX/Loot/Loot_PickUp
 --- !u!65 &-4737309978646037319
 BoxCollider:
   m_ObjectHideFlags: 0

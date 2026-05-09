@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b19fdadf91c48a444b94dff4bff7d034, type: 3}
+  m_Name: LootDB
+  m_EditorClassIdentifier: Assembly-CSharp::LootDatabase
+  smallLoot:
+  - {fileID: 11400000, guid: be606ffec2d6b694b95a9e361c9bf988, type: 2}
+  - {fileID: 11400000, guid: 3ceafc5764a2d934c972b7be1c5df3ae, type: 2}
+  - {fileID: 11400000, guid: 330fb0304f3920f48a94281897c62362, type: 2}
+  - {fileID: 11400000, guid: bd5d7290772576c4fa0c2041201c7383, type: 2}
+  mediumLoot:
+  - {fileID: 11400000, guid: 913626887ed605944a748ee81b89078b, type: 2}
+  - {fileID: 11400000, guid: cfe26b1127073204b84d139649d9a741, type: 2}
+  largeLoot:
+  - {fileID: 11400000, guid: c2631f2381ade6947b2ae418609a9d9e, type: 2}
