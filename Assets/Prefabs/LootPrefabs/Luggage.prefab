@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 97cc4b29169ad914291aa0bded4f4dc0, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 5.649932
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 97cc4b29169ad914291aa0bded4f4dc0, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.12770662
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 97cc4b29169ad914291aa0bded4f4dc0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -47.21615
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 97cc4b29169ad914291aa0bded4f4dc0, type: 3}
       propertyPath: m_LocalRotation.w
@@ -87,7 +87,13 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: c2631f2381ade6947b2ae418609a9d9e, type: 2}
   value: 100
   weight: 5
-  pickUpSound: event:/SFX/Loot/Loot_PickUp
+  pickUpSound:
+    Guid:
+      Data1: 936682925
+      Data2: 1121382176
+      Data3: -1576399740
+      Data4: 642664294
+    Path: event:/Environment/Items/Loot/Loot_PickUp
 --- !u!65 &770887554803178982
 BoxCollider:
   m_ObjectHideFlags: 0

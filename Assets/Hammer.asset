@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
   itemName: Hammer
   itemType: 0
+  fmodMainType: 1
   icon: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
   baseWeight: 5
   dropPrefab: {fileID: 8791087912665570592, guid: c6959cf4df2f6f84b87fd4619af8e56a, type: 3}

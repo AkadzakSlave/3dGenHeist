@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aff483bd6a05c74e95269d22fd7954f, type: 3}
-  m_Name: Brilliant
+  m_Name: Cash
   m_EditorClassIdentifier: Assembly-CSharp::LootData
-  itemName: Boba
-  lootType: 3
-  minValue: 400
-  maxValue: 500
-  weight: 1
-  prefab: {fileID: 3101191389420430174, guid: 9ea9f899e776df045a1afaa9c79eef52, type: 3}
+  itemName: Cash
+  lootType: 0
+  minValue: 100
+  maxValue: 1000
+  weight: 3
+  prefab: {fileID: 8453512800796366143, guid: c6e7160a1c65de94eb662f7e73f78fc1, type: 3}

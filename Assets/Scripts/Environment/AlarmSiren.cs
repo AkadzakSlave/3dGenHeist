@@ -21,7 +21,7 @@ public class AlarmSiren : MonoBehaviour
         if (!sirenEvent.IsNull)
         {
             sirenInstance = RuntimeManager.CreateInstance(sirenEvent);
-            RuntimeManager.AttachInstanceToGameObject(sirenInstance, transform, GetComponent<Rigidbody>());
+            RuntimeManager.AttachInstanceToGameObject(sirenInstance, gameObject, GetComponent<Rigidbody>());
         }
 
         if (GameManager.Instance != null)

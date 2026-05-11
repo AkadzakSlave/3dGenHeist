@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &6040475040384712689
+--- !u!1001 &6894534307926783017
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -22,19 +22,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.64
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.74
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
       propertyPath: m_LocalRotation.x
@@ -42,7 +42,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
       propertyPath: m_LocalRotation.z
@@ -54,7 +54,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -66,7 +66,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
       propertyPath: m_Name
-      value: Bagage
+      value: BagOnPlayer
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3996715374946979927, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -82,31 +86,33 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5206298166798785723}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 3766799221618137188}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5180233825832537810}
+      addedObject: {fileID: 755049330690284024}
   m_SourcePrefab: {fileID: 100100000, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
---- !u!1 &6851520784523018912 stripped
+--- !u!1 &6012067722407774584 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 4dd30c0e0ceadd0408e4098eb43ce413, type: 3}
-  m_PrefabInstance: {fileID: 6040475040384712689}
+  m_PrefabInstance: {fileID: 6894534307926783017}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5206298166798785723
+--- !u!114 &755049330690284024
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6851520784523018912}
+  m_GameObject: {fileID: 6012067722407774584}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a337ab8f8cdcc44ab3e790c0c255a82, type: 3}
+  m_Script: {fileID: 11500000, guid: c6768e69286a39f41ad3528bec962bda, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WorldEquipment
+  m_EditorClassIdentifier: Assembly-CSharp::BagTool
+  itemData: {fileID: 11400000, guid: 66d585362301c7748a446a25dfa8f3d0, type: 2}
+  pickUpSound:
+    Guid:
+      Data1: 2035330305
+      Data2: 1323194766
+      Data3: 1800991632
+      Data4: -1736076445
+    Path: event:/Environment/Items/Main/Main_SwitchPickUp
   dropSound:
     Guid:
       Data1: 1664423562
@@ -114,54 +120,9 @@ MonoBehaviour:
       Data3: -1395734653
       Data4: -72831372
     Path: event:/Environment/Items/Main/Main_Drop
-  itemData: {fileID: 11400000, guid: 66d585362301c7748a446a25dfa8f3d0, type: 2}
   storedMoney: 0
   storedWeight: 0
---- !u!65 &3766799221618137188
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6851520784523018912}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 0.3, y: 0.3, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!54 &5180233825832537810
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6851520784523018912}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 0
-  m_CollisionDetection: 0
+  maxCapacity: 100
+  bagMesh: {fileID: 6012067722407774584}
+  animator: {fileID: 0}
+  animatorLayerName: Bag Layer

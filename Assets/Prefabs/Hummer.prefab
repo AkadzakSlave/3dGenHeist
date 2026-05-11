@@ -107,7 +107,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7a337ab8f8cdcc44ab3e790c0c255a82, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorldEquipment
+  dropSound:
+    Guid:
+      Data1: 1664423562
+      Data2: 1175535569
+      Data3: -1395734653
+      Data4: -72831372
+    Path: event:/Environment/Items/Main/Main_Drop
   itemData: {fileID: 11400000, guid: 020931551b24fea4483dc6b6d39c4fed, type: 2}
+  storedMoney: 0
+  storedWeight: 0
 --- !u!65 &8639692469091315250
 BoxCollider:
   m_ObjectHideFlags: 0

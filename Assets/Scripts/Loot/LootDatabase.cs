@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+public enum LootPointSize { Small, Medium, Large }
+
 [CreateAssetMenu(fileName = "LootDatabase", menuName = "Heist/Loot Database")]
 public class LootDatabase : ScriptableObject
 {

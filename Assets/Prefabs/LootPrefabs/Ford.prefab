@@ -8,17 +8,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -9003323146575883303, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 129c4444a5332d74ca9c044226bc7b64, type: 2}
     - target: {fileID: -8679921383154817045, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
       propertyPath: m_LocalScale.x
-      value: 15.000001
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
       propertyPath: m_LocalScale.y
-      value: 15.000001
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
       propertyPath: m_LocalScale.z
-      value: 15.000001
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
       propertyPath: m_LocalPosition.x
@@ -72,7 +76,27 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 129c4444a5332d74ca9c044226bc7b64, type: 2}
+    - target: {fileID: -6821315975633821789, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 129c4444a5332d74ca9c044226bc7b64, type: 2}
+    - target: {fileID: -6194784029616181176, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 129c4444a5332d74ca9c044226bc7b64, type: 2}
     - target: {fileID: -2090608591832345471, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 129c4444a5332d74ca9c044226bc7b64, type: 2}
+    - target: {fileID: -1992904125535992099, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 129c4444a5332d74ca9c044226bc7b64, type: 2}
+    - target: {fileID: -154879616144885620, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 129c4444a5332d74ca9c044226bc7b64, type: 2}
+    - target: {fileID: 15045261770012224, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 129c4444a5332d74ca9c044226bc7b64, type: 2}
@@ -80,7 +104,19 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ford
       objectReference: {fileID: 0}
+    - target: {fileID: 2334830646326187502, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 129c4444a5332d74ca9c044226bc7b64, type: 2}
+    - target: {fileID: 3615449878971091806, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 129c4444a5332d74ca9c044226bc7b64, type: 2}
     - target: {fileID: 3699295531117829134, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 129c4444a5332d74ca9c044226bc7b64, type: 2}
+    - target: {fileID: 5670784105149147771, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 129c4444a5332d74ca9c044226bc7b64, type: 2}
@@ -120,10 +156,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: adc21f5581ed1394cb6a915450f25597, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootItem
-  data: {fileID: 11400000, guid: bd5d7290772576c4fa0c2041201c7383, type: 2}
+  data: {fileID: 11400000, guid: b2974bece0a9d3a48b6db1c5ecf15a46, type: 2}
   value: 100
   weight: 5
-  pickUpSound: event:/SFX/Loot/Loot_PickUp
+  pickUpSound:
+    Guid:
+      Data1: 936682925
+      Data2: 1121382176
+      Data3: -1576399740
+      Data4: 642664294
+    Path: event:/Environment/Items/Loot/Loot_PickUp
 --- !u!65 &4118209345569991890
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b19fdadf91c48a444b94dff4bff7d034, type: 3}
-  m_Name: LootDB
+  m_Name: TexasLoot
   m_EditorClassIdentifier: Assembly-CSharp::LootDatabase
   smallLoot:
   - {fileID: 11400000, guid: be606ffec2d6b694b95a9e361c9bf988, type: 2}
@@ -20,5 +20,6 @@ MonoBehaviour:
   mediumLoot:
   - {fileID: 11400000, guid: 913626887ed605944a748ee81b89078b, type: 2}
   - {fileID: 11400000, guid: cfe26b1127073204b84d139649d9a741, type: 2}
+  - {fileID: 11400000, guid: b2974bece0a9d3a48b6db1c5ecf15a46, type: 2}
   largeLoot:
   - {fileID: 11400000, guid: c2631f2381ade6947b2ae418609a9d9e, type: 2}

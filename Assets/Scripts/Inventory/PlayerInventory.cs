@@ -2,10 +2,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Events;
+using FMODUnity;
+using FMOD.Studio;
 
 public class PlayerInventory : MonoBehaviour
 {
     public static PlayerInventory Instance { get; private set; }
+
+    [Header("Audio (FMOD)")]
+    public EventReference pickupSound;
 
     [Header("Available Items (Attached to Player)")]
     [Tooltip("Все предметы, которые есть у игрока 'в теле' (Молот, Сумка, разные пушки). Они должны быть выключены.")]
@@ -137,6 +142,16 @@ public class PlayerInventory : MonoBehaviour
             if (activeSlotIndex == targetIndex)
             {
                 slots[targetIndex].Equip();
+            }
+
+            if (!pickupSound.IsNull)
+            {
+                EventInstance pickup = RuntimeManager.CreateInstance(pickupSound);
+                // Передаем тип предмета в FMOD
+                pickup.setParameterByName("MainType", (float)data.fmodMainType);
+                RuntimeManager.AttachInstanceToGameObject(pickup, gameObject);
+                pickup.start();
+                pickup.release();
             }
 
             onInventoryChanged?.Invoke();

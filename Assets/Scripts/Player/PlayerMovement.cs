@@ -85,32 +85,40 @@ public class PlayerMovement : MonoBehaviour
             if (move.magnitude > 1f) move.Normalize();
         }
 
-        // Логика расчета скорости с учетом веса (Плавное замедление)
+        // Логика расчета скорости с учетом веса (Система из Дизайн 2.0)
         float currentMaxSpeed = walkSpeed;
-        float weightFactor = 0f;
+        float currentMaxSprint = sprintSpeed;
+        float weightFactor = 1.0f; // 1.0 = 100% скорости
 
         if (GameManager.Instance != null)
         {
             float weight = GameManager.Instance.currentWeight;
-            float max = GameManager.Instance.maxWeight;
             
-            // Рассчитываем множитель замедления (чем тяжелее, тем медленнее)
-            // При весе 0 -> множитель 1.0. При весе Max -> множитель minWeightSpeed / walkSpeed
-            weightFactor = Mathf.Clamp01(weight / max);
-            float speedMultiplier = Mathf.Lerp(1.0f, minWeightSpeed / walkSpeed, weightFactor);
+            // Таблица замедления из Дизайн 2.0
+            if (weight < 20) weightFactor = 1.0f;
+            else if (weight < 25) weightFactor = 0.9f;
+            else if (weight < 30) weightFactor = 0.8f;
+            else if (weight < 40) weightFactor = 0.6f;
+            else if (weight < 50) weightFactor = 0.4f;
+            else if (weight < 70) weightFactor = 0.2f;
+            else if (weight < 80) weightFactor = 0.1f;
+            else weightFactor = 0.0f; // 80+ кг - не может ходить
+
+            currentMaxSpeed = walkSpeed * weightFactor;
             
-            currentMaxSpeed = walkSpeed * speedMultiplier;
+            // Спринт тоже замедляется, но на 80+ кг остается минимальная скорость (5%)
+            float sprintFactor = Mathf.Max(weightFactor, 0.05f);
+            currentMaxSprint = sprintSpeed * sprintFactor;
         }
 
         float applySpeed = currentMaxSpeed;
         bool isSprinting = false;
 
         // Логика Стамины и Спринта
-        bool isTooHeavyToSprint = weightFactor >= 1.0f;
-        if (!isTooHeavyToSprint && isSprintPressed && isMoving && currentStamina > 0)
+        if (isSprintPressed && isMoving && currentStamina > 0)
         {
             isSprinting = true;
-            applySpeed = sprintSpeed; 
+            applySpeed = currentMaxSprint; 
             currentStamina -= staminaDrainRate * Time.deltaTime;
         }
         else
@@ -150,11 +158,21 @@ public class PlayerMovement : MonoBehaviour
         {
             if (isGrounded)
             {
-                if (currentStamina >= jumpStaminaCost) 
+                float weight = GameManager.Instance != null ? GameManager.Instance.currentWeight : 0;
+                
+                // Прыжок выкл при весе 70+ кг
+                if (weight < 70)
                 {
-                    currentStamina -= jumpStaminaCost;
-                    velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-                    PlayJumpSound();
+                    if (currentStamina >= jumpStaminaCost) 
+                    {
+                        currentStamina -= jumpStaminaCost;
+                        velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                        PlayJumpSound();
+                    }
+                }
+                else
+                {
+                    Debug.Log("[Movement] Слишком тяжело для прыжка!");
                 }
             }
         }

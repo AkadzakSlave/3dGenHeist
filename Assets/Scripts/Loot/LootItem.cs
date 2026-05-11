@@ -14,7 +14,7 @@ public class LootItem : MonoBehaviour, IInteractable
     public int weight;
 
     [Header("Audio")]
-    [EventRef] public string pickUpSound = "event:/SFX/Loot/Loot_PickUp";
+    public EventReference pickUpSound;
 
     private void Start()
     {
@@ -38,7 +38,7 @@ public class LootItem : MonoBehaviour, IInteractable
     public string GetInteractText()
     {
         string name = data != null ? data.itemName : "Loot";
-        return $"Collect {name} (${value})";
+        return $"{name} (${value}, {weight}kg)";
     }
 
     public void Collect()
@@ -53,14 +53,18 @@ public class LootItem : MonoBehaviour, IInteractable
             if (bag.AddLoot(value, weight))
             {
                 if (GameManager.Instance != null) 
+                {
+                    string itemName = data != null ? data.itemName : "Loot";
+                    Debug.Log($"[Loot] Подобрано: {itemName}. В сумке: ${GameManager.Instance.bagMoney}, Вес: {GameManager.Instance.currentWeight}/{GameManager.Instance.maxWeight}кг");
                     GameManager.Instance.onMoneyChanged?.Invoke();
+                }
                 
                 PlayPickUpSound();
                 Destroy(gameObject);
             }
             else
             {
-                Debug.Log("[Loot] Сумка полна!");
+                Debug.Log("<color=red>[Loot] СУМКА ЗАПОЛНЕНА!</color>");
             }
         }
         else
@@ -71,7 +75,7 @@ public class LootItem : MonoBehaviour, IInteractable
 
     private void PlayPickUpSound()
     {
-        if (string.IsNullOrEmpty(pickUpSound)) return;
+        if (pickUpSound.IsNull) return;
 
         FMOD.Studio.EventInstance instance = RuntimeManager.CreateInstance(pickUpSound);
         
@@ -81,8 +85,8 @@ public class LootItem : MonoBehaviour, IInteractable
             instance.setParameterByName("LootType", (float)data.lootType);
         }
 
-        // 3D позиционирование
-        RuntimeManager.AttachInstanceToGameObject(instance, transform, GetComponent<Rigidbody>());
+        // Исправленный метод (передаем GameObject вместо Transform)
+        RuntimeManager.AttachInstanceToGameObject(instance, gameObject, GetComponent<Rigidbody>());
         
         instance.start();
         instance.release();

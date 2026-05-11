@@ -15,7 +15,14 @@ public class HeistUI : MonoBehaviour
     public UnityEngine.UI.Slider quotaProgressSlider;
     public TextMeshProUGUI quotaText; 
     public GameObject[] difficultySkulls; 
+    public TextMeshProUGUI interactionText; // Текст при наведении на предмет
 
+    [Header("UI Localization/Text")]
+    public string bagMoneyFormat = "Bag: ${0}";
+    public string weightFormat = "Weight: {0} / {1}kg";
+    public string overWeightFormat = "<color=red>Weight: {0} / {1}kg (OVERWEIGHT)</color>";
+    public string quotaDayFormat = "Day {0}/3\nVan: ${1}\nProgress: ${2} / ${3}";
+    public string staminaFormat = "Stamina: {0}/{1}";
 
     [Header("Placeholders (Future)")]
     public GameObject healthBarPlaceholder;
@@ -85,23 +92,27 @@ public class HeistUI : MonoBehaviour
 
         if (bagText != null)
         {
-            bagText.text = $"Bag: ${GameManager.Instance.bagMoney}";
+            bagText.text = string.Format(bagMoneyFormat, GameManager.Instance.bagMoney);
         }
 
         if (quotaText != null)
         {
-            quotaText.text = $"Day {GameManager.Instance.currentDay}/3\nVan: ${GameManager.Instance.depositedMoney}\nProgress: ${GameManager.Instance.accumulatedOperationMoney} / ${GameManager.Instance.operationTargetQuota}";
+            quotaText.text = string.Format(quotaDayFormat, GameManager.Instance.currentDay, GameManager.Instance.depositedMoney, GameManager.Instance.accumulatedOperationMoney, GameManager.Instance.operationTargetQuota);
         }
 
         if (weightText != null)
         {
-            weightText.text = $"Weight: {GameManager.Instance.currentWeight} / {GameManager.Instance.maxWeight}";
-            
-            // Если перегруз - меняем цвет на красный
+            // Если перегруз - меняем формат/цвет
             if (GameManager.Instance.currentWeight > GameManager.Instance.maxWeight)
+            {
+                weightText.text = string.Format(overWeightFormat, GameManager.Instance.currentWeight, GameManager.Instance.maxWeight);
                 weightText.color = Color.red;
+            }
             else
+            {
+                weightText.text = string.Format(weightFormat, GameManager.Instance.currentWeight, GameManager.Instance.maxWeight);
                 weightText.color = Color.white;
+            }
         }
     }
 
@@ -122,7 +133,7 @@ public class HeistUI : MonoBehaviour
         {
             int displayCurrent = Mathf.RoundToInt(current);
             int displayMax = Mathf.RoundToInt(max);
-            staminaText.text = $"Stamina: {displayCurrent}/{displayMax}";
+            staminaText.text = string.Format(staminaFormat, displayCurrent, displayMax);
         }
     }
 
@@ -166,6 +177,14 @@ public class HeistUI : MonoBehaviour
         {
             if (difficultySkulls[i] != null)
                 difficultySkulls[i].SetActive(i < level);
+        }
+    }
+    public void SetInteractionText(string text)
+    {
+        if (interactionText != null)
+        {
+            interactionText.text = text;
+            interactionText.gameObject.SetActive(!string.IsNullOrEmpty(text));
         }
     }
 }

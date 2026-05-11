@@ -10,11 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aff483bd6a05c74e95269d22fd7954f, type: 3}
-  m_Name: Cash
+  m_Name: Ford
   m_EditorClassIdentifier: Assembly-CSharp::LootData
-  itemName: 100$
-  lootType: 0
-  minValue: 100
-  maxValue: 1000
-  weight: 3
-  prefab: {fileID: 8453512800796366143, guid: c6e7160a1c65de94eb662f7e73f78fc1, type: 3}
+  itemName: Ford
+  lootType: 1
+  minValue: 1000
+  maxValue: 1200
+  weight: 10
+  prefab: {fileID: 6091717216496605067, guid: ce820c6c96ab6874b9f3bc88cd7b21e8, type: 3}

@@ -22,15 +22,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -37.95
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.44
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.23
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
       propertyPath: m_LocalRotation.w
@@ -114,7 +114,13 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: 3ceafc5764a2d934c972b7be1c5df3ae, type: 2}
   value: 500
   weight: 1
-  pickUpSound: event:/SFX/Loot/Loot_PickUp
+  pickUpSound:
+    Guid:
+      Data1: 936682925
+      Data2: 1121382176
+      Data3: -1576399740
+      Data4: 642664294
+    Path: event:/Environment/Items/Loot/Loot_PickUp
 --- !u!95 &1853178194005265501
 Animator:
   serializedVersion: 7
@@ -123,7 +129,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1214243730013476256}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: bf8e9948864d7924bb522905c81f3ae1, type: 2}
   m_CullingMode: 0

@@ -99,7 +99,13 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: 913626887ed605944a748ee81b89078b, type: 2}
   value: 300
   weight: 10
-  pickUpSound: event:/SFX/Loot/Loot_PickUp
+  pickUpSound:
+    Guid:
+      Data1: 936682925
+      Data2: 1121382176
+      Data3: -1576399740
+      Data4: 642664294
+    Path: event:/Environment/Items/Loot/Loot_PickUp
 --- !u!65 &-4737309978646037319
 BoxCollider:
   m_ObjectHideFlags: 0

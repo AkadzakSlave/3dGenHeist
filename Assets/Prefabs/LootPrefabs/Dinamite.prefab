@@ -10,31 +10,31 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: cee22e6eea8028c42afc6804bc39ede2, type: 3}
       propertyPath: m_LocalScale.x
-      value: 40
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cee22e6eea8028c42afc6804bc39ede2, type: 3}
       propertyPath: m_LocalScale.y
-      value: 40
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cee22e6eea8028c42afc6804bc39ede2, type: 3}
       propertyPath: m_LocalScale.z
-      value: 40
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cee22e6eea8028c42afc6804bc39ede2, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -70.79521
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cee22e6eea8028c42afc6804bc39ede2, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.7107147
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cee22e6eea8028c42afc6804bc39ede2, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0.556439
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cee22e6eea8028c42afc6804bc39ede2, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071067
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cee22e6eea8028c42afc6804bc39ede2, type: 3}
       propertyPath: m_LocalRotation.x
@@ -46,11 +46,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cee22e6eea8028c42afc6804bc39ede2, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cee22e6eea8028c42afc6804bc39ede2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
+      value: -90
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: cee22e6eea8028c42afc6804bc39ede2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
@@ -103,7 +103,13 @@ MonoBehaviour:
   data: {fileID: 11400000, guid: be606ffec2d6b694b95a9e361c9bf988, type: 2}
   value: 100
   weight: 5
-  pickUpSound: event:/SFX/Loot/Loot_PickUp
+  pickUpSound:
+    Guid:
+      Data1: 936682925
+      Data2: 1121382176
+      Data3: -1576399740
+      Data4: 642664294
+    Path: event:/Environment/Items/Loot/Loot_PickUp
 --- !u!65 &3289844510351623724
 BoxCollider:
   m_ObjectHideFlags: 0
