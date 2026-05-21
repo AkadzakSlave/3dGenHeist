@@ -1,0 +1,97 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5009cb04b34cf3d4691b6688983bae60, type: 3}
+  m_Name: PatrolDB
+  m_EditorClassIdentifier: Assembly-CSharp::PatrolDatabase
+  baseSpawnChance: 0.05
+  patrolLevelIncreasePerMinute: 3
+  patrolTiers:
+  - minPatrolLevel: 0
+    maxPatrolLevel: 10
+    minGuards: 2
+    maxGuards: 4
+    minAssaulters: 0
+    maxAssaulters: 0
+    minElites: 0
+    maxElites: 0
+  - minPatrolLevel: 10
+    maxPatrolLevel: 20
+    minGuards: 3
+    maxGuards: 5
+    minAssaulters: 0
+    maxAssaulters: 0
+    minElites: 0
+    maxElites: 0
+  - minPatrolLevel: 20
+    maxPatrolLevel: 30
+    minGuards: 3
+    maxGuards: 5
+    minAssaulters: 1
+    maxAssaulters: 2
+    minElites: 0
+    maxElites: 0
+  - minPatrolLevel: 30
+    maxPatrolLevel: 40
+    minGuards: 4
+    maxGuards: 6
+    minAssaulters: 2
+    maxAssaulters: 3
+    minElites: 0
+    maxElites: 0
+  - minPatrolLevel: 40
+    maxPatrolLevel: 50
+    minGuards: 4
+    maxGuards: 6
+    minAssaulters: 2
+    maxAssaulters: 4
+    minElites: 1
+    maxElites: 2
+  - minPatrolLevel: 50
+    maxPatrolLevel: 60
+    minGuards: 5
+    maxGuards: 7
+    minAssaulters: 3
+    maxAssaulters: 4
+    minElites: 2
+    maxElites: 3
+  - minPatrolLevel: 60
+    maxPatrolLevel: 70
+    minGuards: 5
+    maxGuards: 7
+    minAssaulters: 3
+    maxAssaulters: 5
+    minElites: 2
+    maxElites: 4
+  - minPatrolLevel: 70
+    maxPatrolLevel: 80
+    minGuards: 6
+    maxGuards: 8
+    minAssaulters: 4
+    maxAssaulters: 5
+    minElites: 3
+    maxElites: 4
+  - minPatrolLevel: 80
+    maxPatrolLevel: 90
+    minGuards: 6
+    maxGuards: 8
+    minAssaulters: 4
+    maxAssaulters: 6
+    minElites: 4
+    maxElites: 5
+  - minPatrolLevel: 90
+    maxPatrolLevel: 100
+    minGuards: 7
+    maxGuards: 9
+    minAssaulters: 5
+    maxAssaulters: 6
+    minElites: 5
+    maxElites: 6

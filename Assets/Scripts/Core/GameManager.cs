@@ -22,6 +22,10 @@ public class GameManager : MonoBehaviour
     [Header("Current Heist Session (Live)")]
     public int depositedMoney = 0;
     public int maxWeight = 80;
+    public int allPlayersDeadPenalty = 100;
+
+    [Header("Players")]
+    public List<PlayerHealth> activePlayers = new List<PlayerHealth>();
 
     public int bagMoney
     {
@@ -85,6 +89,7 @@ public class GameManager : MonoBehaviour
 
     private float zeroTimerDelay = 3f;
     private float currentZeroDelay = 0f;
+    private bool isProcessingPlayerWipe = false;
 
     private void Awake()
     {
@@ -108,6 +113,7 @@ public class GameManager : MonoBehaviour
         {
             // Для удобства тестов
             activeOperationPreset = levelGenerator.activePreset;
+            if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
             levelGenerator.GenerateAsync(levelGenerator.activePreset, null);
         }
     }
@@ -236,6 +242,8 @@ public class GameManager : MonoBehaviour
         isHeistActive = false;
         reinforcementCount = 0;
         currentZeroDelay = 0f;
+        if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
+        ReviveAllPlayers();
         onMoneyChanged?.Invoke();
 
         if (heistUI != null) heistUI.UpdateUI();
@@ -269,6 +277,46 @@ public class GameManager : MonoBehaviour
         StartCoroutine(ExtractionRoutine());
     }
 
+    public void RegisterPlayerHealth(PlayerHealth playerHealth)
+    {
+        if (playerHealth != null && !activePlayers.Contains(playerHealth))
+        {
+            activePlayers.Add(playerHealth);
+        }
+    }
+
+    public void UnregisterPlayerHealth(PlayerHealth playerHealth)
+    {
+        if (playerHealth != null && activePlayers.Contains(playerHealth))
+        {
+            activePlayers.Remove(playerHealth);
+        }
+    }
+
+    public void NotifyPlayerDied(PlayerHealth deadPlayer)
+    {
+        if (isProcessingPlayerWipe || isInLobby)
+        {
+            return;
+        }
+
+        activePlayers.RemoveAll(player => player == null);
+        if (activePlayers.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var player in activePlayers)
+        {
+            if (player != null && !player.isDead)
+            {
+                return;
+            }
+        }
+
+        StartCoroutine(AllPlayersDeadRoutine());
+    }
+
     private IEnumerator ExtractionRoutine()
     {
         if (heistUI != null) heistUI.ShowLoadingScreen();
@@ -276,6 +324,7 @@ public class GameManager : MonoBehaviour
         accumulatedOperationMoney += depositedMoney;
         Debug.Log($"<color=orange>[Economy] День {currentDay} завершен. Накоплено: ${accumulatedOperationMoney} / ${operationTargetQuota}</color>");
 
+        if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
         if (levelGenerator != null) levelGenerator.ClearLevel();
 
         isInLobby = true;
@@ -301,6 +350,79 @@ public class GameManager : MonoBehaviour
                 yield return StartCoroutine(TeleportPlayer(bossRoomSpawnPoint.position, bossRoomSpawnPoint.rotation));
             }
             if (heistUI != null) heistUI.HideLoadingScreen();
+        }
+    }
+
+    private IEnumerator AllPlayersDeadRoutine()
+    {
+        isProcessingPlayerWipe = true;
+
+        if (heistUI != null) heistUI.ShowLoadingScreen();
+
+        ApplyPlayerWipePenalty();
+        accumulatedOperationMoney += depositedMoney;
+        depositedMoney = 0;
+
+        Debug.Log($"<color=red>[Heist] All players are dead. Day {currentDay} ended. Penalty: ${allPlayersDeadPenalty}. Total: ${accumulatedOperationMoney} / ${operationTargetQuota}</color>");
+
+        if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
+        if (levelGenerator != null) levelGenerator.ClearLevel();
+
+        isHeistActive = false;
+        isInLobby = true;
+
+        yield return new WaitForSeconds(1f);
+
+        ReviveAllPlayers();
+
+        if (currentDay < 3)
+        {
+            currentDay++;
+            SetupDossiers();
+
+            if (motelSpawnPoint != null)
+            {
+                yield return StartCoroutine(TeleportPlayer(motelSpawnPoint.position, motelSpawnPoint.rotation));
+            }
+        }
+        else
+        {
+            if (bossRoomSpawnPoint != null)
+            {
+                yield return StartCoroutine(TeleportPlayer(bossRoomSpawnPoint.position, bossRoomSpawnPoint.rotation));
+            }
+        }
+
+        if (heistUI != null)
+        {
+            heistUI.HideLoadingScreen();
+            heistUI.UpdateUI();
+        }
+
+        isProcessingPlayerWipe = false;
+    }
+
+    private void ApplyPlayerWipePenalty()
+    {
+        int penaltyLeft = allPlayersDeadPenalty;
+        int depositedPenalty = Mathf.Min(depositedMoney, penaltyLeft);
+        depositedMoney -= depositedPenalty;
+        penaltyLeft -= depositedPenalty;
+
+        if (penaltyLeft > 0)
+        {
+            accumulatedOperationMoney = Mathf.Max(0, accumulatedOperationMoney - penaltyLeft);
+        }
+
+        onMoneyChanged?.Invoke();
+    }
+
+    private void ReviveAllPlayers()
+    {
+        activePlayers.RemoveAll(player => player == null);
+        foreach (var player in activePlayers)
+        {
+            player.Revive(true);
         }
     }
 
@@ -384,6 +506,7 @@ public class GameManager : MonoBehaviour
         {
             isHeistActive = true;
             Debug.Log("<color=red>[Alarm] Тишина закончилась! Таймер запущен.</color>");
+            if (EnemyManager.Instance != null) EnemyManager.Instance.BeginHeist();
             onHeistStarted?.Invoke();
         }
     }

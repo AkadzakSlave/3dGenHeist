@@ -1,0 +1,965 @@
+﻿<w:tab w:val="right" w:leader="dot" w:pos="8306"/></w:tabs><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default"/><w:sz w:val="72"/><w:szCs w:val="72"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:sz w:val="72"/><w:szCs w:val="72"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Содержание
+<w:tab w:val="right" w:leader="dot" w:pos="8306"/></w:tabs><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:textAlignment w:val="auto"/><w:rPr><w:b/><w:bCs/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:instrText xml:space="preserve">TOC \o &quot;1-1&quot; \h \u </w:instrText></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="FF0000"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="FF0000"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:instrText xml:space="preserve"> HYPERLINK \l _Toc13719 </w:instrText></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="FF0000"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="FF0000"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:t>ПРОГРЕССИЯ
+</w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="FF0000"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="FF0000"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:instrText xml:space="preserve"> PAGEREF _Toc13719 \h </w:instrText></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="FF0000"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="FF0000"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:t>2
+<w:tab w:val="right" w:leader="dot" w:pos="8306"/></w:tabs><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:textAlignment w:val="auto"/><w:rPr><w:b/><w:bCs/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="FFC000"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="FFC000"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:instrText xml:space="preserve"> HYPERLINK \l _Toc28273 </w:instrText></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="FFC000"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="FFC000"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:rtl w:val="0"/></w:rPr><w:t>GAMEPLAY LOOP
+</w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="FFC000"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="FFC000"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:instrText xml:space="preserve"> PAGEREF _Toc28273 \h </w:instrText></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="FFC000"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="FFC000"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:t>3
+<w:tab w:val="right" w:leader="dot" w:pos="8306"/></w:tabs><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:textAlignment w:val="auto"/><w:rPr><w:b/><w:bCs/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="FFFF00"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="FFFF00"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:instrText xml:space="preserve"> HYPERLINK \l _Toc18829 </w:instrText></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="FFFF00"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="FFFF00"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:t>МЕХАНИКИ
+</w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="FFFF00"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="FFFF00"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:instrText xml:space="preserve"> PAGEREF _Toc18829 \h </w:instrText></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="FFFF00"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="FFFF00"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:t>5
+<w:tab w:val="right" w:leader="dot" w:pos="8306"/></w:tabs><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:textAlignment w:val="auto"/><w:rPr><w:b/><w:bCs/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="00B050"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="00B050"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:instrText xml:space="preserve"> HYPERLINK \l _Toc878 </w:instrText></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="00B050"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="00B050"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:t>ЛОКАЦИИ
+</w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="00B050"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="00B050"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:instrText xml:space="preserve"> PAGEREF _Toc878 \h </w:instrText></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="00B050"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="00B050"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:t>7
+<w:tab w:val="right" w:leader="dot" w:pos="8306"/></w:tabs><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:textAlignment w:val="auto"/><w:rPr><w:b/><w:bCs/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="00B0F0"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="00B0F0"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:instrText xml:space="preserve"> HYPERLINK \l _Toc8094 </w:instrText></w:r><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:color w:val="00B0F0"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="00B0F0"/><w:sz w:val="32"/><w:szCs w:val="32"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr><w:t>ЭКИПИРОВКА
+</w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="00B0F0"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="00B0F0"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:instrText xml:space="preserve"> PAGEREF _Toc8094 \h </w:instrText></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="00B0F0"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:b/><w:bCs/><w:color w:val="00B0F0"/><w:sz w:val="32"/><w:szCs w:val="32"/></w:rPr><w:t>11
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default"/><w:sz w:val="72"/><w:szCs w:val="72"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:b/><w:bCs/><w:sz w:val="32"/><w:szCs w:val="32"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="end"/></w:r></w:p><w:p w14:paraId="452FF3AA"><w:pPr><w:rPr><w:rFonts w:hint="default"/><w:sz w:val="72"/><w:szCs w:val="72"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:sz w:val="72"/><w:szCs w:val="72"/><w:lang w:val="ru-RU"/></w:rPr><w:br w:type="page"/></w:r></w:p><w:p w14:paraId="3C807BB6"><w:pPr><w:pStyle w:val="2"/><w:bidi w:val="0"/><w:jc w:val="center"/><w:rPr><w:rFonts w:hint="default"/><w:color w:val="FF0000"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:bookmarkStart w:id="0" w:name="_Toc13719"/><w:r><w:rPr><w:rFonts w:hint="default"/><w:color w:val="FF0000"/><w:lang w:val="ru-RU"/></w:rPr><w:t>ПРОГРЕССИЯ
+У игроков существует 2 вида прогресии в игре:
+Сессионная и Перманентная. 
+Сессионная прогрессия
+В этот вид прогрессии входит все, что исчезает, после окончания забега (сессии), а конкретно 
+Экипировка
+, 
+Деньги забега
+ и бесплатный проезд в штаты высокой сложности, если в течении этого забега был пройден соседний штат.
+Перманентная прогрессия
+Эта прогрессия содержит следующие пункты:
+Чистые деньги
+, Стартовое снаряжение, Штаты для старта, 
+Декорации штаба
+.
+Когда игрок впервые заходит в игру у него открыт следующий контент:
+1 
+штат
+ для ограбления - 
+Техас
+2
+ стартов
+ых
+ 
+оружия
+ - 
+Револьвер S&amp;W M10
+ и 
+Пистолет Colt M1911
+2 стартовых 
+утилити
+ - Стандартные 
+кувалда
+ и 
+сумка
+1 стандартный 
+расходник
+ - 
+Стандартная сигара
+GAMEPLAY LOOP
+Игрок появляется на своей базе, которая изначально представляет заброшенный заводской цех, где припаркован грузовик, есть пару ящиков, которые содержат стартовое снаряжение (визуальное отображения прогресса, функционально они бесполезны). После сбора команды и выбора вооружения и штата, игроки загружаются в грузовик и уезжают.
+При запуске ограбления игрок направляется в первый город штата. В случае с Техасом это Даллас. Первое, что видят игроки после отбытия с базы - 
+кузов грузовика
+, где они должны выбрать 1 из двух банков на выбор для грабежа. Выбор будет реализован с помощью двух бумажных досье, где будет: 
+название банка
+время на ограбление
+примерная сложность и величина добычи
+(возможно) доп. параметры миссии (например, больший шанс на спавн определенного вида лута или комнат)
+После выбора банка для грабежа, экран затухает и после загрузки игроки оказываются у боковой стены банка. Отсчет времени начинает идти в момент разрушения входной стены. Стартовая комната всегда одна и та же: громкая сирена, без лута и минимум с 2 стенами для разрушения. Все дальнейшие ЛУТОВЫЕ комнаты будут иметь металлические двери, из которых будут выбегать 
+патрули
+.
+Чтобы открыть новую комнату, игрок должен сломать стену, ведущую к ней.
+ В каждой открытой  комнате, кроме оружейной, будет появляться отряд противников (появляются одновременно с генерацией локации), наполнение которого, определяется 
+Уровнем патруля
+. Каждую прошедшую минуту уровень патруля повышается на 
+3%, 
+после чего уже происходит спавн патруля (по новому проценту). 
+В лутовых комнатах игроки могу собирать добычу, если в руках у них есть сумка (именно в руках, а не в целом в инвентаре). Также, на локациях могут появляться расходники и утилити предметы.
+Каждый предмет имеет вес, нагружающий персонажа, в том числе оружие и расходники. При 
+высокой нагрузке весом
+, персонаж начинает терять скорость передвижения.
+С охранников выпадают боеприпасы и, с маленьким шансом, оружие охранника. 
+Все предметы 
+экипировки
+ можно сложить в лутовую сумку, чтобы перенести их в грузовик и сохранить их для дальнейшего заезда. Однако, достать их оттуда самим нельзя, они сами отделятся от сумки после завершения ограбления (не штата, а именно этого дня).
+Сумки нельзя разгрузить вручную во время ограбления. Если у вас 2 сумки, то вы сможете унести только ту добычу, которая поместится в эти сумки.
+После завершения ограбления, вся добыча автоматически «удаляется» из сумок и переносится в хранилище грузовика (формально показывает награбленное в течении штата, без функционала). А вся экипировка находится внутри грузовика (на полу или полках).
+Теперь игроки снова оказываются в кузове грузовика и выбирают следующий банк в следующем городе. После завершения всех 3 ограблений в штате, игроки попадают к 
+Дону
+.
+МЕХАНИКИ
+Нескрытые механики
+Квота
+Стартовая квота зависит от штата, в котором начал игрок, а конкретно от минимально возможного 
+Уровня опасности
+ первого города штата:
+УО 1 - 
+90-110k
+УО 2 - 100-120
+k
+УО 3 - 130-150
+k
+УО 4 - 145-165
+k
+УО 5 - 160-180
+k
+УО 6 - 
+200-225k
+УО 7 - 
+225-250k
+УО 8 - 250-275
+k
+УО 9 - 350-400
+k
+УО 10 - 400-500
+k
+Все дальнейшие квоты увеличиваются на слуйчаное значнение от 35-50
+k.
+Смерть
+Если игрок умирает, то его снаряжение выпадает прямо рядом с ним. Если снаряжение или лут находятся вне грузовика по окончанию миссии, то они теряются навсегда. 
+Игрок возрождается со случайным из 2 пистолетов и со случайным утилити в слоте, а также с обычной сигарой. Игрок возрождается после завершения дня.
+Восстановление утилити
+После окончания дня, во время выбора нового банка, игроки могут добрать до 2 утилити предметов (кувалда\сумка), по фиксированной стоимости 10
+k 
+за штуку.
+Перегруз
+Когда персонаж начинает переносить большой вес, то он начинает замедляться. 
+&lt;20 
+кг. - 0% 
+20-25 кг. - 10%
+25-30 кг. - 20%
+30-40 кг. - 40%
+40-50 кг. - 60%
+50-70 кг. - 80%
+70-80 кг. - 90%
+80+ кг. - персонаж не может двигаться
+Деньги забега
+Валюта, оставшаяся после сдачи квоты и вывода денег. Используются для покупки предметов для забега и исчезают после окончания забега.
+Чистые деньги
+Валюта для покупки перманентных улучшений и оплаты проезда в сложные штаты. Можно получить только путем вывода 10% у Дона.
+Патруль
+Каждую минуту происходит расчет шанса на спавн отряда солдат из металлических дверей. Этот шанс срабатывает только в комнатах, которые игроки уже открыли. Начальный шанс спавна - всегда 5%. Каждая дверь имеет свой расчет шанса (то есть, это не 5% шанс на то, что патрули появятся сразу из всех открытых дверей, а конкретно в той, где этот шанс сработал). Состав патруля зависит от сложности банка и оставшегося времени.
+Точки
+ лута
+Стеллаж
+Самая низкоуровневая точка лута, где
+ 
+может содержаться до 4 малых лут-предметов.
+Деревянный ящик
+Содержит до 2 малых предметов или 1 средний
+Стол
+Содержит до 4 малых предметов или до 2 средних
+Шкаф
+Содержит до 8 малых предметов и до 1 среднего и 6 малых
+Сейф
+Содержит 1 средний предмет
+Лут-предметы
+Малые (до 10 слотов)
+Пачка купюр 
+(Деньги)
+ - пачка из 100 купюр малого номинала
+Вес - 0.1 кг.
+Стоимость - 100
+$
+Слоты - 1
+«Кирпич» денег 
+(Деньги)
+ - упаковка из 400 купюр малого номинала.
+Вес - 0.5 кг.
+Стоимость - 400
+$
+Слоты - 5
+Золотая ложка 
+(Золото)
+ 
+- маленький, но ценный столовый прибор.
+Вес - 0.1 кг.
+Стоимость - 850-1100
+$
+Слоты - 1
+Золотая цепочка 
+(Золото)
+ 
+- увесистый премиальный аксессуар
+Вес - 1 кг.
+Стоимость - 1250-1750
+$
+Слоты - 5
+1 акционная бумага 
+(Облигации)
+ - лист, утверждающий владение ценным активом
+Вес - 0
+Стоимость - 2500-5500
+$
+Слоты - 1
+Комлпекс бумаг 
+(Облигации)
+ 
+- 4 бумаги на комплекс акций крупной компании
+Вес - 0
+Стоимость - 3500-6500
+$
+Слоты - 2
+Драгоценный камень 
+(Драгоценности) - небольшой камушек стоимостью в дом в пригороде
+Вес - 0.5 кг.
+Стоимость - 8500-12000
+$
+Слоты - 2
+Малая статуя Майя 
+(Реликвии)
+ 
+- древняя глиняная реликвия, сделанная честным трудом неандертальца
+Вес - 1 кг.
+Стоимость - 18000-22000
+$
+Слоты - 7
+Средние (до 25 слотов)
+Чемодан с деньгами
+ 
+(Деньги) 
+- содержит большое количество наличных, но весит немало
+Вес - 
+17
+кг.
+Стоимость - 5500
+$
+Слоты - 25
+Слиток золота 
+(Золото)
+ - не очень легкий способ быстро набить карманы
+Вес - 10 кг.
+Стоимость - 8000-10000
+$
+Слоты - 15
+Чемодан бумаг 
+(Облигации)
+ - содежрит полный пакет акций небольшой компании
+Вес - 10 кг.
+Стоимость - 20000-30000
+$
+Слоты - 25
+Крупный драгоценный камень 
+(Драгоценности)
+ - драгоценный монолит
+Вес - 25 кг.
+Стоимость - 40000-50000
+$
+Слоты - 20
+Средняя статуя Майя 
+(Реликвии) - средняя глиняная реликвия
+Вес - 5 кг.
+Стоимость - 7000
+0-75000$
+Слоты - 20
+Крупные (более 25 слотов)
+Денежный принтер 
+(Деньги)
+ 
+- устройство для печати банкнот
+Вес - 50 кг.
+Стоимость - 25000-30000
+$
+Слоты - 80
+Кусок золотой руды 
+(Золото) - крупный монолит необработанного золота
+Вес - 75 кг.
+Стоимость - 45000-55000
+$
+Слоты - 75
+Золотой клоун 
+(Драгоценности) - небольшая статуетка из золота, украшенная множеством драгоценных камней
+Вес - 60 кг.
+Стоимость - 80000-90000
+$
+Крупная статуя Майя 
+(Реликвии) - каменная мемная рожа
+Вес - 75 кг.
+Стоимость - 100000-125000
+$
+Слоты - 90
+Магазин Дона
+Всегда содержит 2 сессионных предмета и 1 персанентный апгрейд
+Если игроки покупают сессионный предмет, то сразу появляется новое предложение.
+Каждое приобретение предмета увеличивает его дальнейшую стоимость на 15% от КОНКРЕТНОЙ стоимости.
+При покупке оружия восполняется его полный боезапас.
+Цены и шансы выпадения предметов в послеквотовом магазине:
+Сессионные предметы
+Пачка обычных сигар (4шт.) - 30%\10000
+$
+Ассорти сигар (2 обычные\1 быстрая\1 сильная) -
+- 10%\25000
+$
+Кувалда - 15%\20000
+$
+Сумка - 15%\25000
+$
+Револьвер\пистолет - 5%\5% - 10000
+$
+Винчестер - 5%\30000
+$
+Стивенс - 5%\40000
+$
+Молотов - 5%\15000
+$
+Динамит - 5%\25000
+$
+Скрытые механики
+Спавн
+ лута
+Каждая точка спавна имеет шанс на спавн предмета в зависимости от сложности:
+Малый спавн - 35
+%\
+40
+%\
+45
+%\
+50
+%
+Средний спавн - 10%\15%\20%\25%
+Крупный спавн - 5%\10%\15%\20%
+Если в одном и том же месте может появиться 1 средний или 2 маленьких предмета, то сначала идет расечт более крупного(редкого) вида предметов. В случае, если предмет не появился, то начинают пробовать появиться более мелкие. Если более крупный предмет появился, то расчеты на предметы меньше отменяются.
+Если предмет получил шанс на появление, то он начинает определять свой тип (деньги, золото и т.д.) по этому шансу, зависимому от сложности:
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t xml:space="preserve">Деньги -           
+57
+%
+ 
+ 
+\
+57
+%
+ 
+\
+55
+%
+ 
+ 
+\
+50
+%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t xml:space="preserve">Золото -           
+3
+4.7
+%
+\
+3
+2
+%
+ 
+\
+29.5
+%
+\
+29
+%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t xml:space="preserve">Облигации -        
+2
+%
+ 
+  
+\
+4
+%
+  
+\
+7.8
+%
+ 
+\
+12
+%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t xml:space="preserve">Драгоценности -    
+1
+%
+   
+\
+1.5
+%
+\
+2
+%
+   
+\
+3
+%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="C00000"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t xml:space="preserve">Древние реликвии - 
+0.
+3
+%
+ 
+\
+0.5
+%
+\
+0.7
+%
+ 
+\
+1
+%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Расходник\утилити (только малый и средний спавн) - 5%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr></w:p><w:p w14:paraId="60994495"><w:pPr><w:keepNext w:val="0"/><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Если сработал шанс на спавн расходника или утилити, то дальше идет расчет шансов между конкретными предметами:
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Малый спот(расходники):
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Стандартная сигара - 50%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Быстрая сигара - 20%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Коктейль Молотова - 15%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Динамит - 10%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Силовая сигара - 5%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr></w:p><w:p w14:paraId="27F40E81"><w:pPr><w:keepNext w:val="0"/><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Средний спот(утилити):
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Кувалда - 75%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:color w:val="auto"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Сумка - 25%
+Спавн
+ комнат
+Количество комнат определяется уровнем опасности банка. Существует 5 типов комнат, которые могут заспавниться:
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Мал
+. Лутовая - 65%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Бол. Лутовая - 2
+5
+%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Закрытая Лутовая - 3%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Оружейная - 7%
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t xml:space="preserve">Комната охраны - 
+Всегда 1
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr></w:p><w:p w14:paraId="63FA2C57"><w:pPr><w:pStyle w:val="3"/><w:bidi w:val="0"/><w:rPr><w:rFonts w:hint="default"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:rtl w:val="0"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Малая лутовая
+Самая частая комната, в которой есть несколько низкоуровневых точек спавна лута. 
+Комната 1.1 - 2 входа, 4 стеллажа, 2 ящика
+Комната 1.2 - 2 входа, 4 стеллажа, 4 шкафа в закрытом хранилище
+Комната 1.3 - 2 входа, 3 стеллажа
+Комната 1.4 - 2 входа, 4 стеллажа
+Комната 1.5 - 3 входа, 4 стеллажа
+Большая лутовая 
+Крупная версия лутовой комнаты с множеством точек спавна всех калибров
+Комната 2.1 - 2 входа, 4 стола, 
+8 
+стеллажей, 8 ящиков
+Комната 2.2 - 4 входа, 4 стола, 2 шкафа, 6 стеллажей, 7 ящиков
+Закрытая лутовая
+Версия крупной комнаты с закрытым хранилищем
+Комната 3.1 - 3 входа,
+В общей части - 4 стола, 4 стеллажа
+В хранилище - 13 стеллажей, 3 шкафа, 2 сейфа
+Оружейная комната
+Комната для вооружения внутреннего персонала банка
+Не спавнит обычный лут, вместо него есть точки появления экипировки со следующими шансами
+Шанс появления лута - 
+40%/50%/60%/
+75%
+Пистолеты - 40%
+Утилити (50
+/50) - 
+20%
+Расходники (динамит и молотов) - 15%
+Винчестер - 15%
+Стивенс - 10%
+Комната охраны
+Комната без лута, открывает все запертые хранилища и увеличивает время миссии на 1 минуту.
+Уровень патруля
+Показатель, определящий наполнение стартовых противников и появляющихся патрулей.
+Легенда:
+Охранник\штурмовик\элитный отряд
+0-10% - 2-4 противника (2-4\0\0)
+10-20% - 3-5 противника (4\1\0)
+20-30% - 4-5 противников (3\2\0)
+30-50% - 5-6 противников (3\2\1)
+50-70% - 6-7 противников (3\3\1)
+70-80% - 7 противников (3\2\2)
+80-90% - 7 противников (2\3\2)
+90-100+% - 7 противников (1\3\3)
+Уровень опасности
+Показатель для игры, измеряющий уровень банка, определяющий его показатели.
+Легенда:
+ 
+сложность миссии/кол-во комнат/время/ур. патруля
+1 - низкая/8-9/5:00-5:30/0%
+2 - низкая/9-11/5:30-6:00/5%
+3 - средняя/11-13/6:30-7:30/1
+0
+%
+4 - средняя/12-14/7:30-8:30/
+15
+%
+5 - средняя/13-15/8:30-10:00/2
+0
+%
+6 - сложная/15-16/9:30-11:00/2
+0
+%
+7 - сложная/16-18/11:30-13:00/
+20
+%
+8 - сложная/17-19/12:30-15:00/
+25
+%
+9 - экстрим/19-22/15:00-20:00/
+30
+%
+10 - экстрим/21-25/17:00-25:00/
+35
+%
+</w:r></w:p><w:p w14:paraId="10F9E2FF"><w:r><w:br w:type="page"/></w:r></w:p><w:p w14:paraId="7FB891EF"><w:pPr><w:pStyle w:val="2"/><w:bidi w:val="0"/><w:jc w:val="center"/><w:rPr><w:color w:val="00B050"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:bookmarkStart w:id="11" w:name="_Toc878"/><w:r><w:rPr><w:color w:val="00B050"/><w:lang w:val="ru-RU"/></w:rPr><w:t>ЛОКАЦИИ
+Штаты
+Техас
+ (#1)
+Стартовый штат, обладающий самым низким диапазоном сложности.
+Стоимость
+ въезда: 0
+$
+.
+Города штата
+ (уровни опасности)
+:
+Даллас - 1 
+Хьюстон - 1-2 
+Остин
+ - 2
+При прохождении открывает штаты: Нью-Мексико (#2) и Луизиана (#3).
+Нью
+-Мексико 
+(#
+2
+)
+Легендарный
+ штат из Во Все Тяжкие
+.
+Стоимость
+ въезда: 0
+$
+.
+Города штата
+ (уровни опасности)
+:
+Лас
+-Крусес
+ - 1
+-2
+ 
+Альбукерке
+ - 
+2
+ 
+Санта
+-Фе
+ - 2
+-3
+При прохождении открывает штаты: 
+Техас
+ (
+#1), 
+Колорадо
+ (#
+6
+)
+,
+ 
+Аризона
+ (#
+10
+).
+Луизиана
+ 
+(#
+3
+)
+Мини
+-центр международных культур с сильным французским, испанским и африканским влиянием
+.
+Стоимость
+ въезда: 0
+$
+.
+Города штата
+ (уровни опасности)
+:
+Шривпорт
+ - 1
+-2
+ 
+Батон
+-Руж
+ - 
+2
+ 
+Новый
+ Орлеан
+ - 2
+-3
+При прохождении открывает штаты: 
+Техас
+ (
+#1), 
+Арканзас
+ 
+(#
+4
+),
+ 
+Миссисипи
+ 
+(#
+5
+).
+Арканзас
+ 
+(#
+4
+)
+Природная
+ столица востока Америки
+.
+Стоимость
+ въезда: 0
+$
+.
+Города штата
+ (уровни опасности)
+:
+Форт
+-Смит
+ - 
+2-3
+ 
+Фейетвилл
+ - 
+3
+ 
+Литл
+-Рок
+ - 
+3-4
+При прохождении открывает штаты: 
+Миссисипи
+ 
+(#
+5
+)
+, 
+Миссури
+ 
+(#
+7
+) и 
+Теннесси
+ 
+(#
+8
+).
+Миссисипи
+ 
+(#
+5
+)
+Квинтесенция
+ афроамериканской культуры
+.
+Стоимость
+ въезда: 0
+$
+.
+Города штата
+ (уровни опасности)
+:
+Натчез
+ - 
+2-3
+ 
+Джексон
+ - 
+3
+ 
+Меридиан
+ - 
+3-4
+При прохождении открывает штаты: 
+Луизиана 
+(#3), 
+Арканзас
+ 
+(#
+4
+), 
+Алабама
+ 
+(#
+9
+) и 
+Теннесси
+ 
+(#
+8
+).
+Колорадо 
+(#
+6
+)
+Горный
+ штат, популярный благодаря зимнему туризму
+.
+Стоимость
+ въезда: 0
+$
+.
+Города штата
+ (уровни опасности)
+:
+Колорадо
+-Спрингс
+ - 
+3-4
+ 
+Денвер
+ - 
+4
+ 
+Вейл
+ - 
+4-5
+При прохождении открывает штаты: Нью-Мексико (#2).
+Миссури
+ 
+(#
+7
+)
+Развитая
+ культура пивоварения, произовдства вина и второе место в Америке по кол-ву пещер
+.
+Стоимость
+ въезда: 0
+$
+.
+Города штата
+ (уровни опасности)
+:
+Спрингфилд
+ - 
+3-4
+ 
+Канзас
+-Сити
+ - 
+4
+ 
+Колумбия
+ - 
+4-5
+При прохождении открывает штаты:
+ 
+Арканзас
+ 
+(#
+4
+)
+.
+Теннесси
+ 
+(#
+8
+)
+Родина
+ мемфиса и множества хорошей музыки
+.
+Стоимость
+ въезда: 500
+$
+.
+Города штата
+ (уровни опасности)
+:
+Мемфис
+ - 
+4-5
+ 
+Нашвилл
+ - 
+5
+ 
+Пиджен
+ Фордж
+ - 
+5-6
+При прохождении открывает штаты: 
+Миссисипи 
+(#
+5
+), 
+Арканзас
+ 
+(#
+4
+), 
+Алабама
+ 
+(#
+9
+).
+Алабама
+ 
+(#
+9
+)
+SWEEEET HOOOOOME AAAAALABAMAAA
+.
+Стоимость
+ въезда: 
+75
+0
+$
+.
+Города штата
+ (уровни опасности)
+:
+Ханствилл
+ 
+- 
+5-6
+ 
+Бирмингем
+ - 
+6
+ 
+Монгомери
+ - 
+6-7
+При прохождении открывает штаты: 
+Миссисипи 
+(#
+5
+), 
+Теннесси
+ 
+(#
+8
+).
+Аризона
+ 
+(#
+10
+)
+Каменистая
+ пустыня с кактусами
+.
+Стоимость
+ въезда: 1000
+$
+.
+Города штата
+ (уровни опасности)
+:
+Тусон
+ - 
+6-7
+ 
+Финикс
+ - 
+7
+ 
+Седона
+ - 
+7-8
+При прохождении открывает штаты: Нью-Мексико (#2).
+Банковские
+ локации
+Малая лутовая
+Шанс спавна - 65%
+Самая часто встречающаяся комната, обычно содержит 2-4 низкоуровневых точки для лута
+Небанковские
+ локации
+Кузов грузовика
+Место
+ нахождения игроков между грабежами во время путешествия по штатам и точка для хранения всего сессионного лута.
+Дон
+Игроки попадают сюда после завершения штата.
+Сначала игроки отдают квоту, в случае неудачи набора квоты, игроков устраняют. В случае удачи, игрокам позволяют вывести 10% от общей суммы награбленного (распределяется равномерно между всеми игроками, например, если 4 игрока в лобби, то каждый получает 2.5%), после чего забирают квоту. Вывод в 10% выставляется автоматически (игрок не может сам крутить ползунок на, например, 6%), если же вывод средств уменьшает общую сумму ниже уровня квоты, то вывод становится недоступен.
+Далее игроки попадают в магазин Дона, где им на выбор дают 2 временных предмета (экипировка для этого забега) и 1 постоянный (перманентные улучшения, например доступ к старту с новым оружием). Временные предметы можно приобрести на деньги забега (которые являются общими), а перманентные улучшения приобретаются за чистые деньги персонально каждым игроком.
+После покупок, игроки выбирают, вернутся ли они в штаб или поедут в следующий штат.
+ 
+ЭКИПИРОВКА
+Оружие
+Револьвер Smith &amp; Wesson M10
+Стартовое снаряжение для игрока
+Урон - 34 (51)
+Боезапас - 6\60
+Скорострельность - 40 в\м
+Перезарядка:
+Открывание и очистка барабана - 1.3 с.
+Перезарядка 1 патрона - 0.7 с.
+Возвращение в готовое состояние - 1 с.
+Полная - 6.5 с.
+Референс:
+https://www.youtube.com/watch?v=uYV4fHIuJUg
+Модель:
+Пистолет Colt M1911
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Альтернативное базовое снаряжение для игрока
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t xml:space="preserve">Урон - 
+28
+ (
+39
+)
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="en-US"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t xml:space="preserve">Боезапас - 
+7
+\
+140
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t xml:space="preserve">Скорострельность - 
+222
+ в\м
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t xml:space="preserve">Перезарядка - 
+2
+.2 с.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr></w:p><w:p w14:paraId="163E0600"><w:pPr><w:keepNext w:val="0"/><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Референс:
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="SimSun" w:hAnsi="SimSun" w:eastAsia="SimSun" w:cs="SimSun"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="SimSun" w:hAnsi="SimSun" w:eastAsia="SimSun" w:cs="SimSun"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="114300" distR="114300"><wp:extent cx="4705985" cy="2952115"/><wp:effectExtent l="0" t="0" r="18415" b="635"/><wp:docPr id="5" name="Изображение 3" descr="IMG_256"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="5" name="Изображение 3" descr="IMG_256"/><pic:cNvPicPr><a:picLocks noChangeAspect="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId11"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="4705985" cy="2952115"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln w="9525"><a:noFill/></a:ln></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="5861E08F"><w:pPr><w:keepNext w:val="0"/><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun" w:cs="Cascadia Mono"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun" w:cs="Cascadia Mono"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun" w:cs="Cascadia Mono"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:instrText xml:space="preserve"> HYPERLINK &quot;https://www.youtube.com/watch?v=W2RhX8NVVA4&quot; </w:instrText></w:r><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun" w:cs="Cascadia Mono"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:rStyle w:val="11"/><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun" w:cs="Cascadia Mono"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:t>https://www.youtube.com/watch?v=W2RhX8NVVA4
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun" w:cs="Cascadia Mono"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr></w:p><w:p w14:paraId="4B48E876"><w:pPr><w:rPr><w:rFonts w:hint="default" w:ascii="SimSun" w:hAnsi="SimSun" w:eastAsia="SimSun" w:cs="SimSun"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="SimSun" w:hAnsi="SimSun" w:eastAsia="SimSun" w:cs="SimSun"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr><w:br w:type="page"/></w:r></w:p><w:p w14:paraId="2E92C3D7"><w:pPr><w:pStyle w:val="3"/><w:bidi w:val="0"/><w:rPr><w:rFonts w:hint="default"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Winchester M1887
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Рычажное ружье для средней и дальней дистанции
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Урон - 66 (101)
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Боезапас - 6\36
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Скорострельность - 30 в\м
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Перезарядка:
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Подготовка магазина - 1.6 с.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Перезарядка первого патрона - 1.2 с.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Перезарядка второго-пятого патрона - 0.8 с.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Перезарядка ствольного (шестого) патрона с возвращением в готовое состояние - 1 с.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Полная - 7 с.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun" w:cs="Cascadia Mono"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun" w:cs="Cascadia Mono"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Референс:
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="SimSun" w:hAnsi="SimSun" w:eastAsia="SimSun" w:cs="SimSun"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="SimSun" w:hAnsi="SimSun" w:eastAsia="SimSun" w:cs="SimSun"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr><w:drawing><wp:inline distT="0" distB="0" distL="114300" distR="114300"><wp:extent cx="5269230" cy="2968625"/><wp:effectExtent l="0" t="0" r="7620" b="3175"/><wp:docPr id="6" name="Изображение 4" descr="IMG_256"/><wp:cNvGraphicFramePr><a:graphicFrameLocks xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" noChangeAspect="1"/></wp:cNvGraphicFramePr><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="6" name="Изображение 4" descr="IMG_256"/><pic:cNvPicPr><a:picLocks noChangeAspect="1"/></pic:cNvPicPr></pic:nvPicPr><pic:blipFill><a:blip r:embed="rId12"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="5269230" cy="2968625"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom><a:noFill/><a:ln w="9525"><a:noFill/></a:ln></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p><w:p w14:paraId="48F4600F"><w:pPr><w:keepNext w:val="0"/><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun" w:cs="Cascadia Mono"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun" w:cs="Cascadia Mono"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun" w:cs="Cascadia Mono"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr><w:instrText xml:space="preserve"> HYPERLINK &quot;https://www.youtube.com/watch?v=1kyq6lG65yM&quot; </w:instrText></w:r><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun" w:cs="Cascadia Mono"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:rStyle w:val="11"/><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun" w:cs="Cascadia Mono"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr><w:t>https://www.youtube.com/watch?v=1kyq6lG65yM
+Stevens Model 94B Alofs Reloading Magazine
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="en-US"/></w:rPr><w:t xml:space="preserve">Break-action 
+дробовик с модификацией перезарядки
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="en-US"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Урон - 9
+x11 (9x17) - 
+до 5 метров
+;
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="en-US"/></w:rPr><w:t xml:space="preserve"> 
+</w:r><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="en-US"/></w:rPr><w:t xml:space="preserve">  
+9
+x6  (9x11) - 
+до 10 метров
+;
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Боезапас - 5
+\40
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Скорострельность - 20 в\м
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Перезарядка:
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Подготовка магазина - 0.5 с.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Перезарядка первого патрона - 0.7 с.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Подготовка доп. Магазина - 0.5 с.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Перезарядка второго-пятого патрона - 0.5 с.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Возвращение в готовое состояние - 1.3 с.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Полная - 5 с.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr></w:p><w:p w14:paraId="2C4A0183"><w:pPr><w:keepNext w:val="0"/><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Референс:
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="360" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr><w:instrText xml:space="preserve"> HYPERLINK &quot;https://www.youtube.com/watch?v=JeXJqjxP8wI&quot; </w:instrText></w:r><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:rPr><w:rStyle w:val="11"/><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr><w:t>https://www.youtube.com/watch?v=JeXJqjxP8wI
+Утилити
+Кувалда
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:rtl w:val="0"/></w:rPr><w:t>Основной инструмент для уничтожения стен между комнатами, стандартная версия требует 3 удара по стене, чтобы полностью сломать ее и может ударить в общей сумме 6 раз, до того как сломается.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:ind w:firstLine="708"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr></w:p><w:p w14:paraId="0000004D"><w:pPr><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:ind w:firstLine="708"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr></w:p><w:p w14:paraId="0000004E"><w:pPr><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:ind w:firstLine="708"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr></w:p><w:p w14:paraId="0000004F"><w:pPr><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:ind w:firstLine="708"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr></w:p><w:p w14:paraId="00000050"><w:pPr><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:ind w:firstLine="708"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr></w:p><w:p w14:paraId="00000051"><w:pPr><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:ind w:firstLine="708"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr></w:p><w:p w14:paraId="00000052"><w:pPr><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:ind w:firstLine="708"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr></w:p><w:p w14:paraId="00000053"><w:pPr><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:ind w:firstLine="708"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr></w:p><w:p w14:paraId="158EBB2D"><w:pPr><w:pStyle w:val="2"/><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:textAlignment w:val="auto"/><w:rPr><w:rtl w:val="0"/></w:rPr></w:pPr><w:bookmarkStart w:id="23" w:name="_heading=h.72sy8it2f4sd" w:colFirst="0" w:colLast="0"/><w:bookmarkEnd w:id="23"/></w:p><w:p w14:paraId="00000054"><w:pPr><w:pStyle w:val="3"/><w:bidi w:val="0"/></w:pPr><w:r><w:rPr><w:rtl w:val="0"/></w:rPr><w:t>Сумка для добычи
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:ind w:firstLine="720" w:firstLineChars="0"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/></w:rPr><w:t>Единственный возможный метод транспортировки лута из банка в грузовик. Стандартный вариант может вмещать до 75 кг. лута и имеет 100 слотов, которые автоматически занимаются предметами при их подборе и служат единицей измерения вместимости сумки.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/></w:rPr><w:t>Например, если игрок подобрал:
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/></w:rPr><w:t>3 пачки денег + 4 драгоценных камня + 1 слиток золота, то его сумка наполнена на:
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/></w:rPr><w:t>15 + 8 + 15 = 38\100, и весит 1.5 + 0.8 + 12 = 14.3 кг;
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/></w:rPr><w:t>Примерная стоимость добычи в сумке - 6000 + 210000 + 17500 = 243500$
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr></w:p><w:p w14:paraId="0000005B"><w:pPr><w:keepLines w:val="0"/><w:pageBreakBefore w:val="0"/><w:widowControl/><w:kinsoku/><w:wordWrap/><w:overflowPunct/><w:topLinePunct w:val="0"/><w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:ind w:firstLine="708"/><w:jc w:val="both"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:rtl w:val="0"/></w:rPr><w:t>У сумки отдельный хитбокс, в который могут попасть пули. При попадании по сумке, игрок получает на 10% меньше урона, а вся добыча внутри теряет 5% от своей изначальной стоимости.
+Например, золото, подобранное игроком получило стоимость 17000$. При попадании пули по сумке, оно теряет 2.5% в стоимости (так как золото теряет стоимость на 50% меньше). То есть стоимость этого слитка становится 16575$. При повторном попадании, оно теряет те же 2.5% от ИЗНАЧАЛЬНОЙ (17000$) стоимости.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr></w:pPr><w:r><w:rPr><w:sz w:val="28"/><w:szCs w:val="28"/></w:rPr><w:br w:type="page"/></w:r></w:p><w:p w14:paraId="0000005D"><w:pPr><w:pStyle w:val="3"/><w:bidi w:val="0"/></w:pPr><w:bookmarkStart w:id="24" w:name="_Расходники"/><w:r><w:rPr><w:rtl w:val="0"/></w:rPr><w:t>Расходники
+Стандартная сигара
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Является стандартным снаряжением на слот сигары, который восстанавливает здоровье при использовании
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t xml:space="preserve">Действует 60 сек. - 2 
+HP
+\с
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr></w:p><w:p w14:paraId="1A169017"><w:pPr><w:pStyle w:val="3"/><w:bidi w:val="0"/><w:rPr><w:rFonts w:hint="default"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Быстрая сигара
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Альтернативная сигара, ускоряющая передвижение при использовании
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Действует 30 сек. - +25% к скорости передвижения и лута
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr></w:p><w:p w14:paraId="49DB0D6B"><w:pPr><w:pStyle w:val="3"/><w:bidi w:val="0"/><w:rPr><w:rFonts w:hint="default"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Силовая сигара
+Сигара для переноса тяжелых предметов.
+Действует 45 сек. - уменьшает замедление от веса в 2 раза.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr></w:p><w:p w14:paraId="7F4999AB"><w:pPr><w:pStyle w:val="3"/><w:bidi w:val="0"/><w:rPr><w:rFonts w:hint="default"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Коктейль Молотова
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Поджигающая граната, позволяющая зачистить большую зону от противников, рискуя потерей лута (денег и облигаций) из-за того, что они сгорят.
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:cs="Cascadia Mono"/><w:b w:val="0"/><w:bCs w:val="0"/><w:sz w:val="24"/><w:szCs w:val="24"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr></w:p><w:p w14:paraId="41D54BD1"><w:pPr><w:pStyle w:val="3"/><w:bidi w:val="0"/><w:rPr><w:rFonts w:hint="default"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default"/><w:lang w:val="ru-RU"/></w:rPr><w:t>Динамитная шашка
+<w:autoSpaceDE/><w:autoSpaceDN/><w:bidi w:val="0"/><w:adjustRightInd/><w:snapToGrid/><w:spacing w:line="240" w:lineRule="auto"/><w:jc w:val="left"/><w:textAlignment w:val="auto"/><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr></w:pPr><w:r><w:rPr><w:rFonts w:hint="default" w:ascii="Cascadia Mono" w:hAnsi="Cascadia Mono" w:eastAsia="SimSun"/><w:sz w:val="28"/><w:szCs w:val="28"/><w:lang w:val="ru-RU"/></w:rPr><w:t>При размещении на уничтожаемую стену через короткий промежуток времени взрывает ее и оглушает всех противников внутри открытой комнаты.

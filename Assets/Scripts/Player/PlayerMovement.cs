@@ -211,6 +211,22 @@ public class PlayerMovement : MonoBehaviour
         if (footstepEvent.IsNull) return;
         
         EventInstance footsteps = RuntimeManager.CreateInstance(footstepEvent);
+
+        // 1. Проверяем наличие сумки (слот 0)
+        float hasBag = 0f;
+        if (PlayerInventory.Instance != null && PlayerInventory.Instance.slots[0] != null)
+        {
+            if (PlayerInventory.Instance.slots[0].itemData.fmodMainType == MainEquipmentType.Bag)
+            {
+                hasBag = 1f;
+            }
+        }
+        footsteps.setParameterByName("HasBag", hasBag);
+
+        // 2. Передаем общий вес игрока
+        float playerWeight = GameManager.Instance != null ? GameManager.Instance.currentWeight : 0f;
+        footsteps.setParameterByName("PlayerWeight", playerWeight);
+
         RuntimeManager.AttachInstanceToGameObject(footsteps, gameObject);
         footsteps.start();
         footsteps.release();

@@ -8,6 +8,8 @@ public class HeistUI : MonoBehaviour
     public TextMeshProUGUI weightText;
     public TextMeshProUGUI timerText;
     public TextMeshProUGUI staminaText;
+    public TextMeshProUGUI healthText;
+    public TextMeshProUGUI weaponText;
     public GameObject quotaMetBanner;
 
     [Header("Mission HUD Info")]
@@ -23,6 +25,7 @@ public class HeistUI : MonoBehaviour
     public string overWeightFormat = "<color=red>Weight: {0} / {1}kg (OVERWEIGHT)</color>";
     public string quotaDayFormat = "Day {0}/3\nVan: ${1}\nProgress: ${2} / ${3}";
     public string staminaFormat = "Stamina: {0}/{1}";
+    public string healthFormat = "HP: {0}/{1}";
 
     [Header("Placeholders (Future)")]
     public GameObject healthBarPlaceholder;
@@ -134,6 +137,24 @@ public class HeistUI : MonoBehaviour
             int displayCurrent = Mathf.RoundToInt(current);
             int displayMax = Mathf.RoundToInt(max);
             staminaText.text = string.Format(staminaFormat, displayCurrent, displayMax);
+        }
+    }
+
+    public void UpdateHealth(int current, int max)
+    {
+        if (healthText != null)
+        {
+            healthText.text = string.Format(healthFormat, current, max);
+            healthText.color = current <= 25 ? Color.red : Color.white;
+        }
+    }
+
+    public void UpdateWeapon(string text)
+    {
+        if (weaponText != null)
+        {
+            weaponText.text = text;
+            weaponText.gameObject.SetActive(!string.IsNullOrEmpty(text));
         }
     }
 

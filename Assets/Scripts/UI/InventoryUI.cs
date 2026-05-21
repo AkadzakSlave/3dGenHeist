@@ -49,10 +49,11 @@ public class InventoryUI : MonoBehaviour
             // Если в слоте есть предмет
             if (currentItem != null && currentItem.itemData != null)
             {
-                if (currentItem.itemData.icon != null)
+                uiSlots[i].itemIcon.sprite = currentItem.itemData.icon;
+                uiSlots[i].itemIcon.enabled = currentItem.itemData.icon != null;
+                if (currentItem.itemData.icon == null)
                 {
-                    uiSlots[i].itemIcon.sprite = currentItem.itemData.icon;
-                    uiSlots[i].itemIcon.enabled = true;
+                    uiSlots[i].itemIcon.sprite = null;
                 }
             }
             else

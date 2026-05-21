@@ -14,22 +14,39 @@ public class WorldEquipment : MonoBehaviour, IInteractable
     public int storedMoney = 0;
     public int storedWeight = 0;
 
-    private void Start()
+    private float lastSoundTime = 0f;
+
+    private void OnCollisionEnter(Collision collision)
     {
-        if (!dropSound.IsNull)
+        if (dropSound.IsNull) return;
+        
+        // Защита от спама звуком (задержка 0.5с между ударами)
+        if (Time.time - lastSoundTime < 0.5f) return;
+        
+        // Звук играет только при достаточно сильном ударе
+        float impactForce = collision.relativeVelocity.magnitude;
+        if (impactForce < 1.0f) return;
+
+        lastSoundTime = Time.time;
+
+        EventInstance drop = RuntimeManager.CreateInstance(dropSound);
+        
+        if (itemData != null)
         {
-            EventInstance drop = RuntimeManager.CreateInstance(dropSound);
+            // 1. Тип предмета
+            drop.setParameterByName("MainType", (float)itemData.fmodMainType);
             
-            // Если есть данные о предмете, передаем тип в FMOD
-            if (itemData != null)
-            {
-                drop.setParameterByName("MainType", (float)itemData.fmodMainType);
-            }
-            
-            RuntimeManager.AttachInstanceToGameObject(drop, gameObject, GetComponent<Rigidbody>());
-            drop.start();
-            drop.release();
+            // 2. Вес предмета (Базовый вес + вес лута внутри)
+            float totalWeight = itemData.baseWeight + storedWeight;
+            drop.setParameterByName("ItemWeight", totalWeight);
         }
+
+        // 3. Сила удара
+        drop.setParameterByName("ImpactForce", impactForce);
+        
+        RuntimeManager.AttachInstanceToGameObject(drop, gameObject, GetComponent<Rigidbody>());
+        drop.start();
+        drop.release();
     }
 
     public void Interact()

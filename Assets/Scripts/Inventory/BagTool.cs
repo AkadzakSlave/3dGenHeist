@@ -15,7 +15,7 @@ public class BagTool : EquipableItem
 
     public override void Equip()
     {
-        if (bagMesh != null) bagMesh.SetActive(true);
+        SetBagVisual(true);
         if (animator != null)
         {
             int idx = animator.GetLayerIndex(animatorLayerName);
@@ -26,7 +26,7 @@ public class BagTool : EquipableItem
 
     public override void Unequip()
     {
-        if (bagMesh != null) bagMesh.SetActive(false);
+        SetBagVisual(false);
         if (animator != null)
         {
             int idx = animator.GetLayerIndex(animatorLayerName);
@@ -60,5 +60,19 @@ public class BagTool : EquipableItem
         storedWeight += weightAmt;
         Debug.Log($"[Bag] Добавлено лута. Теперь внутри: ${storedMoney}, вес: {storedWeight}кг / {maxCapacity}кг");
         return true;
+    }
+
+    private void SetBagVisual(bool isVisible)
+    {
+        if (bagMesh != null)
+        {
+            bagMesh.SetActive(isVisible);
+            return;
+        }
+
+        foreach (var renderer in GetComponentsInChildren<Renderer>(true))
+        {
+            renderer.enabled = isVisible;
+        }
     }
 }

@@ -75,7 +75,8 @@ public class HammerTool : EquipableItem
         if (hammerMesh != null) hammerMesh.SetActive(true); 
         
         StopAllCoroutines();
-        StartCoroutine(EquipRoutine());
+        if (isActiveAndEnabled) StartCoroutine(EquipRoutine());
+        else isTransitioning = false;
     }
 
     public override void Unequip()
@@ -89,7 +90,12 @@ public class HammerTool : EquipableItem
         // Модель скрываем после задержки или сразу, если нужно быстро. 
         // Если есть анимация убирания 'remove', лучше скрыть в корутине.
         StopAllCoroutines();
-        StartCoroutine(UnequipRoutine());
+        if (isActiveAndEnabled) StartCoroutine(UnequipRoutine());
+        else
+        {
+            if (hammerMesh != null) hammerMesh.SetActive(false);
+            isTransitioning = false;
+        }
     }
 
     public override void PrimaryAction()

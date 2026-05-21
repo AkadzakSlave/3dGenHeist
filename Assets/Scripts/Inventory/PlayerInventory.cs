@@ -13,40 +13,48 @@ public class PlayerInventory : MonoBehaviour
     public EventReference pickupSound;
 
     [Header("Available Items (Attached to Player)")]
-    [Tooltip("Все предметы, которые есть у игрока 'в теле' (Молот, Сумка, разные пушки). Они должны быть выключены.")]
     public List<EquipableItem> allPossibleItems;
 
     [Header("Inventory Status")]
-    [Tooltip("Слот 0: Инструмент. Слот 1: Оружие.")]
+    [Tooltip("Slot 0: Tool. Slot 1: Weapon.")]
     public EquipableItem[] slots = new EquipableItem[2];
     public int activeSlotIndex = 0;
+    public string emptyWeaponText = "Нет оружия";
 
     [Header("Events")]
     public UnityEvent onInventoryChanged;
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void Start()
     {
-        // У игрока на старте ничего
         for (int i = 0; i < slots.Length; i++)
         {
             slots[i] = null;
         }
 
-        // Вместо выключения объектов, вызываем Unequip, который теперь прячет только визуал
+        activeSlotIndex = 0;
+
         foreach (var item in allPossibleItems)
         {
-            if (item != null)
-            {
-                item.gameObject.SetActive(true); // Объект должен быть ВСЕГДА активен для Аниматора
-                item.Unequip();
-            }
+            if (item == null) continue;
+
+            item.gameObject.SetActive(true);
+            item.Unequip();
         }
+
+        onInventoryChanged?.Invoke();
+        UpdateWeaponText();
     }
 
     private void Update()
@@ -58,25 +66,18 @@ public class PlayerInventory : MonoBehaviour
     {
         if (Keyboard.current == null || Mouse.current == null) return;
 
-        // --- Переключение слотов (1 и 2) ---
         if (Keyboard.current.digit1Key.wasPressedThisFrame) SwitchSlot(0);
         if (Keyboard.current.digit2Key.wasPressedThisFrame) SwitchSlot(1);
 
-        // --- Переключение на колесико мыши ---
         float scroll = Mouse.current.scroll.ReadValue().y;
         if (scroll > 0f) SwitchSlot(activeSlotIndex - 1);
         else if (scroll < 0f) SwitchSlot(activeSlotIndex + 1);
 
-        // --- Основное действие (ЛКМ) ---
-        if (Mouse.current.leftButton.wasPressedThisFrame)
+        if (Mouse.current.leftButton.wasPressedThisFrame && slots[activeSlotIndex] != null)
         {
-            if (slots[activeSlotIndex] != null)
-            {
-                slots[activeSlotIndex].PrimaryAction();
-            }
+            slots[activeSlotIndex].PrimaryAction();
         }
 
-        // --- Выкинуть предмет (G) ---
         if (Keyboard.current.gKey.wasPressedThisFrame)
         {
             DropCurrentItem();
@@ -87,81 +88,72 @@ public class PlayerInventory : MonoBehaviour
     {
         if (slots == null || slots.Length == 0) return;
 
-        // Закольцовываем индексы
         if (newIndex < 0) newIndex = slots.Length - 1;
         if (newIndex >= slots.Length) newIndex = 0;
 
-        if (activeSlotIndex == newIndex) return;
+        if (activeSlotIndex == newIndex)
+        {
+            UpdateWeaponText();
+            return;
+        }
 
-        // Прячем старый
         if (slots[activeSlotIndex] != null)
         {
             slots[activeSlotIndex].Unequip();
         }
 
-        // Берем новый
         activeSlotIndex = newIndex;
+
         if (slots[activeSlotIndex] != null)
         {
+            EnsureItemActive(slots[activeSlotIndex]);
             slots[activeSlotIndex].Equip();
         }
 
         onInventoryChanged?.Invoke();
+        UpdateWeaponText();
     }
 
     public bool PickupItem(ItemData data)
     {
         if (data == null) return false;
 
-        // Находим нужный слот в зависимости от типа
         int targetIndex = data.itemType == ItemType.Tool ? 0 : 1;
-
         if (slots == null || targetIndex >= slots.Length)
         {
-            Debug.LogError($"[Inventory] Ошибка: Слот №{targetIndex} для типа {data.itemType} отсутствует в массиве slots!");
+            Debug.LogError($"[Inventory] Missing slot for {data.itemType}.");
             return false;
         }
 
-        // Если слот уже занят - выводим конкретное сообщение
         if (slots[targetIndex] != null)
         {
-            string typeName = data.itemType.ToString();
-            string occupiedBy = slots[targetIndex].itemData.itemName;
-            Debug.Log($"[Inventory] Ячейка {typeName} занята предметом {occupiedBy}");
+            string occupiedBy = slots[targetIndex].itemData != null ? slots[targetIndex].itemData.itemName : slots[targetIndex].name;
+            Debug.Log($"[Inventory] {data.itemType} slot is already occupied by {occupiedBy}.");
             return false;
         }
 
-        // Ищем физический компонент этого предмета на теле игрока
-        EquipableItem itemToEnable = allPossibleItems.Find(item => item.itemData == data);
-        
-        if (itemToEnable != null)
+        EquipableItem itemToEnable = allPossibleItems.Find(item => item != null && item.itemData == data);
+        if (itemToEnable == null)
         {
-            slots[targetIndex] = itemToEnable;
-            
-            // Если подобрали предмет в активный слот, сразу берем в руки
-            if (activeSlotIndex == targetIndex)
-            {
-                slots[targetIndex].Equip();
-            }
-
-            if (!pickupSound.IsNull)
-            {
-                EventInstance pickup = RuntimeManager.CreateInstance(pickupSound);
-                // Передаем тип предмета в FMOD
-                pickup.setParameterByName("MainType", (float)data.fmodMainType);
-                RuntimeManager.AttachInstanceToGameObject(pickup, gameObject);
-                pickup.start();
-                pickup.release();
-            }
-
-            onInventoryChanged?.Invoke();
-            return true;
-        }
-        else
-        {
-            Debug.LogError($"[Inventory] Предмет {data.itemName} не найден на теле игрока в allPossibleItems!");
+            Debug.LogError($"[Inventory] Item {data.itemName} is not listed in allPossibleItems.");
             return false;
         }
+
+        if (slots[activeSlotIndex] != null)
+        {
+            slots[activeSlotIndex].Unequip();
+        }
+
+        slots[targetIndex] = itemToEnable;
+        activeSlotIndex = targetIndex;
+        EnsureItemActive(slots[targetIndex]);
+        slots[targetIndex].Equip();
+
+        PlayPickupSound(data);
+
+        onInventoryChanged?.Invoke();
+        UpdateWeaponText();
+        return true;
     }
 
     public void DropCurrentItem()
@@ -171,30 +163,24 @@ public class PlayerInventory : MonoBehaviour
         EquipableItem currentItem = slots[activeSlotIndex];
         if (currentItem == null) return;
 
-        // 1. Сначала убираем из рук (Мгновенно скрываем визуал для чистоты дропа)
         currentItem.Unequip();
-        
-        // 2. Рассчитываем точку спавна перед лицом
+
         Vector3 dropPosition;
         Transform cam = Camera.main != null ? Camera.main.transform : transform;
-        
-        RaycastHit hit;
-        // Пускаем луч, чтобы предмет не спавнился ЗА стеной
-        if (Physics.Raycast(cam.position, cam.forward, out hit, 2.0f))
+
+        if (Physics.Raycast(cam.position, cam.forward, out RaycastHit hit, 2.0f))
         {
-            dropPosition = hit.point - cam.forward * 0.2f; // Чуть ближе к игроку от точки удара
+            dropPosition = hit.point - cam.forward * 0.2f;
         }
         else
         {
             dropPosition = cam.position + cam.forward * 1.5f;
         }
 
-        // 3. Спавним префаб
         if (currentItem.itemData != null && currentItem.itemData.dropPrefab != null)
         {
             GameObject droppedObj = Instantiate(currentItem.itemData.dropPrefab, dropPosition, Quaternion.identity);
-            
-            // ПЕРЕНОС ДАННЫХ: Если мы выкинули сумку, данные о деньгах должны сохраниться в префабе на полу
+
             if (currentItem is BagTool bag)
             {
                 WorldEquipment worldEq = droppedObj.GetComponent<WorldEquipment>();
@@ -202,19 +188,19 @@ public class PlayerInventory : MonoBehaviour
                 {
                     worldEq.storedMoney = bag.storedMoney;
                     worldEq.storedWeight = bag.storedWeight;
-                    Debug.Log($"[Persistent] Данные сумки (${bag.storedMoney}) перенесены на пол.");
                 }
             }
         }
 
-        // 4. Очищаем слот
+        string itemName = currentItem.itemData != null ? currentItem.itemData.itemName : currentItem.name;
         slots[activeSlotIndex] = null;
-        onInventoryChanged?.Invoke();
 
-        Debug.Log($"[Inventory] {currentItem.itemData.itemName} выброшен.");
+        onInventoryChanged?.Invoke();
+        UpdateWeaponText();
+
+        Debug.Log($"[Inventory] {itemName} dropped.");
     }
 
-    // Возвращает весь вес, который сейчас несет игрок (Инструмент + Оружие)
     public int GetTotalWeight()
     {
         int weight = 0;
@@ -230,5 +216,36 @@ public class PlayerInventory : MonoBehaviour
         return slots[activeSlotIndex];
     }
 
-    // DevSwapTool удален по запросу
+    private void PlayPickupSound(ItemData data)
+    {
+        if (pickupSound.IsNull) return;
+
+        EventInstance pickup = RuntimeManager.CreateInstance(pickupSound);
+        pickup.setParameterByName("MainType", (float)data.fmodMainType);
+        RuntimeManager.AttachInstanceToGameObject(pickup, gameObject);
+        pickup.start();
+        pickup.release();
+    }
+
+    private void EnsureItemActive(EquipableItem item)
+    {
+        if (item != null && !item.gameObject.activeSelf)
+        {
+            item.gameObject.SetActive(true);
+        }
+    }
+
+    private void UpdateWeaponText()
+    {
+        if (GameManager.Instance == null || GameManager.Instance.heistUI == null) return;
+
+        if (slots != null && slots.Length > 1 && slots[1] is WeaponItem weapon)
+        {
+            weapon.RefreshWeaponUI();
+        }
+        else
+        {
+            GameManager.Instance.heistUI.UpdateWeapon(emptyWeaponText);
+        }
+    }
 }
