@@ -9,6 +9,7 @@ public class WeaponItem : EquipableItem
     public int damage = 25;
     public float range = 60f;
     public LayerMask hitLayers = ~0;
+    public bool isAutomatic = false;
 
     [Header("Ammo")]
     public bool infiniteAmmo = false;
@@ -21,10 +22,12 @@ public class WeaponItem : EquipableItem
     public GameObject weaponMesh;
     public Animator animator;
     public Transform muzzlePoint;
+    public ParticleSystem muzzleFlash;
     public string animatorLayerName = "Weapon Layer";
 
     [Header("Audio (FMOD)")]
     public EventReference fireEvent;
+    public EventReference reloadEvent;
 
     private float nextFireTime = 0f;
     private float reloadFinishTime = 0f;
@@ -72,6 +75,7 @@ public class WeaponItem : EquipableItem
     public override void Unequip()
     {
         isEquipped = false;
+        isReloading = false; // Cancel reload when unequipping
 
         if (weaponMesh != null) weaponMesh.SetActive(false);
         if (animator != null)
@@ -113,6 +117,11 @@ public class WeaponItem : EquipableItem
             RuntimeManager.PlayOneShot(fireEvent, muzzlePoint != null ? muzzlePoint.position : transform.position);
         }
 
+        if (muzzleFlash != null)
+        {
+            muzzleFlash.Play();
+        }
+
         if (animator != null)
         {
             animator.SetTrigger("Fire");
@@ -126,7 +135,10 @@ public class WeaponItem : EquipableItem
             return;
         }
 
-        if (Physics.Raycast(cam.position, cam.forward, out RaycastHit hit, range, hitLayers, QueryTriggerInteraction.Ignore))
+        Vector3 rayOrigin = cam.position + cam.forward * 0.5f;
+        float rayRange = Mathf.Max(0.1f, range - 0.5f);
+
+        if (Physics.Raycast(rayOrigin, cam.forward, out RaycastHit hit, rayRange, hitLayers, QueryTriggerInteraction.Ignore))
         {
             EnemyHealth enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>();
             if (enemyHealth != null)
@@ -161,6 +173,11 @@ public class WeaponItem : EquipableItem
 
         isReloading = true;
         reloadFinishTime = Time.time + reloadTime;
+
+        if (!reloadEvent.IsNull)
+        {
+            RuntimeManager.PlayOneShot(reloadEvent, transform.position);
+        }
 
         if (animator != null)
         {

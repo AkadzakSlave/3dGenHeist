@@ -115,7 +115,16 @@ PrefabInstance:
       addedObject: {fileID: 3335382155967983169}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2068a4a668e5f6047829bb29d50f8ab0, type: 3}
       insertIndex: -1
+      addedObject: {fileID: -2372503314134649297}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2068a4a668e5f6047829bb29d50f8ab0, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 7971883055196647869}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2068a4a668e5f6047829bb29d50f8ab0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4985905182852319150}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2068a4a668e5f6047829bb29d50f8ab0, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 912855738518063164}
   m_SourcePrefab: {fileID: 100100000, guid: 2068a4a668e5f6047829bb29d50f8ab0, type: 3}
 --- !u!1 &8344422727505114613 stripped
 GameObject:
@@ -135,7 +144,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
   data: {fileID: 11400000, guid: e2b8be90c9e34bb41b0f388e72c0485e, type: 2}
-  movementMode: 2
+  movementMode: 1
   directMovementStopDistance: 2
   targetSearchInterval: 1
   directMovementIgnoresDetectionRadius: 1
@@ -143,6 +152,30 @@ MonoBehaviour:
   canShoot: 1
   requireLineOfSight: 1
   aimHeight: 1.2
+--- !u!114 &-2372503314134649297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8344422727505114613}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb0da9757d0ddb4ebfa0f4f483cc8d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  useEnemyDataHealth: 1
+  maxHealth: 100
+  currentHealth: 100
+  isDead: 0
+  destroyOnDeath: 1
+  destroyDelay: 0
+  onDamaged:
+    m_PersistentCalls:
+      m_Calls: []
+  onDeath:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &7971883055196647869
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -164,6 +197,88 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1.6, z: 1}
   m_Center: {x: 0, y: 0.8, z: -0}
+--- !u!195 &4985905182852319150
+NavMeshAgent:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8344422727505114613}
+  m_Enabled: 1
+  m_AgentTypeID: 0
+  m_Radius: 0.5
+  m_Speed: 3.5
+  m_Acceleration: 8
+  avoidancePriority: 50
+  m_AngularSpeed: 120
+  m_StoppingDistance: 0
+  m_AutoTraverseOffMeshLink: 1
+  m_AutoBraking: 1
+  m_AutoRepath: 1
+  m_Height: 2
+  m_BaseOffset: 0
+  m_WalkableMask: 4294967295
+  m_ObstacleAvoidanceType: 4
+--- !u!137 &912855738518063164
+SkinnedMeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8344422727505114613}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 3
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  serializedVersion: 2
+  m_Quality: 0
+  m_UpdateWhenOffscreen: 0
+  m_SkinnedMotionVectors: 1
+  m_Mesh: {fileID: 0}
+  m_Bones: []
+  m_BlendShapeWeights: []
+  m_RootBone: {fileID: 0}
+  m_AABB:
+    m_Center: {x: 0, y: 0, z: 0}
+    m_Extent: {x: 0, y: 0, z: 0}
+  m_DirtyAABB: 0
 --- !u!4 &8684779487383203663 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2068a4a668e5f6047829bb29d50f8ab0, type: 3}

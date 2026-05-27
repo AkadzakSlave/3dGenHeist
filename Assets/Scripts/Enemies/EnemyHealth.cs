@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -16,6 +17,9 @@ public class EnemyHealth : MonoBehaviour
     public UnityEvent onDeath;
 
     private EnemyController enemyController;
+    private Renderer[] renderers;
+    private Color[] originalColors;
+    private Coroutine flashCoroutine;
 
     private void Awake()
     {
@@ -34,6 +38,17 @@ public class EnemyHealth : MonoBehaviour
         }
 
         currentHealth = maxHealth;
+
+        // Cache all child renderers and their original colors
+        renderers = GetComponentsInChildren<Renderer>(true);
+        originalColors = new Color[renderers.Length];
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            if (renderers[i] != null && renderers[i].material.HasProperty("_Color"))
+            {
+                originalColors[i] = renderers[i].material.color;
+            }
+        }
     }
 
     public void TakeDamage(int damage)
@@ -44,14 +59,56 @@ public class EnemyHealth : MonoBehaviour
         }
 
         currentHealth = Mathf.Max(0, currentHealth - damage);
+        
+        // Trigger red flash visual feedback
+        FlashRed();
+
         onDamaged?.Invoke();
 
-        Debug.Log($"[EnemyHealth] {name} took {damage}. HP: {currentHealth}/{maxHealth}");
+        Debug.Log($"[EnemyHealth] {name} took {damage} damage. HP: {currentHealth}/{maxHealth}");
 
         if (currentHealth <= 0)
         {
             Die();
         }
+    }
+
+    private void FlashRed()
+    {
+        if (flashCoroutine != null)
+        {
+            StopCoroutine(flashCoroutine);
+        }
+        
+        if (gameObject.activeInHierarchy)
+        {
+            flashCoroutine = StartCoroutine(FlashRoutine());
+        }
+    }
+
+    private IEnumerator FlashRoutine()
+    {
+        // Set all renderer colors to red
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            if (renderers[i] != null && renderers[i].material.HasProperty("_Color"))
+            {
+                renderers[i].material.color = Color.red;
+            }
+        }
+
+        yield return new WaitForSeconds(0.15f);
+
+        // Restore original colors
+        for (int i = 0; i < renderers.Length; i++)
+        {
+            if (renderers[i] != null && renderers[i].material.HasProperty("_Color"))
+            {
+                renderers[i].material.color = originalColors[i];
+            }
+        }
+
+        flashCoroutine = null;
     }
 
     private void Die()

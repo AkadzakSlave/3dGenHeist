@@ -73,9 +73,23 @@ public class PlayerInventory : MonoBehaviour
         if (scroll > 0f) SwitchSlot(activeSlotIndex - 1);
         else if (scroll < 0f) SwitchSlot(activeSlotIndex + 1);
 
-        if (Mouse.current.leftButton.wasPressedThisFrame && slots[activeSlotIndex] != null)
+        if (slots[activeSlotIndex] != null)
         {
-            slots[activeSlotIndex].PrimaryAction();
+            bool triggerAction = false;
+
+            if (slots[activeSlotIndex] is WeaponItem weapon && weapon.isAutomatic)
+            {
+                triggerAction = Mouse.current.leftButton.isPressed;
+            }
+            else
+            {
+                triggerAction = Mouse.current.leftButton.wasPressedThisFrame;
+            }
+
+            if (triggerAction)
+            {
+                slots[activeSlotIndex].PrimaryAction();
+            }
         }
 
         if (Keyboard.current.gKey.wasPressedThisFrame)
@@ -168,18 +182,42 @@ public class PlayerInventory : MonoBehaviour
         Vector3 dropPosition;
         Transform cam = Camera.main != null ? Camera.main.transform : transform;
 
-        if (Physics.Raycast(cam.position, cam.forward, out RaycastHit hit, 2.0f))
+        Vector3 customPosOffset = Vector3.zero;
+        Vector3 customRotOffset = Vector3.zero;
+        if (currentItem.itemData != null)
         {
-            dropPosition = hit.point - cam.forward * 0.2f;
+            customPosOffset = currentItem.itemData.dropPositionOffset;
+            customRotOffset = currentItem.itemData.dropRotationOffset;
+        }
+
+        // Base drop position: 1.2m forward and 0.4m down (waist height)
+        Vector3 spawnOffset = cam.forward * 1.2f - Vector3.up * 0.4f;
+        Vector3 cameraRelativeOffset = cam.right * customPosOffset.x + cam.up * customPosOffset.y + cam.forward * customPosOffset.z;
+        spawnOffset += cameraRelativeOffset;
+
+        if (Physics.Raycast(cam.position, spawnOffset.normalized, out RaycastHit hit, spawnOffset.magnitude))
+        {
+            if (hit.collider.transform.IsChildOf(transform))
+            {
+                dropPosition = cam.position + spawnOffset;
+            }
+            else
+            {
+                dropPosition = hit.point - spawnOffset.normalized * 0.15f;
+            }
         }
         else
         {
-            dropPosition = cam.position + cam.forward * 1.5f;
+            dropPosition = cam.position + spawnOffset;
         }
+
+        Vector3 camForwardFlat = new Vector3(cam.forward.x, 0f, cam.forward.z).normalized;
+        Quaternion baseRotation = camForwardFlat.sqrMagnitude > 0.001f ? Quaternion.LookRotation(camForwardFlat) : Quaternion.identity;
+        Quaternion dropRotation = baseRotation * Quaternion.Euler(customRotOffset);
 
         if (currentItem.itemData != null && currentItem.itemData.dropPrefab != null)
         {
-            GameObject droppedObj = Instantiate(currentItem.itemData.dropPrefab, dropPosition, Quaternion.identity);
+            GameObject droppedObj = Instantiate(currentItem.itemData.dropPrefab, dropPosition, dropRotation);
 
             if (currentItem is BagTool bag)
             {

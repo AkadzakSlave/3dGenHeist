@@ -24,4 +24,11 @@ public class ItemData : ScriptableObject
     
     [Tooltip("Префаб, который появится на полу, если игрок нажмет выбросить (G)")]
     public GameObject dropPrefab;
+
+    [Header("Drop Customize Options")]
+    [Tooltip("Дополнительное локальное смещение позиции при выбросе")]
+    public Vector3 dropPositionOffset = Vector3.zero;
+
+    [Tooltip("Дополнительный поворот при выбросе")]
+    public Vector3 dropRotationOffset = Vector3.zero;
 }

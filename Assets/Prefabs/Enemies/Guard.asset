@@ -18,7 +18,7 @@ MonoBehaviour:
   moveSpeed: 3.5
   angularSpeed: 120
   acceleration: 8
-  maxHealth: 1
+  maxHealth: 45
   detectionRadius: 15
   damagePerShot: 10
   attackRange: 12
@@ -27,3 +27,10 @@ MonoBehaviour:
   lineOfSightMask:
     serializedVersion: 2
     m_Bits: 4294967295
+  fireEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 

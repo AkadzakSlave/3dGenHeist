@@ -101,6 +101,19 @@ public class LevelGenerator : MonoBehaviour
     private IEnumerator GenerateWrapper(System.Action onComplete)
     {
         yield return StartCoroutine(GenerateLevelWithRetries());
+
+        // Bake NavMesh dynamically at runtime for modular procedural rooms
+        var surface = GetComponent<Unity.AI.Navigation.NavMeshSurface>();
+        if (surface != null)
+        {
+            Debug.Log("<color=cyan>[Gen] Перезапекание NavMesh для всего процедурного уровня...</color>");
+            surface.BuildNavMesh();
+        }
+        else
+        {
+            Debug.LogWarning("<color=orange>[Gen] NavMeshSurface не найден на LevelGenerator. NavMesh не будет пересобран.</color>");
+        }
+
         onComplete?.Invoke();
     }
 

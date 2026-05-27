@@ -8,6 +8,7 @@ public enum EnemyMovementMode
     DirectToPlayer
 }
 
+[RequireComponent(typeof(NavMeshAgent))]
 public class EnemyController : MonoBehaviour
 {
     public EnemyData data;
@@ -29,6 +30,7 @@ public class EnemyController : MonoBehaviour
     private PlayerHealth playerHealth;
     private float targetSearchTimer = 0f;
     private float fireTimer = 0f;
+    private readonly RaycastHit[] losHits = new RaycastHit[5];
 
     private float MoveSpeed => data != null ? data.moveSpeed : 3.5f;
     private float AngularSpeed => data != null ? data.angularSpeed : 120f;
@@ -49,6 +51,8 @@ public class EnemyController : MonoBehaviour
             agent.speed = MoveSpeed;
             agent.angularSpeed = AngularSpeed;
             agent.acceleration = Acceleration;
+            agent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
+            agent.radius = 0.45f;
 
             if (movementMode == EnemyMovementMode.DirectToPlayer)
             {
@@ -69,14 +73,18 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
-        if (playerTarget == null)
+        if (playerTarget == null || playerHealth == null || playerHealth.isDead)
         {
+            playerTarget = null;
+            playerHealth = null;
+
             targetSearchTimer -= Time.deltaTime;
             if (targetSearchTimer <= 0f)
             {
                 FindPlayerTarget();
             }
 
+            StopMoving();
             return;
         }
 
@@ -111,18 +119,55 @@ public class EnemyController : MonoBehaviour
     {
         targetSearchTimer = targetSearchInterval;
 
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null)
+        // Try to find the closest living player in GameManager
+        if (GameManager.Instance != null && GameManager.Instance.activePlayers.Count > 0)
         {
-            playerTarget = player.transform;
-            playerHealth = player.GetComponent<PlayerHealth>();
-            return;
+            PlayerHealth closestPlayer = null;
+            float closestDistance = float.MaxValue;
+
+            foreach (var player in GameManager.Instance.activePlayers)
+            {
+                if (player != null && !player.isDead)
+                {
+                    float dist = Vector3.Distance(transform.position, player.transform.position);
+                    if (dist < closestDistance)
+                    {
+                        closestDistance = dist;
+                        closestPlayer = player;
+                    }
+                }
+            }
+
+            if (closestPlayer != null)
+            {
+                playerTarget = closestPlayer.transform;
+                playerHealth = closestPlayer;
+                return;
+            }
         }
 
+        // Fallback: Find by tag
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            PlayerHealth ph = playerObj.GetComponent<PlayerHealth>();
+            if (ph != null && !ph.isDead)
+            {
+                playerTarget = playerObj.transform;
+                playerHealth = ph;
+                return;
+            }
+        }
+
+        // Fallback: GameManager playerTransform
         if (GameManager.Instance != null && GameManager.Instance.playerTransform != null)
         {
-            playerTarget = GameManager.Instance.playerTransform;
-            playerHealth = playerTarget.GetComponent<PlayerHealth>();
+            PlayerHealth ph = GameManager.Instance.playerTransform.GetComponent<PlayerHealth>();
+            if (ph != null && !ph.isDead)
+            {
+                playerTarget = GameManager.Instance.playerTransform;
+                playerHealth = ph;
+            }
         }
     }
 
@@ -140,12 +185,13 @@ public class EnemyController : MonoBehaviour
 
         if (!agent.isOnNavMesh)
         {
-            if (movementMode == EnemyMovementMode.Auto)
+            // Try to warp agent back to the nearest NavMesh position
+            if (NavMesh.SamplePosition(transform.position, out NavMeshHit hit, 2.0f, NavMesh.AllAreas))
             {
-                agent.enabled = false;
+                agent.Warp(hit.position);
             }
 
-            return false;
+            return agent.isOnNavMesh;
         }
 
         return movementMode == EnemyMovementMode.NavMesh || movementMode == EnemyMovementMode.Auto;
@@ -163,12 +209,6 @@ public class EnemyController : MonoBehaviour
 
     private void MoveDirectly(float distanceToPlayer)
     {
-        if (agent != null && agent.enabled && agent.isOnNavMesh)
-        {
-            agent.ResetPath();
-            agent.isStopped = true;
-        }
-
         Vector3 direction = playerTarget.position - transform.position;
         direction.y = 0f;
 
@@ -176,10 +216,28 @@ public class EnemyController : MonoBehaviour
 
         if (distanceToPlayer <= directMovementStopDistance)
         {
+            if (agent != null && agent.enabled && agent.isOnNavMesh)
+            {
+                agent.ResetPath();
+                agent.isStopped = true;
+            }
             return;
         }
 
-        transform.position += direction.normalized * MoveSpeed * Time.deltaTime;
+        Vector3 translation = direction.normalized * MoveSpeed * Time.deltaTime;
+
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+        {
+            if (agent.isStopped)
+            {
+                agent.isStopped = false;
+            }
+            agent.Move(translation);
+        }
+        else
+        {
+            transform.position += translation;
+        }
     }
 
     private bool HasLineOfSight()
@@ -189,22 +247,38 @@ public class EnemyController : MonoBehaviour
             return true;
         }
 
-        Vector3 origin = firePoint != null ? firePoint.position : transform.position + Vector3.up * aimHeight + transform.forward * 0.25f;
+        Vector3 origin = firePoint != null ? firePoint.position : transform.position + Vector3.up * aimHeight + transform.forward * 0.35f;
         Vector3 target = playerTarget.position + Vector3.up * aimHeight;
         Vector3 direction = target - origin;
+        float distance = Mathf.Min(direction.magnitude, AttackRange);
 
-        RaycastHit[] hits = Physics.RaycastAll(origin, direction.normalized, AttackRange, LineOfSightMask, QueryTriggerInteraction.Ignore);
-        System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
-
-        foreach (var hit in hits)
+        int hitCount = Physics.RaycastNonAlloc(origin, direction.normalized, losHits, distance, LineOfSightMask, QueryTriggerInteraction.Ignore);
+        if (hitCount > 0)
         {
-            if (hit.collider.transform.IsChildOf(transform))
+            float closestDist = float.MaxValue;
+            RaycastHit closestHit = default;
+            bool foundHit = false;
+
+            for (int i = 0; i < hitCount; i++)
             {
-                continue;
+                if (losHits[i].collider.transform.IsChildOf(transform))
+                {
+                    continue;
+                }
+
+                if (losHits[i].distance < closestDist)
+                {
+                    closestDist = losHits[i].distance;
+                    closestHit = losHits[i];
+                    foundHit = true;
+                }
             }
 
-            PlayerHealth hitPlayer = hit.collider.GetComponentInParent<PlayerHealth>();
-            return hitPlayer != null && hitPlayer == playerHealth;
+            if (foundHit)
+            {
+                PlayerHealth hitPlayer = closestHit.collider.GetComponentInParent<PlayerHealth>();
+                return hitPlayer != null && hitPlayer == playerHealth;
+            }
         }
 
         return false;
@@ -224,6 +298,12 @@ public class EnemyController : MonoBehaviour
         {
             FindPlayerTarget();
             return;
+        }
+
+        // Play gunshot audio
+        if (data != null && !data.fireEvent.IsNull)
+        {
+            FMODUnity.RuntimeManager.PlayOneShot(data.fireEvent, firePoint != null ? firePoint.position : transform.position);
         }
 
         if (Random.value <= HitChance)

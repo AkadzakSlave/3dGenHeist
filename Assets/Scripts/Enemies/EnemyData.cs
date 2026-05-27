@@ -31,4 +31,7 @@ public class EnemyData : ScriptableObject
     public float fireInterval = 1.5f;
     [Range(0f, 1f)] public float hitChance = 0.75f;
     public LayerMask lineOfSightMask = ~0;
+
+    [Header("Audio (FMOD)")]
+    public FMODUnity.EventReference fireEvent;
 }
