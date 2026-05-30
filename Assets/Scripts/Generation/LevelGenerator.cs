@@ -102,16 +102,43 @@ public class LevelGenerator : MonoBehaviour
     {
         yield return StartCoroutine(GenerateLevelWithRetries());
 
-        // Bake NavMesh dynamically at runtime for modular procedural rooms
+        // 1. Temporarily deactivate all destructible walls so the NavMesh can bake uninterrupted through doorways
+        List<GameObject> breakableWalls = new List<GameObject>();
+        if (spawnedWalls != null)
+        {
+            foreach (var wall in spawnedWalls)
+            {
+                if (wall != null && wall.GetComponent<DestructibleWall>() != null)
+                {
+                    breakableWalls.Add(wall);
+                    wall.SetActive(false);
+                }
+            }
+        }
+
+        // 2. Bake NavMesh dynamically at runtime for modular procedural rooms
         var surface = GetComponent<Unity.AI.Navigation.NavMeshSurface>();
         if (surface != null)
         {
             Debug.Log("<color=cyan>[Gen] Перезапекание NavMesh для всего процедурного уровня...</color>");
+            
+            // Force the use of Physics Colliders to avoid Read/Write mesh access errors
+            surface.useGeometry = UnityEngine.AI.NavMeshCollectGeometry.PhysicsColliders;
+            
             surface.BuildNavMesh();
         }
         else
         {
             Debug.LogWarning("<color=orange>[Gen] NavMeshSurface не найден на LevelGenerator. NavMesh не будет пересобран.</color>");
+        }
+
+        // 3. Reactivate all destructible walls
+        foreach (var wall in breakableWalls)
+        {
+            if (wall != null)
+            {
+                wall.SetActive(true);
+            }
         }
 
         onComplete?.Invoke();
