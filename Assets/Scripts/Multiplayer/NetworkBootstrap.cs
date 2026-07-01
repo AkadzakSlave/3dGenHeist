@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+using Unity.Netcode.Components;
 
 public class NetworkBootstrap : MonoBehaviour
 {
@@ -37,6 +38,9 @@ public class NetworkBootstrap : MonoBehaviour
 
     [Tooltip("Объект визуального контейнера панели UI")]
     public GameObject uiContainer;
+
+    [Tooltip("Компонент для отображения отладочной текстовой информации")]
+    public TMP_Text debugTextInfo;
 
     private bool isUiActive = false;
     private bool isValidated = false;
@@ -156,6 +160,12 @@ public class NetworkBootstrap : MonoBehaviour
             return;
         }
 
+        // Запуск валидации настроек перед стартом хоста
+        if (!ValidateHostSettings())
+        {
+            return;
+        }
+
         // Защита от двойного запуска или повторного нажатия
         if (NetworkManager.Singleton.IsServer || NetworkManager.Singleton.IsClient)
         {
@@ -164,7 +174,7 @@ public class NetworkBootstrap : MonoBehaviour
         }
 
         Debug.Log("[NET] Starting Host");
-        ConfigureTransport();
+        ConfigureTransport(true);
 
         if (NetworkManager.Singleton.StartHost())
         {
@@ -193,7 +203,7 @@ public class NetworkBootstrap : MonoBehaviour
         }
 
         Debug.Log("[NET] Starting Client");
-        ConfigureTransport();
+        ConfigureTransport(false);
 
         if (NetworkManager.Singleton.StartClient())
         {
@@ -231,7 +241,74 @@ public class NetworkBootstrap : MonoBehaviour
         }
     }
 
-    private void ConfigureTransport()
+    private bool ValidateHostSettings()
+    {
+        bool success = true;
+
+        if (NetworkManager.Singleton == null)
+        {
+            Debug.LogError("[NET ERROR] Validation Failed: NetworkManager does not exist in the scene.");
+            return false;
+        }
+
+        Debug.Log("[NET] Validation Check: NetworkManager exists. [OK]");
+
+        UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
+        if (transport == null)
+        {
+            Debug.LogError("[NET ERROR] Validation Failed: UnityTransport component not found on NetworkManager.");
+            success = false;
+        }
+        else
+        {
+            Debug.Log("[NET] Validation Check: UnityTransport exists. [OK]");
+        }
+
+        if (NetworkManager.Singleton.NetworkConfig.PlayerPrefab == null)
+        {
+            Debug.LogError("[NET ERROR] Validation Failed: Player Prefab is not assigned in NetworkManager NetworkConfig.");
+            success = false;
+        }
+        else
+        {
+            Debug.Log("[NET] Validation Check: Player Prefab assigned in NetworkManager. [OK]");
+            GameObject playerPrefab = NetworkManager.Singleton.NetworkConfig.PlayerPrefab;
+
+            if (playerPrefab.GetComponent<NetworkObject>() == null)
+            {
+                Debug.LogError("[NET ERROR] Validation Failed: NetworkObject component is missing on the Player Prefab.");
+                success = false;
+            }
+            else
+            {
+                Debug.Log("[NET] Validation Check: NetworkObject present on Player Prefab. [OK]");
+            }
+
+            if (playerPrefab.GetComponent<NetworkTransform>() == null)
+            {
+                Debug.LogError("[NET ERROR] Validation Failed: NetworkTransform component is missing on the Player Prefab.");
+                success = false;
+            }
+            else
+            {
+                Debug.Log("[NET] Validation Check: NetworkTransform present on Player Prefab. [OK]");
+            }
+
+            if (playerPrefab.GetComponent<NetworkPlayerSetup>() == null)
+            {
+                Debug.LogError("[NET ERROR] Validation Failed: NetworkPlayerSetup component is missing on the Player Prefab.");
+                success = false;
+            }
+            else
+            {
+                Debug.Log("[NET] Validation Check: NetworkPlayerSetup present on Player Prefab. [OK]");
+            }
+        }
+
+        return success;
+    }
+
+    private void ConfigureTransport(bool isHost)
     {
         UnityTransport transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
         if (transport == null) return;
@@ -242,11 +319,22 @@ public class NetworkBootstrap : MonoBehaviour
             ipAddress = ipInputField.text.Trim();
         }
 
-        transport.SetConnectionData(ipAddress, defaultPort);
+        if (isHost)
+        {
+            // Host listens on all interfaces (0.0.0.0)
+            transport.SetConnectionData("127.0.0.1", defaultPort, "0.0.0.0");
+        }
+        else
+        {
+            // Client connects to the specific IP address entered
+            transport.SetConnectionData(ipAddress, defaultPort);
+        }
 
         // Логирование конфигурации подключения
-        Debug.Log($"[NET] IP: {ipAddress}");
-        Debug.Log($"[NET] Port: {defaultPort}");
+        Debug.Log($"[NET] Connection IP: {transport.ConnectionData.Address}");
+        Debug.Log($"[NET] Listen Address: {transport.ConnectionData.ServerListenAddress}");
+        Debug.Log($"[NET] Port: {transport.ConnectionData.Port}");
+        Debug.Log($"[NET] Connection State: {(NetworkManager.Singleton.IsListening ? "Active" : "Connecting/Inactive")}");
     }
 
     private void OnClientConnected(ulong clientId)
@@ -276,6 +364,78 @@ public class NetworkBootstrap : MonoBehaviour
         if (ipInputField != null) ipInputField.gameObject.SetActive(!isNetworkActive);
         
         if (disconnectButton != null) disconnectButton.gameObject.SetActive(isNetworkActive);
+    }
+
+    private void OnGUI()
+    {
+        if (!isUiActive) return;
+
+        // Построение отладочной строки
+        System.Text.StringBuilder sb = new System.Text.StringBuilder();
+        sb.AppendLine("=== MULTIPLAYER DEBUG PANEL ===");
+        
+        if (NetworkManager.Singleton == null)
+        {
+            sb.AppendLine("NetworkManager: NOT FOUND");
+        }
+        else
+        {
+            bool isHost = NetworkManager.Singleton.IsHost;
+            bool isServer = NetworkManager.Singleton.IsServer;
+            bool isClient = NetworkManager.Singleton.IsClient;
+            
+            string mode = "Idle";
+            if (isHost) mode = "Host";
+            else if (isServer) mode = "Server";
+            else if (isClient) mode = "Client";
+            
+            sb.AppendLine($"Host/Client Mode: {mode}");
+            sb.AppendLine($"Network Status: {(NetworkManager.Singleton.IsListening ? "Connected/Active" : "Disconnected/Inactive")}");
+            
+            if (isClient || isServer)
+            {
+                sb.AppendLine($"Local Client ID: {NetworkManager.Singleton.LocalClientId}");
+                
+                System.Collections.Generic.List<string> clientIds = new System.Collections.Generic.List<string>();
+                if (NetworkManager.Singleton.ConnectedClientsList != null)
+                {
+                    foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
+                    {
+                        clientIds.Add(client.ClientId.ToString());
+                    }
+                }
+                sb.AppendLine($"Connected Client IDs: {string.Join(", ", clientIds)}");
+                
+                NetworkObject localPlayer = null;
+                if (NetworkManager.Singleton.SpawnManager != null)
+                {
+                    localPlayer = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
+                }
+                
+                if (localPlayer != null)
+                {
+                    sb.AppendLine($"Player Object ID: {localPlayer.NetworkObjectId}");
+                    sb.AppendLine($"Owner Client ID: {localPlayer.OwnerClientId}");
+                    sb.AppendLine($"Current Position: {localPlayer.transform.position.ToString("F3")}");
+                }
+                else
+                {
+                    sb.AppendLine("Player Object: NOT SPAWNED");
+                }
+            }
+        }
+
+        string debugText = sb.ToString();
+
+        // Обновляем текстовый компонент, если он назначен
+        if (debugTextInfo != null)
+        {
+            debugTextInfo.text = debugText;
+        }
+
+        // Рисуем экранный оверлей на случай, если TMP_Text не настроен в инспекторе сцены
+        GUI.Box(new Rect(15, 15, 320, 240), "");
+        GUI.Label(new Rect(25, 20, 300, 230), debugText);
     }
 
     // Вспомогательный метод для подготовки к переходу между сценами
