@@ -5,6 +5,7 @@ public class PlayerCamera : MonoBehaviour
 {
     public float mouseSensitivity = 15f;
     public Transform playerBody;
+    public InputReader inputReader;
     
     private float xRotation = 0f;
 
@@ -16,9 +17,12 @@ public class PlayerCamera : MonoBehaviour
 
     void Update()
     {
-        if (Mouse.current == null) return;
+        Vector2 mouseDelta = Vector2.zero;
+        if (inputReader != null)
+        {
+            mouseDelta = inputReader.LookInput;
+        }
 
-        Vector2 mouseDelta = Mouse.current.delta.ReadValue();
         float mouseX = mouseDelta.x * mouseSensitivity * Time.deltaTime;
         float mouseY = mouseDelta.y * mouseSensitivity * Time.deltaTime;
 

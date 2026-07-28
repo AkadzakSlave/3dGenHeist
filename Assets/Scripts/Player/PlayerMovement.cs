@@ -38,6 +38,9 @@ public class PlayerMovement : MonoBehaviour
     [Header("UI Reference")]
     public HeistUI uiRef;
 
+    [Header("Input")]
+    public InputReader inputReader;
+
     private CharacterController controller;
     [Header("Debug Status (Read Only)")]
     [SerializeField] private float currentSpeedDisplay;
@@ -46,6 +49,28 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 velocity;
     private float footstepTimer = 0f;
     private bool wasGrounded = true;
+    private bool jumpRequested = false;
+
+    private void OnEnable()
+    {
+        if (inputReader != null)
+        {
+            inputReader.JumpEvent += OnJump;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (inputReader != null)
+        {
+            inputReader.JumpEvent -= OnJump;
+        }
+    }
+
+    private void OnJump()
+    {
+        jumpRequested = true;
+    }
 
     void Start()
     {
@@ -69,13 +94,12 @@ public class PlayerMovement : MonoBehaviour
         bool isSprintPressed = false;
         bool isMoving = false;
 
-        if (Keyboard.current != null)
+        if (inputReader != null)
         {
-            if (Keyboard.current.wKey.isPressed) z += 1f;
-            if (Keyboard.current.sKey.isPressed) z -= 1f;
-            if (Keyboard.current.dKey.isPressed) x += 1f;
-            if (Keyboard.current.aKey.isPressed) x -= 1f;
-            if (Keyboard.current.leftShiftKey.isPressed) isSprintPressed = true;
+            Vector2 moveInput = inputReader.MoveInput;
+            x = moveInput.x;
+            z = moveInput.y;
+            isSprintPressed = inputReader.IsSprintPressed;
         }
 
         Vector3 move = transform.right * x + transform.forward * z;
@@ -154,8 +178,9 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Логика Прыжка
-        if (Keyboard.current != null && Keyboard.current.spaceKey.wasPressedThisFrame)
+        if (jumpRequested)
         {
+            jumpRequested = false;
             if (isGrounded)
             {
                 float weight = GameManager.Instance != null ? GameManager.Instance.currentWeight : 0;
@@ -176,6 +201,15 @@ public class PlayerMovement : MonoBehaviour
                 }
             }
         }
+        else
+        {
+            // Reset the flag even if not grounded, so jump request isn't queued indefinitely
+            if (isGrounded)
+            {
+                jumpRequested = false;
+            }
+        }
+
 
         // Применяем гравитацию
         velocity.y += gravity * Time.deltaTime;

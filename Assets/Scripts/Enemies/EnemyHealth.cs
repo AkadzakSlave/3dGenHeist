@@ -20,6 +20,8 @@ public class EnemyHealth : MonoBehaviour
     private Renderer[] renderers;
     private Color[] originalColors;
     private Coroutine flashCoroutine;
+    private MaterialPropertyBlock propBlock;
+    private static readonly int ColorShaderID = Shader.PropertyToID("_Color");
 
     private void Awake()
     {
@@ -38,15 +40,16 @@ public class EnemyHealth : MonoBehaviour
         }
 
         currentHealth = maxHealth;
+        propBlock = new MaterialPropertyBlock();
 
         // Cache all child renderers and their original colors
         renderers = GetComponentsInChildren<Renderer>(true);
         originalColors = new Color[renderers.Length];
         for (int i = 0; i < renderers.Length; i++)
         {
-            if (renderers[i] != null && renderers[i].material.HasProperty("_Color"))
+            if (renderers[i] != null && renderers[i].sharedMaterial != null && renderers[i].sharedMaterial.HasProperty(ColorShaderID))
             {
-                originalColors[i] = renderers[i].material.color;
+                originalColors[i] = renderers[i].sharedMaterial.color;
             }
         }
     }
@@ -91,9 +94,11 @@ public class EnemyHealth : MonoBehaviour
         // Set all renderer colors to red
         for (int i = 0; i < renderers.Length; i++)
         {
-            if (renderers[i] != null && renderers[i].material.HasProperty("_Color"))
+            if (renderers[i] != null && renderers[i].sharedMaterial != null && renderers[i].sharedMaterial.HasProperty(ColorShaderID))
             {
-                renderers[i].material.color = Color.red;
+                renderers[i].GetPropertyBlock(propBlock);
+                propBlock.SetColor(ColorShaderID, Color.red);
+                renderers[i].SetPropertyBlock(propBlock);
             }
         }
 
@@ -102,9 +107,11 @@ public class EnemyHealth : MonoBehaviour
         // Restore original colors
         for (int i = 0; i < renderers.Length; i++)
         {
-            if (renderers[i] != null && renderers[i].material.HasProperty("_Color"))
+            if (renderers[i] != null && renderers[i].sharedMaterial != null && renderers[i].sharedMaterial.HasProperty(ColorShaderID))
             {
-                renderers[i].material.color = originalColors[i];
+                renderers[i].GetPropertyBlock(propBlock);
+                propBlock.SetColor(ColorShaderID, originalColors[i]);
+                renderers[i].SetPropertyBlock(propBlock);
             }
         }
 

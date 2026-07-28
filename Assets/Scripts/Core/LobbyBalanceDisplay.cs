@@ -21,7 +21,25 @@ public class LobbyBalanceDisplay : MonoBehaviour
     [Tooltip("Текст ПОСЛЕ числа (например: ' выполнено')")]
     public string suffix = "";
 
-    void Update()
+    void Start()
+    {
+        RefreshDisplay();
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.onGlobalBalanceChanged.AddListener(RefreshDisplay);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.onGlobalBalanceChanged.RemoveListener(RefreshDisplay);
+        }
+    }
+
+    public void RefreshDisplay()
     {
         if (GameManager.Instance == null || textElement == null) return;
 

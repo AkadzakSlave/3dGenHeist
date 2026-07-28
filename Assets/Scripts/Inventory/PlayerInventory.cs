@@ -21,6 +21,9 @@ public class PlayerInventory : MonoBehaviour
     public int activeSlotIndex = 0;
     public string emptyWeaponText = "Нет оружия";
 
+    [Header("Input")]
+    public InputReader inputReader;
+
     [Header("Events")]
     public UnityEvent onInventoryChanged;
 
@@ -29,10 +32,55 @@ public class PlayerInventory : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            if (slots == null || slots.Length < 3)
+            {
+                System.Array.Resize(ref slots, 3);
+            }
         }
         else
         {
             Destroy(gameObject);
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (inputReader != null)
+        {
+            inputReader.SwitchSlotEvent += SwitchSlot;
+            inputReader.ScrollSlotEvent += OnScrollSlot;
+            inputReader.DropEvent += DropCurrentItem;
+            inputReader.PrimaryActionEvent += OnPrimaryActionTriggered;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (inputReader != null)
+        {
+            inputReader.SwitchSlotEvent -= SwitchSlot;
+            inputReader.ScrollSlotEvent -= OnScrollSlot;
+            inputReader.DropEvent -= DropCurrentItem;
+            inputReader.PrimaryActionEvent -= OnPrimaryActionTriggered;
+        }
+    }
+
+    private void OnScrollSlot(float scrollValue)
+    {
+        if (scrollValue > 0.1f) SwitchSlot(activeSlotIndex - 1);
+        else if (scrollValue < -0.1f) SwitchSlot(activeSlotIndex + 1);
+    }
+
+    private void OnPrimaryActionTriggered()
+    {
+        if (slots[activeSlotIndex] != null)
+        {
+            if (slots[activeSlotIndex] is WeaponItem weapon && weapon.isAutomatic)
+            {
+                // Automatic weapons are polled in Update
+                return;
+            }
+            slots[activeSlotIndex].PrimaryAction();
         }
     }
 
@@ -59,42 +107,22 @@ public class PlayerInventory : MonoBehaviour
 
     private void Update()
     {
-        HandleInput();
+        HandlePrimaryAction();
     }
 
-    private void HandleInput()
+    private void HandlePrimaryAction()
     {
-        if (Keyboard.current == null || Mouse.current == null) return;
-
-        if (Keyboard.current.digit1Key.wasPressedThisFrame) SwitchSlot(0);
-        if (Keyboard.current.digit2Key.wasPressedThisFrame) SwitchSlot(1);
-
-        float scroll = Mouse.current.scroll.ReadValue().y;
-        if (scroll > 0f) SwitchSlot(activeSlotIndex - 1);
-        else if (scroll < 0f) SwitchSlot(activeSlotIndex + 1);
-
         if (slots[activeSlotIndex] != null)
         {
-            bool triggerAction = false;
+            bool isHeld = inputReader != null && inputReader.IsPrimaryActionPressed;
 
             if (slots[activeSlotIndex] is WeaponItem weapon && weapon.isAutomatic)
             {
-                triggerAction = Mouse.current.leftButton.isPressed;
+                if (isHeld)
+                {
+                    slots[activeSlotIndex].PrimaryAction();
+                }
             }
-            else
-            {
-                triggerAction = Mouse.current.leftButton.wasPressedThisFrame;
-            }
-
-            if (triggerAction)
-            {
-                slots[activeSlotIndex].PrimaryAction();
-            }
-        }
-
-        if (Keyboard.current.gKey.wasPressedThisFrame)
-        {
-            DropCurrentItem();
         }
     }
 
@@ -132,7 +160,7 @@ public class PlayerInventory : MonoBehaviour
     {
         if (data == null) return false;
 
-        int targetIndex = data.itemType == ItemType.Tool ? 0 : 1;
+        int targetIndex = (int)data.itemType;
         if (slots == null || targetIndex >= slots.Length)
         {
             Debug.LogError($"[Inventory] Missing slot for {data.itemType}.");

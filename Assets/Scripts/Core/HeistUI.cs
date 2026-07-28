@@ -37,12 +37,22 @@ public class HeistUI : MonoBehaviour
 
     private float timerBlinkSpeed = 5f;
 
+    private int lastTimerSecond = -1;
+    private int lastStaminaInt = -1;
+
     void Start()
     {
         UpdateUI();
+        UpdateMissionInfo();
+
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.onMoneyChanged.AddListener(UpdateUI);
+            GameManager.Instance.onMoneyChanged.AddListener(OnMoneyOrMissionChanged);
+        }
+
+        if (PlayerInventory.Instance != null)
+        {
+            PlayerInventory.Instance.onInventoryChanged.AddListener(UpdateUI);
         }
         
         if (quotaMetBanner != null)
@@ -50,13 +60,30 @@ public class HeistUI : MonoBehaviour
             quotaMetBanner.SetActive(false);
         }
     }
+
+    private void OnDestroy()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.onMoneyChanged.RemoveListener(OnMoneyOrMissionChanged);
+        }
+
+        if (PlayerInventory.Instance != null)
+        {
+            PlayerInventory.Instance.onInventoryChanged.RemoveListener(UpdateUI);
+        }
+    }
+
+    private void OnMoneyOrMissionChanged()
+    {
+        UpdateUI();
+        UpdateMissionInfo();
+    }
+
     void Update()
     {
         if (GameManager.Instance == null) return;
 
-        UpdateUI(); // Постоянно синхронизируем UI для плавности веса и денег
-        UpdateMissionInfo(); // Обновляем информацию о городе и квоте
-        
         bool isInLobby = GameManager.Instance.isInLobby;
 
         // Показываем/скрываем элементы
@@ -69,12 +96,17 @@ public class HeistUI : MonoBehaviour
         if (isInLobby) return;
 
         // Обновление таймера (только на уровне)
-        if (timerText != null)
+        if (timerText != null && GameManager.Instance.isHeistActive)
         {
             float t = GameManager.Instance.heistTimer;
-            int minutes = Mathf.FloorToInt(t / 60);
-            int seconds = Mathf.FloorToInt(t % 60);
-            timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+            int totalSeconds = Mathf.FloorToInt(t);
+            if (totalSeconds != lastTimerSecond)
+            {
+                lastTimerSecond = totalSeconds;
+                int minutes = totalSeconds / 60;
+                int seconds = totalSeconds % 60;
+                timerText.text = string.Format("{0:00}:{1:00}", minutes, seconds);
+            }
 
             // Моргание красным, если таймер на нуле
             if (t <= 0)
@@ -136,7 +168,11 @@ public class HeistUI : MonoBehaviour
         {
             int displayCurrent = Mathf.RoundToInt(current);
             int displayMax = Mathf.RoundToInt(max);
-            staminaText.text = string.Format(staminaFormat, displayCurrent, displayMax);
+            if (displayCurrent != lastStaminaInt)
+            {
+                lastStaminaInt = displayCurrent;
+                staminaText.text = string.Format(staminaFormat, displayCurrent, displayMax);
+            }
         }
     }
 

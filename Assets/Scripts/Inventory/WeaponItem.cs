@@ -29,6 +29,9 @@ public class WeaponItem : EquipableItem
     public EventReference fireEvent;
     public EventReference reloadEvent;
 
+    [Header("Input")]
+    public InputReader inputReader;
+
     private float nextFireTime = 0f;
     private float reloadFinishTime = 0f;
     private bool isEquipped = false;
@@ -37,6 +40,22 @@ public class WeaponItem : EquipableItem
     private void Awake()
     {
         ammoInMagazine = Mathf.Clamp(ammoInMagazine, 0, magazineSize);
+    }
+
+    private void OnDisable()
+    {
+        if (inputReader != null)
+        {
+            inputReader.ReloadEvent -= OnReloadAction;
+        }
+    }
+
+    private void OnReloadAction()
+    {
+        if (isEquipped && !isReloading)
+        {
+            StartReload();
+        }
     }
 
     private void Update()
@@ -50,16 +69,16 @@ public class WeaponItem : EquipableItem
         {
             FinishReload();
         }
-
-        if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
-        {
-            StartReload();
-        }
     }
 
     public override void Equip()
     {
         isEquipped = true;
+
+        if (inputReader != null)
+        {
+            inputReader.ReloadEvent += OnReloadAction;
+        }
 
         if (weaponMesh != null) weaponMesh.SetActive(true);
         if (animator != null)
@@ -76,6 +95,11 @@ public class WeaponItem : EquipableItem
     {
         isEquipped = false;
         isReloading = false; // Cancel reload when unequipping
+
+        if (inputReader != null)
+        {
+            inputReader.ReloadEvent -= OnReloadAction;
+        }
 
         if (weaponMesh != null) weaponMesh.SetActive(false);
         if (animator != null)

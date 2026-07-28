@@ -75,6 +75,7 @@ public class GameManager : MonoBehaviour
     [Header("Events")]
     public UnityEvent onMoneyChanged;
     public UnityEvent onHeistStarted;
+    public UnityEvent onGlobalBalanceChanged;
 
     [Header("State & Teleportation")]
     public bool isInLobby = true;
@@ -105,6 +106,9 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        onGlobalBalanceChanged?.Invoke();
+        onMoneyChanged?.Invoke();
+
         if (isInLobby && lobbySpawnPoint != null && playerController != null)
         {
             StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));
@@ -166,6 +170,9 @@ public class GameManager : MonoBehaviour
         isInLobby = false;
         SetupDossiers();
 
+        onGlobalBalanceChanged?.Invoke();
+        onMoneyChanged?.Invoke();
+
         if (motelSpawnPoint != null)
         {
             StartCoroutine(TeleportPlayer(motelSpawnPoint.position, motelSpawnPoint.rotation));
@@ -193,6 +200,7 @@ public class GameManager : MonoBehaviour
         dossier.Select();
         selectedDossier = dossier;
         Debug.Log($"<color=cyan>[Truck] Выбран банк: {selectedDossier.bankName} (Сложность: {selectedDossier.difficultyLevel})</color>");
+        onMoneyChanged?.Invoke();
     }
 
     public void ProceedToHeist()
@@ -455,6 +463,7 @@ public class GameManager : MonoBehaviour
 
             completedQuotas++;
             Debug.Log($"<color=green>[Don] Profit: ${profit}. Bank: ${cleanMoney}. Session: ${sessionShare}</color>");
+            onGlobalBalanceChanged?.Invoke();
 
             // РАЗБЛОКИРОВКА НОВЫХ ШТАТОВ
             if (activeOperationPreset != null && activeOperationPreset.unlockPresets != null)
@@ -483,6 +492,7 @@ public class GameManager : MonoBehaviour
             globalBankBalance = 0;
             completedQuotas = 0;
             Debug.Log($"<color=red>[Economy] Игровой процесс сброшен. Начинаем заново.</color>");
+            onGlobalBalanceChanged?.Invoke();
             // Экран уже черный (BossRoomManager затемнил его перед выстрелом)
         }
 

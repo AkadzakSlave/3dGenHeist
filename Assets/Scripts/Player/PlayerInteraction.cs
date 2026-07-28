@@ -8,18 +8,32 @@ public class PlayerInteraction : MonoBehaviour
     public float interactDistance = 3.0f;
     public LayerMask interactLayer;
 
-    [Header("UI Message (Optional)")]
+    [Header("Input")]
+    public InputReader inputReader;
     public string interactKey = "E"; // Будет использоваться в логах или UI
+
+    private Collider lastHitCollider;
+    private IInteractable cachedInteractable;
+
+    private void OnEnable()
+    {
+        if (inputReader != null)
+        {
+            inputReader.InteractEvent += TryInteract;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (inputReader != null)
+        {
+            inputReader.InteractEvent -= TryInteract;
+        }
+    }
 
     void Update()
     {
         UpdateInteractionUI();
-
-        // Проверка нажатия кнопки E
-        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
-        {
-            TryInteract();
-        }
     }
 
     private void UpdateInteractionUI()
@@ -32,11 +46,21 @@ public class PlayerInteraction : MonoBehaviour
 
         if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, interactDistance, interactLayer))
         {
-            IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
-            if (interactable != null)
+            if (hit.collider != lastHitCollider)
             {
-                prompt = $"[{interactKey}] {interactable.GetInteractText()}";
+                lastHitCollider = hit.collider;
+                cachedInteractable = hit.collider.GetComponentInParent<IInteractable>();
             }
+
+            if (cachedInteractable != null)
+            {
+                prompt = $"[{interactKey}] {cachedInteractable.GetInteractText()}";
+            }
+        }
+        else
+        {
+            lastHitCollider = null;
+            cachedInteractable = null;
         }
 
         GameManager.Instance.heistUI.SetInteractionText(prompt);
@@ -44,17 +68,9 @@ public class PlayerInteraction : MonoBehaviour
 
     private void TryInteract()
     {
-        if (playerCamera == null) return;
-
-        RaycastHit hit;
-        // Пускаем луч из камеры
-        if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, interactDistance, interactLayer))
+        if (cachedInteractable != null)
         {
-            IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
-            if (interactable != null)
-            {
-                interactable.Interact();
-            }
+            cachedInteractable.Interact();
         }
     }
 }

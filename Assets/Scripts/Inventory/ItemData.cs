@@ -2,8 +2,9 @@ using UnityEngine;
 
 public enum ItemType 
 { 
-    Tool, // Слот 1 (Молот, Сумка)
-    Weapon // Слот 2 (Оружие)
+    Tool = 0,      // Слот 1 (Молот, Сумка)
+    Weapon = 1,    // Слот 2 (Оружие)
+    Utility = 2    // Слот 3 (Утилиты: Динамит, Гранаты и т.д.)
 }
 
 public enum MainEquipmentType
