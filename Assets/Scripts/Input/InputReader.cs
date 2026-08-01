@@ -244,7 +244,7 @@ public class InputReader : ScriptableObject
         EnableAllActions();
     }
 
-    private void EnableAllActions()
+    public void EnableAllActions()
     {
         if (playerMap != null) playerMap.Enable();
         moveAction?.Enable();
@@ -263,7 +263,7 @@ public class InputReader : ScriptableObject
         debugAction?.Enable();
     }
 
-    private void DisableAllActions()
+    public void DisableAllActions()
     {
         if (playerMap != null) playerMap.Disable();
         moveAction?.Disable();

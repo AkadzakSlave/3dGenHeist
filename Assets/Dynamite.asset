@@ -17,6 +17,6 @@ MonoBehaviour:
   fmodMainType: 0
   icon: {fileID: 21300000, guid: 95ec8b5caaea3da448a322c7cdd6c685, type: 3}
   baseWeight: 5
-  dropPrefab: {fileID: 4436148024880182438, guid: df48f3a18a34d534f9944f801d077113, type: 3}
+  dropPrefab: {fileID: 7210630709750325716, guid: cbab67b402206af4a832a0f8decdb9ac, type: 3}
   dropPositionOffset: {x: 0, y: 0, z: 0}
   dropRotationOffset: {x: 0, y: 90, z: 0}

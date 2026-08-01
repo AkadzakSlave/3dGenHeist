@@ -14,6 +14,9 @@ public class WorldEquipment : MonoBehaviour, IInteractable
     public int storedMoney = 0;
     public int storedWeight = 0;
 
+    [Header("Storage Rack Association")]
+    public bool isFromTeamStorage = false;
+
     private float lastSoundTime = 0f;
 
     private void OnCollisionEnter(Collision collision)
@@ -63,6 +66,11 @@ public class WorldEquipment : MonoBehaviour, IInteractable
                     bag.storedMoney = storedMoney;
                     bag.storedWeight = storedWeight;
                     Debug.Log($"[Persistent] Из сумки с пола извлечено: ${storedMoney}");
+                }
+
+                if (isFromTeamStorage && TeamStorageManager.Instance != null)
+                {
+                    TeamStorageManager.Instance.RemoveItem(itemData, 1);
                 }
 
                 Destroy(gameObject);
