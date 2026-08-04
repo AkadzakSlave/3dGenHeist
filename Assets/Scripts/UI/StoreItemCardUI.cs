@@ -50,6 +50,17 @@ public class StoreItemCardUI : MonoBehaviour
                 tagBadgeText.gameObject.SetActive(false);
             }
         }
+        else if (itemNameText != null)
+        {
+            if (entry.isDonExclusive)
+            {
+                itemNameText.text = $"{entry.itemData.itemName} <color=#ffd700>👑 [Don]</color>";
+            }
+            else if (entry.requiresLicense)
+            {
+                itemNameText.text = $"{entry.itemData.itemName} <color=#00ffff>🔒 [License]</color>";
+            }
+        }
 
         if (addToCartButton != null)
         {

@@ -186,13 +186,24 @@ public class EnemyManager : MonoBehaviour
         activePatrolDoors.RemoveAll(point => point == null || !point.gameObject.activeInHierarchy);
         patrolDoorCount = activePatrolDoors.Count;
 
-        if (activePatrolDoors.Count == 0)
+        List<EnemySpawnPoint> openPatrolDoors = activePatrolDoors.FindAll(point => point != null && point.IsRoomOpened());
+        if (openPatrolDoors.Count == 0)
         {
-            Debug.LogWarning("[EnemyManager] No active patrol doors found.");
+            Debug.Log("[EnemyManager] Patrol skipped: No rooms with broken walls are open yet.");
             return;
         }
 
-        EnemySpawnPoint door = activePatrolDoors[Random.Range(0, activePatrolDoors.Count)];
+        EnemySpawnPoint door = openPatrolDoors[Random.Range(0, openPatrolDoors.Count)];
+
+        PlacedBarricade barricade = door != null ? door.GetComponentInChildren<PlacedBarricade>() : null;
+        if (barricade != null)
+        {
+            if (barricade.TryBlockPatrolExit(door.gameObject.name))
+            {
+                return; // Patrol exit blocked by barricade
+            }
+        }
+
         PatrolTier tier = patrolDatabase.GetTierForLevel(currentPatrolLevel);
 
         Debug.Log($"[EnemyManager] Patrol spawning from {door.gameObject.name}.");

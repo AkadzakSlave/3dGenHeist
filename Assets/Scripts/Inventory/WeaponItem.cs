@@ -11,6 +11,10 @@ public class WeaponItem : EquipableItem
     public LayerMask hitLayers = ~0;
     public bool isAutomatic = false;
 
+    [Header("Shotgun / Spread Tuning")]
+    public int pelletsPerShot = 1;
+    public float spreadAngle = 0f;
+
     [Header("Ammo")]
     public bool infiniteAmmo = false;
     public int magazineSize = 6;
@@ -161,23 +165,27 @@ public class WeaponItem : EquipableItem
 
         Vector3 rayOrigin = cam.position + cam.forward * 0.5f;
         float rayRange = Mathf.Max(0.1f, range - 0.5f);
+        int actualPellets = Mathf.Max(1, pelletsPerShot);
 
-        if (Physics.Raycast(rayOrigin, cam.forward, out RaycastHit hit, rayRange, hitLayers, QueryTriggerInteraction.Ignore))
+        for (int i = 0; i < actualPellets; i++)
         {
-            EnemyHealth enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>();
-            if (enemyHealth != null)
+            Vector3 shootDir = cam.forward;
+            if (spreadAngle > 0f)
             {
-                enemyHealth.TakeDamage(damage);
-                Debug.Log($"[Weapon] Hit {enemyHealth.name} for {damage}.");
+                float randomX = Random.Range(-spreadAngle, spreadAngle);
+                float randomY = Random.Range(-spreadAngle, spreadAngle);
+                shootDir = Quaternion.Euler(randomX, randomY, 0f) * cam.forward;
             }
-            else
+
+            if (Physics.Raycast(rayOrigin, shootDir, out RaycastHit hit, rayRange, hitLayers, QueryTriggerInteraction.Ignore))
             {
-                Debug.Log($"[Weapon] Hit {hit.collider.name}.");
+                EnemyHealth enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>();
+                if (enemyHealth != null)
+                {
+                    enemyHealth.TakeDamage(damage);
+                    Debug.Log($"[Weapon] Pellet hit {enemyHealth.name} for {damage}.");
+                }
             }
-        }
-        else
-        {
-            Debug.Log("[Weapon] Shot missed.");
         }
 
         UpdateWeaponUI();

@@ -35,6 +35,27 @@ MonoBehaviour:
     requiresLicense: 0
     isDonExclusive: 0
     description: "\u0414\u0435\u043B\u0430\u0435\u0442 \u0411\u0423\u041C!"
+  - itemData: {fileID: 11400000, guid: db6b2dc8a9778aa4e81bca1cc9639a8f, type: 2}
+    price: 25
+    maxCapacity: 4
+    category: 3
+    requiresLicense: 0
+    isDonExclusive: 0
+    description: "\u041F\u0438\u043F-\u041F\u0438\u043F"
+  - itemData: {fileID: 11400000, guid: 89af8ec558010fa4f9370a1bf9ef4ac7, type: 2}
+    price: 35
+    maxCapacity: 4
+    category: 3
+    requiresLicense: 0
+    isDonExclusive: 0
+    description: "\u0417\u0430\u0442\u0432\u043E\u0440\u043D\u0438\u043A\u0438"
+  - itemData: {fileID: 11400000, guid: d7661f05eda173645af2208a5bd90e26, type: 2}
+    price: 45
+    maxCapacity: 4
+    category: 2
+    requiresLicense: 0
+    isDonExclusive: 0
+    description: "\u0413\u041E\u0420\u0418\u0418\u0418\u041C!"
   - itemData: {fileID: 11400000, guid: 3335515493b687e499926c3847b56c91, type: 2}
     price: 50
     maxCapacity: 2
@@ -42,3 +63,31 @@ MonoBehaviour:
     requiresLicense: 0
     isDonExclusive: 0
     description: "\u041A\u0440\u0443\u0442\u0438 \u0431\u0430\u0440\u0430\u0431\u0430\u043D"
+  - itemData: {fileID: 11400000, guid: 4c8d33f94dd992c44b256f6e6a5195cc, type: 2}
+    price: 70
+    maxCapacity: 2
+    category: 2
+    requiresLicense: 1
+    isDonExclusive: 0
+    description: "\u0414\u0438\u043A\u041F\u0438\u0433\u043B"
+  - itemData: {fileID: 11400000, guid: 37cb5f110d08f334bb269e723e3076b6, type: 2}
+    price: 70
+    maxCapacity: 2
+    category: 2
+    requiresLicense: 1
+    isDonExclusive: 0
+    description: "\u0412\u0438\u043D\u0427\u0435\u0441\u0442\u0435\u0440"
+  - itemData: {fileID: 11400000, guid: da21cb36407940c4f8177369ad79bfe7, type: 2}
+    price: 100
+    maxCapacity: 2
+    category: 2
+    requiresLicense: 1
+    isDonExclusive: 0
+    description: "\u0414\u0435\u043B\u0430\u0442\u044C \u041F\u0438\u0443-\u041F\u0430\u0443"
+  - itemData: {fileID: 11400000, guid: f64cdabae9287524598d0664aa472eac, type: 2}
+    price: 100
+    maxCapacity: 2
+    category: 2
+    requiresLicense: 1
+    isDonExclusive: 0
+    description: "\u0420\u0435\u0448\u0435\u0442\u043E"

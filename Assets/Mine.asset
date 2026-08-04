@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1fb9d01ddf9858246a62c027e3a1e6aa, type: 3}
+  m_Name: Mine
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemName: Mine
+  itemType: 2
+  fmodMainType: 0
+  icon: {fileID: 21300000, guid: e3da71ca33a12fa4fb8edeceecc1ed57, type: 3}
+  baseWeight: 5
+  dropPrefab: {fileID: 2272813256690516083, guid: 9b32a407a1961354f8db6199cc1b37fe, type: 3}
+  dropPositionOffset: {x: 0, y: 0, z: 0}
+  dropRotationOffset: {x: 0, y: 90, z: 0}
