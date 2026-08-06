@@ -11,12 +11,21 @@ public class PlayerCamera : MonoBehaviour
 
     void Start()
     {
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        if (MainMenuUI.Instance != null && MainMenuUI.Instance.IsMainMenuActive)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+        else
+        {
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+        }
     }
 
     void Update()
     {
+        if (Cursor.lockState != CursorLockMode.Locked) return;
         Vector2 mouseDelta = Vector2.zero;
         if (inputReader != null)
         {

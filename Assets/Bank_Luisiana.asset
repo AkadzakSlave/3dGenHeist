@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: Bank_Luisiana
   m_EditorClassIdentifier: Assembly-CSharp::LevelPreset
   levelName: Luisiana
+  stateDescription: "c\u0430\u0441\u043D\u044B\u0439 \u0440wadadadadawda"
+  stateIcon: {fileID: 21300000, guid: 8f76bab4de34cab47b66aa06f9f522c5, type: 3}
   cities:
   - cityName: "\u0428\u0440\u0438\u0432\u043F\u043E\u0440\u0442"
     minDifficulty: 2
@@ -28,7 +30,7 @@ MonoBehaviour:
   - Mamut Raxal
   - Go Ven Iy
   - Iron Vault
-  entryFee: 0
+  entryFee: 300
   unlockPresets: []
   startRoom: {fileID: 11400000, guid: b87174c73af0ae541802031f0962c28f, type: 2}
   vanZonePrefab: {fileID: 2218685468410544309, guid: 2006e2e306c223847acb5fec4837a0c4, type: 3}

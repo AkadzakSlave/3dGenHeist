@@ -277,6 +277,32 @@ public class PlayerInventory : MonoBehaviour
         return weight;
     }
 
+    public void ClearInventory()
+    {
+        if (allPossibleItems != null)
+        {
+            foreach (var item in allPossibleItems)
+            {
+                if (item != null)
+                {
+                    item.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        if (slots != null)
+        {
+            for (int i = 0; i < slots.Length; i++)
+            {
+                slots[i] = null;
+            }
+        }
+
+        activeSlotIndex = 0;
+        onInventoryChanged?.Invoke();
+        UpdateWeaponText();
+    }
+
     public EquipableItem GetActiveItem()
     {
         return slots[activeSlotIndex];
@@ -295,9 +321,18 @@ public class PlayerInventory : MonoBehaviour
 
     private void EnsureItemActive(EquipableItem item)
     {
-        if (item != null && !item.gameObject.activeSelf)
+        if (item != null)
         {
-            item.gameObject.SetActive(true);
+            if (!item.gameObject.activeSelf)
+            {
+                item.gameObject.SetActive(true);
+            }
+
+            PlayerInteraction interaction = GetComponentInParent<PlayerInteraction>();
+            if (interaction != null)
+            {
+                interaction.ApplyHoldingMode();
+            }
         }
     }
 
