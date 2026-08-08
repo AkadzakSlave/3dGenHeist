@@ -23,4 +23,24 @@ public class LootDatabase : ScriptableObject
         if (targetList == null || targetList.Count == 0) return null;
         return targetList[Random.Range(0, targetList.Count)];
     }
+
+    public int GetAverageItemValue()
+    {
+        int total = 0;
+        int count = 0;
+        List<LootData>[] categories = new List<LootData>[] { smallLoot, mediumLoot, largeLoot };
+        foreach (var category in categories)
+        {
+            if (category == null) continue;
+            foreach (var item in category)
+            {
+                if (item != null)
+                {
+                    total += (item.minValue + item.maxValue) / 2;
+                    count++;
+                }
+            }
+        }
+        return count > 0 ? total / count : 250;
+    }
 }

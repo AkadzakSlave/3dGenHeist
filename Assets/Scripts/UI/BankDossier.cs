@@ -10,6 +10,8 @@ public class BankDossier : MonoBehaviour, IInteractable
     public int timeLimit;
     public int minRooms;
     public int maxRooms;
+    public int estimatedMinLoot;
+    public int estimatedMaxLoot;
 
     [Header("UI Display")]
     public TextMeshProUGUI nameText;
@@ -32,12 +34,19 @@ public class BankDossier : MonoBehaviour, IInteractable
         minRooms = preset.minRooms;
         maxRooms = preset.maxRooms;
 
+        // Расчет предварительной стоимости лута до генерации (с учетом ~8-11 предметов на комнату)
+        int avgLootVal = 250;
+        int minItemsPerRoom = 8;
+        int maxItemsPerRoom = 11;
+        estimatedMinLoot = Mathf.RoundToInt(minRooms * minItemsPerRoom * avgLootVal * 0.85f);
+        estimatedMaxLoot = Mathf.RoundToInt(maxRooms * maxItemsPerRoom * avgLootVal * 1.15f);
+
         // 4. Обновляем визуальную часть (Экран)
         if (nameText != null) nameText.text = bankName;
         if (infoText != null) 
         {
             string formattedTime = $"{(timeLimit / 60):00}:{(timeLimit % 60):00}";
-            infoText.text = $"Difficulty: {difficultyLevel}\nTime: {formattedTime}\nRooms: {minRooms}-{maxRooms}";
+            infoText.text = $"Difficulty: {difficultyLevel}\nTime: {formattedTime}\nRooms: {minRooms}-{maxRooms}\nEst. Loot: ~${estimatedMinLoot}-${estimatedMaxLoot}";
         }
 
         Deselect();

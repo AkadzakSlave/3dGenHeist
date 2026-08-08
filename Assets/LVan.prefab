@@ -1253,6 +1253,7 @@ Transform:
   - {fileID: 7070388712415038535}
   - {fileID: 8233470455962644788}
   - {fileID: 966736608079236679}
+  - {fileID: 8135029078144421506}
   - {fileID: 8445443729021771102}
   - {fileID: 6663790916657471712}
   - {fileID: 1319057250239509032}
@@ -2132,6 +2133,100 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!1001 &1815312007323366972
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 1607698575023005751}
+    m_Modifications:
+    - target: {fileID: 6342681645461226543, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      propertyPath: m_Name
+      value: DossierTableTerminal
+      objectReference: {fileID: 0}
+    - target: {fileID: 7625761298336659646, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7625761298336659646, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7625761298336659646, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -1.185
+      objectReference: {fileID: 0}
+    - target: {fileID: 7625761298336659646, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7625761298336659646, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7625761298336659646, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7625761298336659646, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7625761298336659646, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7625761298336659646, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7625761298336659646, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7625761298336659646, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8603573584380687867, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 47e384361946a804e99fb292715131e3, type: 2}
+    m_RemovedComponents:
+    - {fileID: 6469000969873983758, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+    - {fileID: 1663680938882767887, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 6342681645461226543, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+      insertIndex: 1
+      addedObject: {fileID: 1027076989415489361}
+  m_SourcePrefab: {fileID: 100100000, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+--- !u!1 &4698648579610898963 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6342681645461226543, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+  m_PrefabInstance: {fileID: 1815312007323366972}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1027076989415489361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4698648579610898963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e6716a7dff2ca74d87dcfb71ffded9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DossierTableTerminal
+  interactPrompt: "\u0412\u044B\u0431\u0440\u0430\u0442\u044C \u0434\u043E\u0441\u044C\u0435
+    \u0431\u0430\u043D\u043A\u0430"
+--- !u!4 &8135029078144421506 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7625761298336659646, guid: e1a62a3348d5d4240b627aaa0832bac4, type: 3}
+  m_PrefabInstance: {fileID: 1815312007323366972}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6382493445697187901
 PrefabInstance:
   m_ObjectHideFlags: 0

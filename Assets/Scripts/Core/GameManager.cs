@@ -275,8 +275,36 @@ public class GameManager : MonoBehaviour
         
         yield return StartCoroutine(TeleportPlayer(targetPos, Quaternion.identity));
 
+        RecalculateMapLoot();
+
         isInLobby = false;
         if (heistUI != null) heistUI.HideLoadingScreen();
+    }
+
+    [Header("Loot Scan Info")]
+    public int totalMapLootValue;
+    public int totalMapLootCount;
+
+    public void RecalculateMapLoot()
+    {
+        LootItem[] items = FindObjectsByType<LootItem>(FindObjectsInactive.Exclude);
+        totalMapLootValue = 0;
+        totalMapLootCount = items != null ? items.Length : 0;
+
+        foreach (var item in items)
+        {
+            if (item != null)
+            {
+                totalMapLootValue += item.value;
+            }
+        }
+
+        Debug.Log($"<color=yellow>[LootScan] Всего предметов на локации: {totalMapLootCount} шт. На сумму: ${totalMapLootValue}</color>");
+
+        if (heistUI != null)
+        {
+            heistUI.UpdateMapLootInfo(totalMapLootValue, totalMapLootCount);
+        }
     }
 
     public void ExtractFromHeist()

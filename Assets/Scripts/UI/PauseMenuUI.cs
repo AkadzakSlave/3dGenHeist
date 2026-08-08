@@ -65,9 +65,10 @@ public class PauseMenuUI : MonoBehaviour
 
     private void OnTogglePauseInput()
     {
-        // Don't toggle pause if Main Menu, Store UI, or Map Selection UI is currently open
+        // Don't toggle pause if Main Menu, Store UI, Map Selection UI, or Dossier Selection UI is currently open
         if (MainMenuUI.Instance != null && MainMenuUI.Instance.IsMainMenuActive) return;
         if (MapSelectionUI.Instance != null && MapSelectionUI.Instance.IsMapOpen) return;
+        if (DossierSelectionUI.Instance != null && DossierSelectionUI.Instance.IsDossierOpen) return;
         var store = FindAnyObjectByType<StoreUI>();
         if (store != null && store.IsStoreOpen) return;
 
