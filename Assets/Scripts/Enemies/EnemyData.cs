@@ -25,10 +25,14 @@ public class EnemyData : ScriptableObject
     [Header("AI")]
     public float detectionRadius = 15f;
 
-    [Header("Combat")]
+    [Header("Combat & Weapon")]
     public int damagePerShot = 10;
-    public float attackRange = 12f;
-    public float fireInterval = 1.5f;
+    public float attackRange = 14f;
+    public float fireInterval = 0.2f;
+    public int magazineSize = 10;
+    public float reloadTime = 2.5f;
+    public int burstCount = 3;
+    public float burstPause = 1.2f;
     [Range(0f, 1f)] public float hitChance = 0.75f;
     public LayerMask lineOfSightMask = ~0;
 

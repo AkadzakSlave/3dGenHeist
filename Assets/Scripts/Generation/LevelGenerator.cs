@@ -120,10 +120,14 @@ public class LevelGenerator : MonoBehaviour
         var surface = GetComponent<Unity.AI.Navigation.NavMeshSurface>();
         if (surface != null)
         {
-            Debug.Log("<color=cyan>[Gen] Перезапекание NavMesh для всего процедурного уровня...</color>");
+            Debug.Log("<color=cyan>[Gen] Перезапекание NavMesh для всего процедурного уровня с мебелью...</color>");
             
-            // Force the use of Physics Colliders to avoid Read/Write mesh access errors
+            // Force the use of Physics Colliders for modular rooms with furniture
             surface.useGeometry = UnityEngine.AI.NavMeshCollectGeometry.PhysicsColliders;
+            surface.overrideTileSize = true;
+            surface.tileSize = 256;
+            surface.overrideVoxelSize = true;
+            surface.voxelSize = 0.08f; // High precision for furniture navigation
             
             surface.BuildNavMesh();
         }

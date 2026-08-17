@@ -18,4 +18,23 @@ MonoBehaviour:
   moveSpeed: 3.5
   angularSpeed: 120
   acceleration: 8
+  maxHealth: 100
   detectionRadius: 15
+  damagePerShot: 10
+  attackRange: 14
+  fireInterval: 0.2
+  magazineSize: 20
+  reloadTime: 2.8
+  burstCount: 5
+  burstPause: 1.2
+  hitChance: 0.75
+  lineOfSightMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  fireEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 

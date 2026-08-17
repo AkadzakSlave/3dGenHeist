@@ -167,6 +167,11 @@ public class WeaponItem : EquipableItem
         float rayRange = Mathf.Max(0.1f, range - 0.5f);
         int actualPellets = Mathf.Max(1, pelletsPerShot);
 
+        if (EnemyManager.Instance != null)
+        {
+            EnemyManager.Instance.NotifyNoise(rayOrigin, 25f);
+        }
+
         for (int i = 0; i < actualPellets; i++)
         {
             Vector3 shootDir = cam.forward;
