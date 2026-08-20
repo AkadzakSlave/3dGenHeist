@@ -120,6 +120,14 @@ PrefabInstance:
       value: Guard
       objectReference: {fileID: 0}
     - target: {fileID: 8465187428913559915, guid: 2068a4a668e5f6047829bb29d50f8ab0, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 110
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465187428913559915, guid: 2068a4a668e5f6047829bb29d50f8ab0, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 130
+      objectReference: {fileID: 0}
+    - target: {fileID: 8465187428913559915, guid: 2068a4a668e5f6047829bb29d50f8ab0, type: 3}
       propertyPath: m_LocalRotation.w
       value: 0.7071068
       objectReference: {fileID: 0}
@@ -193,6 +201,7 @@ MonoBehaviour:
   hearingRadius: 22
   useCoverSystem: 1
   coverSearchInterval: 3
+  showOverheadDebugText: 1
 --- !u!114 &-8986690161241688098
 MonoBehaviour:
   m_ObjectHideFlags: 0
