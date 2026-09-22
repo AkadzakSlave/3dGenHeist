@@ -6773,7 +6773,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 193323465437373562, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
       propertyPath: m_CastShadows
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 193323465437373562, guid: e88654f7372077346ad29ea0481c9f7c, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -7824,10 +7824,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInteraction
   playerCamera: {fileID: 2193814410149548343}
+  playerBody: {fileID: 0}
   interactDistance: 3
   interactLayer:
     serializedVersion: 2
     m_Bits: 1
+  holdingMode: 1
+  itemHolderRoot: {fileID: 0}
+  enableCSStyleSway: 1
+  swayAmount: 0.02
+  swaySmoothing: 6
   inputReader: {fileID: 0}
   interactKey: E
 --- !u!95 &8655617208199323530
