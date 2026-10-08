@@ -57,6 +57,7 @@ public class LootItem : MonoBehaviour, IInteractable
                     string itemName = data != null ? data.itemName : "Loot";
                     Debug.Log($"[Loot] Подобрано: {itemName}. В сумке: ${GameManager.Instance.bagMoney}, Вес: {GameManager.Instance.currentWeight}/{GameManager.Instance.maxWeight}кг");
                     GameManager.Instance.onMoneyChanged?.Invoke();
+                    GameManager.Instance.RecalculateMapLoot();
                 }
                 
                 PlayPickUpSound();

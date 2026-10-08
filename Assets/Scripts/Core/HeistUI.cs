@@ -16,6 +16,7 @@ public class HeistUI : MonoBehaviour
     public TextMeshProUGUI cityNameText;
     public UnityEngine.UI.Slider quotaProgressSlider;
     public TextMeshProUGUI quotaText; 
+    public TextMeshProUGUI totalMapLootText; // Показывает суммарную стоимость лута на карте
     public GameObject[] difficultySkulls; 
     public TextMeshProUGUI interactionText; // Текст при наведении на предмет
 
@@ -24,6 +25,7 @@ public class HeistUI : MonoBehaviour
     public string weightFormat = "Weight: {0} / {1}kg";
     public string overWeightFormat = "<color=red>Weight: {0} / {1}kg (OVERWEIGHT)</color>";
     public string quotaDayFormat = "Day {0}/3\nVan: ${1}\nProgress: ${2} / ${3}";
+    public string mapLootFormat = "Осталось на карте: ${0} ({1} шт.)";
     public string staminaFormat = "Stamina: {0}/{1}";
     public string healthFormat = "HP: {0}/{1}";
 
@@ -148,6 +150,14 @@ public class HeistUI : MonoBehaviour
                 weightText.text = string.Format(weightFormat, GameManager.Instance.currentWeight, GameManager.Instance.maxWeight);
                 weightText.color = Color.white;
             }
+        }
+    }
+
+    public void UpdateMapLootInfo(int totalMapLoot, int count)
+    {
+        if (totalMapLootText != null)
+        {
+            totalMapLootText.text = string.Format(mapLootFormat, totalMapLoot, count);
         }
     }
 

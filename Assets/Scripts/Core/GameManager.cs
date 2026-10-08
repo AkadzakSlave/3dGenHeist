@@ -275,8 +275,36 @@ public class GameManager : MonoBehaviour
         
         yield return StartCoroutine(TeleportPlayer(targetPos, Quaternion.identity));
 
+        RecalculateMapLoot();
+
         isInLobby = false;
         if (heistUI != null) heistUI.HideLoadingScreen();
+    }
+
+    [Header("Loot Scan Info")]
+    public int totalMapLootValue;
+    public int totalMapLootCount;
+
+    public void RecalculateMapLoot()
+    {
+        LootItem[] items = FindObjectsByType<LootItem>(FindObjectsInactive.Exclude);
+        totalMapLootValue = 0;
+        totalMapLootCount = items != null ? items.Length : 0;
+
+        foreach (var item in items)
+        {
+            if (item != null)
+            {
+                totalMapLootValue += item.value;
+            }
+        }
+
+        Debug.Log($"<color=yellow>[LootScan] Всего предметов на локации: {totalMapLootCount} шт. На сумму: ${totalMapLootValue}</color>");
+
+        if (heistUI != null)
+        {
+            heistUI.UpdateMapLootInfo(totalMapLootValue, totalMapLootCount);
+        }
     }
 
     public void ExtractFromHeist()
@@ -543,6 +571,68 @@ public class GameManager : MonoBehaviour
         }
 
         onMoneyChanged?.Invoke();
+    }
+
+    public void ReturnToMainMenu()
+    {
+        StartCoroutine(ReturnToMainMenuRoutine());
+    }
+
+    private IEnumerator ReturnToMainMenuRoutine()
+    {
+        if (heistUI != null) heistUI.ShowLoadingScreen();
+
+        isHeistActive = false;
+        isInLobby = true;
+        isProcessingPlayerWipe = false;
+
+        // Reset session money
+        sessionMoney = 0;
+        depositedMoney = 0;
+        accumulatedOperationMoney = 0;
+        onMoneyChanged?.Invoke();
+
+        // Clear player inventory and held items
+        if (PlayerInventory.Instance != null)
+        {
+            PlayerInventory.Instance.ClearInventory();
+        }
+
+        // Clear procedural level if active
+        if (levelGenerator != null)
+        {
+            levelGenerator.ClearLevel();
+        }
+
+        // Reset enemies
+        if (EnemyManager.Instance != null)
+        {
+            EnemyManager.Instance.ResetForNewHeist();
+        }
+
+        // Reset player health
+        PlayerHealth health = FindAnyObjectByType<PlayerHealth>();
+        if (health != null)
+        {
+            health.currentHealth = health.maxHealth;
+            health.isDead = false;
+        }
+
+        // Teleport player back to initial lobby spawn point
+        if (lobbySpawnPoint != null && playerController != null)
+        {
+            yield return StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));
+        }
+
+        yield return new WaitForSeconds(0.3f);
+
+        // Show Main Menu UI
+        if (MainMenuUI.Instance != null)
+        {
+            MainMenuUI.Instance.ShowMainMenu();
+        }
+
+        if (heistUI != null) heistUI.HideLoadingScreen();
     }
 
     private IEnumerator TeleportPlayer(Vector3 pos, Quaternion rot)

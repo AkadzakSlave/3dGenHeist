@@ -22,6 +22,7 @@ public class InputReader : ScriptableObject
     public event UnityAction<int> SwitchSlotEvent;
     public event UnityAction<float> ScrollSlotEvent;
     public event UnityAction ToggleDebugMenuEvent;
+    public event UnityAction TogglePauseMenuEvent;
 
     [Header("Input Asset Reference")]
     public InputActionAsset inputActionsAsset;
@@ -41,6 +42,7 @@ public class InputReader : ScriptableObject
     private InputAction digit3Action; // prepared placeholder
     private InputAction scrollAction;
     private InputAction debugAction;
+    private InputAction pauseAction;
 
     private void OnEnable()
     {
@@ -178,6 +180,15 @@ public class InputReader : ScriptableObject
         }
         debugAction.performed += ctx => ToggleDebugMenuEvent?.Invoke();
 
+        pauseAction = playerMap.FindAction("Pause");
+        if (pauseAction == null)
+        {
+            pauseAction = new InputAction("Pause");
+            pauseAction.AddBinding("<Keyboard>/escape");
+            pauseAction.AddBinding("<Keyboard>/p");
+        }
+        pauseAction.performed += ctx => TogglePauseMenuEvent?.Invoke();
+
         EnableAllActions();
     }
 
@@ -261,6 +272,7 @@ public class InputReader : ScriptableObject
         digit3Action?.Enable();
         scrollAction?.Enable();
         debugAction?.Enable();
+        pauseAction?.Enable();
     }
 
     public void DisableAllActions()
@@ -280,6 +292,7 @@ public class InputReader : ScriptableObject
         digit3Action?.Disable();
         scrollAction?.Disable();
         debugAction?.Disable();
+        pauseAction?.Disable();
     }
 
     // Helper properties for direct value polling where necessary

@@ -42,6 +42,7 @@ public class StoreUI : MonoBehaviour
     private Dictionary<ItemData, int> shoppingCart = new Dictionary<ItemData, int>();
     private ShopCategory activeCategory = ShopCategory.All;
     private bool isOpen = false;
+    public bool IsStoreOpen => isOpen || (mainStoreWindow != null && mainStoreWindow.activeSelf);
 
     private void Awake()
     {

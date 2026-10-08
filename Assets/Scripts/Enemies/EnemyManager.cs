@@ -90,6 +90,17 @@ public class EnemyManager : MonoBehaviour
             return;
         }
 
+        // Apply Bank Difficulty scaling
+        int diff = 1;
+        if (GameManager.Instance != null && GameManager.Instance.selectedDossier != null)
+        {
+            diff = Mathf.Clamp(GameManager.Instance.selectedDossier.difficultyLevel, 1, 10);
+        }
+
+        currentPatrolLevel = startingPatrolLevel + (diff - 1) * 3f;
+        mobCap = 12 + diff * 3;
+        patrolTimerInterval = Mathf.Max(25f, 60f - (diff - 1) * 3.5f);
+
         CacheSpawnPoints();
 
         if (spawnInitialEnemiesOnHeistStart)
@@ -100,7 +111,7 @@ public class EnemyManager : MonoBehaviour
         patrolTimer = 0f;
         isHeistInitialized = true;
 
-        Debug.Log($"[EnemyManager] Heist enemies ready. Initial points: {initialSpawnPointCount}, patrol doors: {patrolDoorCount}, patrol level: {currentPatrolLevel}%");
+        Debug.Log($"<color=orange>[EnemyManager] Heist Difficulty Level: {diff}. Initial points: {initialSpawnPointCount}, patrol doors: {patrolDoorCount}, mob cap: {mobCap}, patrol level: {currentPatrolLevel}%</color>");
     }
 
     public void ClearActiveEnemies()
@@ -156,7 +167,7 @@ public class EnemyManager : MonoBehaviour
             }
 
             int count = Random.Range(point.minInitialCount, point.maxInitialCount + 1);
-            SpawnEnemiesOfType(GetPrefabForType(point.initialEnemyType), count, point.transform);
+            StartCoroutine(SpawnEnemiesOfType(GetPrefabForType(point.initialEnemyType), count, point.transform));
         }
     }
 
@@ -187,13 +198,27 @@ public class EnemyManager : MonoBehaviour
         patrolDoorCount = activePatrolDoors.Count;
 
         List<EnemySpawnPoint> openPatrolDoors = activePatrolDoors.FindAll(point => point != null && point.IsRoomOpened());
-        if (openPatrolDoors.Count == 0)
+        
+        // Filter out doors that already have enemies crowding around them (> 1 enemy within 5m)
+        List<EnemySpawnPoint> uncrowdedDoors = openPatrolDoors.FindAll(door => {
+            int nearbyEnemies = 0;
+            Collider[] cols = Physics.OverlapSphere(door.transform.position, 5.0f);
+            foreach (var col in cols)
+            {
+                if (col.GetComponentInParent<EnemyController>() != null) nearbyEnemies++;
+            }
+            return nearbyEnemies <= 1;
+        });
+
+        List<EnemySpawnPoint> candidateDoors = uncrowdedDoors.Count > 0 ? uncrowdedDoors : openPatrolDoors;
+
+        if (candidateDoors.Count == 0)
         {
-            Debug.Log("[EnemyManager] Patrol skipped: No rooms with broken walls are open yet.");
+            Debug.Log("[EnemyManager] Patrol skipped: No valid uncrowded rooms available.");
             return;
         }
 
-        EnemySpawnPoint door = openPatrolDoors[Random.Range(0, openPatrolDoors.Count)];
+        EnemySpawnPoint door = candidateDoors[Random.Range(0, candidateDoors.Count)];
 
         PlacedBarricade barricade = door != null ? door.GetComponentInChildren<PlacedBarricade>() : null;
         if (barricade != null)
@@ -216,16 +241,21 @@ public class EnemyManager : MonoBehaviour
         int assaultersToSpawn = Random.Range(tier.minAssaulters, tier.maxAssaulters + 1);
         int elitesToSpawn = Random.Range(tier.minElites, tier.maxElites + 1);
 
-        SpawnEnemiesOfType(guardPrefab, guardsToSpawn, spawnPoint);
-        SpawnEnemiesOfType(assaulterPrefab, assaultersToSpawn, spawnPoint);
-        SpawnEnemiesOfType(elitePrefab, elitesToSpawn, spawnPoint);
+        StartCoroutine(StaggeredSpawnRoutine(guardsToSpawn, assaultersToSpawn, elitesToSpawn, spawnPoint));
     }
 
-    private void SpawnEnemiesOfType(GameObject prefab, int count, Transform spawnPoint)
+    private System.Collections.IEnumerator StaggeredSpawnRoutine(int guards, int assaulters, int elites, Transform spawnPoint)
+    {
+        yield return SpawnEnemiesOfType(guardPrefab, guards, spawnPoint);
+        yield return SpawnEnemiesOfType(assaulterPrefab, assaulters, spawnPoint);
+        yield return SpawnEnemiesOfType(elitePrefab, elites, spawnPoint);
+    }
+
+    private System.Collections.IEnumerator SpawnEnemiesOfType(GameObject prefab, int count, Transform spawnPoint)
     {
         if (prefab == null || spawnPoint == null || count <= 0)
         {
-            return;
+            yield break;
         }
 
         for (int i = 0; i < count; i++)
@@ -235,7 +265,7 @@ public class EnemyManager : MonoBehaviour
                 break;
             }
 
-            Vector3 offset = new Vector3(Random.Range(-1f, 1f), 0f, Random.Range(-1f, 1f));
+            Vector3 offset = spawnPoint.forward * (i * 0.4f) + new Vector3(Random.Range(-0.3f, 0.3f), 0f, 0f);
             GameObject enemyObj = Instantiate(prefab, spawnPoint.position + offset, spawnPoint.rotation, transform);
             EnemyController enemy = enemyObj.GetComponentInChildren<EnemyController>();
 
@@ -243,6 +273,8 @@ public class EnemyManager : MonoBehaviour
             {
                 RegisterEnemy(enemy);
             }
+
+            yield return new WaitForSeconds(0.25f);
         }
     }
 
@@ -274,6 +306,22 @@ public class EnemyManager : MonoBehaviour
         {
             activeEnemies.Remove(enemy);
             currentEnemyCount = activeEnemies.Count;
+        }
+    }
+
+    public void NotifyNoise(Vector3 soundPosition, float soundRadius = 22f)
+    {
+        for (int i = 0; i < activeEnemies.Count; i++)
+        {
+            var enemy = activeEnemies[i];
+            if (enemy != null && enemy.gameObject.activeInHierarchy)
+            {
+                float dist = Vector3.Distance(enemy.transform.position, soundPosition);
+                if (dist <= soundRadius)
+                {
+                    enemy.OnHearSound(soundPosition);
+                }
+            }
         }
     }
 }

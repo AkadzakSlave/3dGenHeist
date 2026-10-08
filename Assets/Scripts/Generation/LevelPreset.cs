@@ -14,6 +14,9 @@ public class LevelPreset : ScriptableObject
 {
     [Header("Preset Information")]
     public string levelName = "Texas";
+    [TextArea(2, 4)]
+    public string stateDescription = "Опасный регион с развитой банковской сетью и усиленной охраной.";
+    public Sprite stateIcon;
     public List<CityConfig> cities = new List<CityConfig>();
     public List<string> bankNamesPool = new List<string> { "Zloop Bank", "Mamut Raxal", "Go Ven Iy", "Iron Vault" };
 
