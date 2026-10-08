@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Манипуляция — локальная версия</title>
+<style>
+:root{
+  --bg:#111214;--panel:#191b1f;--panel2:#202329;--text:#f4f1ea;--muted:#9c9da3;
+  --accent:#e65b50;--accent2:#f0a35a;--green:#79c99b;--line:#30333a;
+  --shadow:0 20px 60px rgba(0,0,0,.35);--radius:22px;
+}
+*{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 50% -10%,#2a2524 0,#111214 42%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,input{font:inherit} button{cursor:pointer;border:0}
+.app{min-height:100vh;display:flex;justify-content:center;padding:24px}
+.shell{width:min(1120px,100%);display:flex;flex-direction:column;gap:18px}
+.top{display:flex;justify-content:space-between;align-items:center;padding:4px 2px}
+.logo{font-weight:900;letter-spacing:.08em;font-size:15px}.logo span{color:var(--accent)}
+.pill{color:var(--muted);font-size:12px;border:1px solid var(--line);padding:8px 11px;border-radius:999px;background:#15171a}
+.card{background:linear-gradient(180deg,rgba(34,36,42,.96),rgba(24,26,30,.96));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.hero{padding:46px;display:grid;grid-template-columns:1.2fr .8fr;gap:34px;align-items:center}
+h1{font-size:clamp(44px,8vw,86px);line-height:.9;margin:0 0 22px;letter-spacing:-.06em}
+h1 em{font-style:normal;color:var(--accent)}
+h2{margin:0 0 10px;font-size:28px}.sub{color:var(--muted);line-height:1.6;max-width:650px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.btn{padding:13px 18px;border-radius:14px;background:#292c32;color:var(--text);border:1px solid #393c44;transition:.15s transform,.15s background}
+.btn:hover{transform:translateY(-1px);background:#30343b}.btn.primary{background:var(--accent);border-color:transparent;color:white;font-weight:800}.btn.ghost{background:transparent}
+.btn.danger{background:#632c29}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.preview{min-height:320px;padding:20px;display:flex;align-items:center;justify-content:center}
+.table{width:100%;aspect-ratio:1.15;border-radius:50%;background:radial-gradient(ellipse,#252b2b,#171a1b 70%);border:8px solid #111516;box-shadow:inset 0 0 0 2px #39403d,0 20px 40px #0005;display:flex;align-items:center;justify-content:center;position:relative}
+.topic{width:56%;text-align:center}.topic .label{font-size:10px;letter-spacing:.18em;color:#a6aba6}.topic strong{display:block;font-size:20px;margin-top:8px}
+.node{position:absolute;width:58px;height:58px;border-radius:50%;background:#282c31;border:2px solid #444952;display:grid;place-items:center;font-size:23px}
+.n1{top:8%;left:50%;transform:translateX(-50%)}.n2{right:7%;top:50%;transform:translateY(-50%)}.n3{bottom:8%;left:50%;transform:translateX(-50%)}.n4{left:7%;top:50%;transform:translateY(-50%)}
+.hidden{display:none!important}
+.view{display:flex;flex-direction:column;gap:16px}.viewhead{display:flex;justify-content:space-between;align-items:center;gap:12px}.viewhead h2{margin:0}
+.form{padding:24px;display:grid;gap:16px}.field{display:grid;gap:7px}.field label{font-size:12px;color:var(--muted)}input{background:#111317;border:1px solid #373a42;color:var(--text);border-radius:12px;padding:12px 13px;outline:0}input:focus{border-color:#686c77}
+.player-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;padding:20px}.player{padding:15px;background:#15171b;border:1px solid var(--line);border-radius:15px;display:flex;justify-content:space-between;align-items:center}.dot{width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block;margin-right:8px}
+.game{display:grid;grid-template-columns:1fr 320px;gap:16px}.main{padding:24px}.side{padding:20px;display:flex;flex-direction:column;gap:12px}
+.timer{font-size:34px;font-variant-numeric:tabular-nums;font-weight:900}.phase{color:var(--accent2);font-size:12px;letter-spacing:.15em;text-transform:uppercase}
+.topicbig{font-size:clamp(26px,4vw,44px);line-height:1.1;margin:20px 0 30px;max-width:850px}.players{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}.pbox{padding:13px;background:#15171b;border:1px solid var(--line);border-radius:14px}.pbox small{display:block;color:var(--muted);margin-top:4px}
+.private{padding:18px;border-radius:17px;background:linear-gradient(160deg,#332826,#242327);border:1px solid #57413d}.private .kind{color:#dba49d;font-size:11px;text-transform:uppercase;letter-spacing:.12em}.private strong{display:block;font-size:24px;margin:6px 0}.private p{color:#bbbcc2;line-height:1.45;margin:0}.section{padding-top:8px;border-top:1px solid var(--line)}.row{display:flex;gap:8px;flex-wrap:wrap}.notice{padding:14px;background:#17191d;border:1px solid var(--line);border-radius:14px;color:#c9cad0;font-size:13px;line-height:1.5}
+.overlay{position:fixed;inset:0;background:#090a0ccc;backdrop-filter:blur(8px);display:grid;place-items:center;padding:20px;z-index:10}.modal{width:min(560px,100%);padding:26px}.modal h3{font-size:28px;margin:0 0 8px}.modal p{color:var(--muted);line-height:1.5}.choices{display:grid;gap:8px;margin:18px 0}.choice{padding:14px;border:1px solid var(--line);background:#15171b;color:var(--text);border-radius:13px;text-align:left}.choice:hover{border-color:#666b75}
+.revealgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}.reveal{padding:17px;background:#15171b;border:1px solid var(--line);border-radius:16px}.reveal b{font-size:18px}.tag{display:inline-block;padding:5px 8px;border-radius:999px;background:#292d34;color:#c7c9cf;font-size:11px;margin-top:8px}.score{font-size:27px;font-weight:900;color:var(--accent2)}
+.footer{text-align:center;color:#6f7178;font-size:11px;padding:8px}
+@media(max-width:800px){.hero,.game{grid-template-columns:1fr}.hero{padding:30px 22px}.preview{min-height:240px}.side{order:-1}.app{padding:12px}.main{padding:18px}}
+</style>
+</head>
+<body>
+<div class="app"><div class="shell">
+  <div class="top"><div class="logo">МАНИПУЛЯЦ<span>ИЯ</span></div><div class="pill">Локальная игра • без сервера</div></div>
+
+  <section id="home" class="card hero">
+    <div>
+      <h1>Манипу<em>ляция</em></h1>
+      <div class="sub">Социальная игра на аргументы, роли и скрытые манипуляции. Эта версия работает прямо в браузере: можно играть одной компанией на одном устройстве.</div>
+      <div class="actions">
+        <button class="btn primary" onclick="openSetup()">Начать игру</button>
+        <button class="btn ghost" onclick="showRules()">Как играть</button>
+      </div>
+    </div>
+    <div class="preview"><div class="table">
+      <div class="topic"><div class="label">ТЕМА ДИСКУССИИ</div><strong>Стоит ли запрещать телефоны в школах?</strong></div>
+      <div class="node n1">♠</div><div class="node n2">♥</div><div class="node n3">♦</div><div class="node n4">♣</div>
+    </div></div>
+  </section>
+
+  <section id="setup" class="view hidden">
+    <div class="viewhead"><h2>Настройка партии</h2><button class="btn ghost" onclick="goHome()">← Назад</button></div>
+    <div class="card form">
+      <div class="field"><label>Имена игроков (от 4 до 10, по одному в строке)</label><textarea id="names" rows="7" style="resize:vertical;background:#111317;border:1px solid #373a42;color:var(--text);border-radius:12px;padding:12px 13px;font:inherit;outline:0">Илья
+Катя
+Макс
+Дима</textarea></div>
+      <div class="row"><button class="btn" onclick="addDemo()">Добавить 6 игроков</button><button class="btn primary" onclick="startGame()">Раздать карты и начать</button></div>
+      <div class="notice">Сейчас доступен режим «Один экран»: устройство передаётся игрокам по очереди для просмотра секретной информации. Онлайн-режим добавим позже, не меняя игровое ядро.</div>
+    </div>
+  </section>
+
+  <section id="game" class="view hidden">
+    <div class="game">
+      <div class="card main">
+        <div class="viewhead"><div><div id="phase" class="phase">Подготовка</div><div id="timer" class="timer">10:00</div></div><button class="btn danger" onclick="finishRound()">Завершить раунд</button></div>
+        <div id="topic" class="topicbig"></div>
+        <div class="section"><div class="phase">Игроки</div><div id="players" class="players" style="margin-top:10px"></div></div>
+        <div class="actions"><button class="btn danger" onclick="openAccuse()">🚨 Разоблачить</button><button class="btn" onclick="openReveal()">Показать карты</button></div>
+      </div>
+      <aside class="card side">
+        <div class="phase">Твоя карта</div>
+        <div id="currentPrivate"></div>
+        <div class="notice">Передай устройство следующему игроку только после того, как текущий закончит просмотр своей карты.</div>
+        <button class="btn" onclick="nextPrivate()">Следующий игрок</button>
+      </aside>
+    </div>
+  </section>
+
+  <section id="rules" class="card form hidden">
+    <div class="viewhead"><h2>Как играть</h2><button class="btn ghost" onclick="goHome()">← Назад</button></div>
+    <div class="sub">
+      <p><b>1. Раздача.</b> Каждый игрок получает роль, сторону и секретную манипуляцию.</p>
+      <p><b>2. Дискуссия.</b> Обсуждайте общую тему и старайтесь выполнить свою скрытую задачу.</p>
+      <p><b>3. Разоблачение.</b> В любой момент можно подозревать другого игрока. В локальной версии обвиняемый должен подтвердить или опровергнуть использование своей манипуляции.</p>
+      <p><b>4. Решение.</b> Игрок, которому досталась роль принимающего решение, выбирает итоговую сторону.</p>
+      <p><b>5. Раскрытие.</b> Все карты открываются, рассчитываются очки и начинается следующий раунд.</p>
+    </div>
+  </section>
+
+  <div class="footer">Локальная версия • контент и оформление можно расширять без сервера</div>
+</div></div>
+
+<div id="modal" class="overlay hidden"><div class="card modal" id="modalBody"></div></div>
+
+<script>
+const topics=[
+"Стоит ли запрещать телефоны в школах?",
+"Нужно ли отменить домашние задания?",
+"Должен ли искусственный интеллект иметь право голоса в обществе?",
+"Стоит ли сделать общественный транспорт бесплатным?",
+"Нужно ли разрешить четырёхдневную рабочую неделю?",
+"Должны ли видеоигры считаться видом искусства?",
+"Нужно ли запретить рекламу фастфуда для детей?",
+"Стоит ли заменить экзамены проектами?"
+];
+const roles=[
+["Оптимист","Ищи сильные стороны выбранной позиции и убеждай остальных.","for"],
+["Скептик","Сомневайся в аргументах и заставляй собеседников уточнять позицию.","against"],
+["Провокатор","Создавай напряжение и эмоциональные реакции, не раскрывая задачу.","any"],
+["Рационалист","Требуй фактов, причин и логических связей.","any"],
+["Принимает решение","В конце раунда выбери сторону, которую считаешь убедительной.","decider"]
+];
+const manipulations=[
+["Апелляция к большинству","Ссылайся на то, что «так думают все», даже если это не доказательство."],
+["Ложная дилемма","Представляй ситуацию так, будто существует только два варианта."],
+["Апелляция к авторитету","Подкрепляй мысль ссылкой на известного человека или статус."],
+["Эмоциональный пример","Используй яркую историю вместо полноценного аргумента."],
+["Подмена тезиса","Незаметно отвечай на более удобную версию аргумента оппонента."],
+["Скользкая дорожка","Покажи, как маленькое решение якобы неизбежно приведёт к крайним последствиям."],
+["Риторический вопрос","Задавай вопрос так, чтобы сам вопрос уже подталкивал к нужному ответу."],
+["Выборочный факт","Используй один правдивый факт, умолчав о важном контексте."]
+];
+let game={players:[],topic:"",phase:"DISCUSSION",seconds:600,current:0,interval:null,accused:[],scores:{}};
+
+function show(id){["home","setup","game","rules"].forEach(x=>document.getElementById(x).classList.toggle("hidden",x!==id))}
+function goHome(){show("home")}
+function openSetup(){show("setup")}
+function showRules(){show("rules")}
+function addDemo(){document.getElementById("names").value=["Илья","Катя","Макс","Дима","Саша","Олег"].join("\\n")}
+function shuffle(a){return [...a].sort(()=>Math.random()-.5)}
+function startGame(){
+ let names=document.getElementById("names").value.split("\\n").map(x=>x.trim()).filter(Boolean);
+ if(names.length<4||names.length>10){alert("Нужно от 4 до 10 игроков.");return}
+ let pool=shuffle(roles), mp=shuffle(manipulations);
+ game.players=names.map((name,i)=>{
+   let role=pool[i%pool.length], manip=mp[i%mp.length];
+   return {name,role:role[0],roleText:role[1],position:role[2],manip:manip[0],manipText:manip[1],used:false,accused:false,score:0};
+ });
+ game.topic=topics[Math.floor(Math.random()*topics.length)]; game.seconds=600;game.current=0;game.phase="DISCUSSION";
+ game.players.forEach(p=>p.score=0); renderGame(); show("game"); startTimer();
+}
+function renderGame(){
+ document.getElementById("topic").textContent=game.topic;
+ document.getElementById("phase").textContent="Свободная дискуссия";
+ document.getElementById("players").innerHTML=game.players.map((p,i)=>`<div class="pbox"><span class="dot"></span>${esc(p.name)}<small>${p.accused?"Разоблачён":""}</small></div>`).join("");
+ renderPrivate();
+}
+function renderPrivate(){
+ const p=game.players[game.current];
+ document.getElementById("currentPrivate").innerHTML=`<div class="private">
+ <div class="kind">Игрок ${game.current+1} из ${game.players.length}</div>
+ <strong>${esc(p.name)}</strong>
+ <div class="kind" style="margin-top:14px">Роль</div><strong>${esc(p.role)}</strong>
+ <p>${esc(p.roleText)}</p>
+ <div class="kind" style="margin-top:16px">Манипуляция</div><strong>${esc(p.manip)}</strong>
+ <p>${esc(p.manipText)}</p>
+ </div>`;
+}
+function nextPrivate(){game.current=(game.current+1)%game.players.length;renderPrivate()}
+function startTimer(){
+ clearInterval(game.interval); game.interval=setInterval(()=>{if(game.seconds>0){game.seconds--;updateTimer()}else{clearInterval(game.interval);finishRound()}},1000);updateTimer()
+}
+function updateTimer(){let m=Math.floor(game.seconds/60),s=game.seconds%60;document.getElementById("timer").textContent=`${String(m).padStart(2,"0")}:${String(s).padStart(2,"0")}`}
+function finishRound(){clearInterval(game.interval);game.phase="DECISION";document.getElementById("phase").textContent="Решение";openDecision()}
+function openAccuse(){
+ const choices=game.players.map((p,i)=>`<button class="choice" onclick="accuse(${i})">${esc(p.name)} ${p.accused?"— уже разоблачён":""}</button>`).join("");
+ openModal(`<h3>🚨 Разоблачение</h3><p>Выберите игрока, которого подозреваете в использовании манипуляции.</p><div class="choices">${choices}</div><button class="btn ghost" onclick="closeModal()">Отмена</button>`);
+}
+function accuse(i){
+ if(game.players[i].accused){return}
+ const p=game.players[i];p.accused=true;
+ openModal(`<h3>Вас разоблачили</h3><p><b>${esc(p.name)}</b>, подтвердите, использовали ли вы свою манипуляцию.</p><div class="choices"><button class="choice" onclick="resolveAccuse(${i},true)">Да, я использовал(а) её</button><button class="choice" onclick="resolveAccuse(${i},false)">Нет, не использовал(а)</button></div>`);
+ renderGame();
+}
+function resolveAccuse(i,yes){
+ const p=game.players[i];
+ if(yes){p.used=true;p.score-=1} else {p.score+=1}
+ closeModal();renderGame();
+}
+function openDecision(){
+ const dec=game.players.find(p=>p.role==="Принимает решение")||game.players[0];
+ openModal(`<h3>🎯 Решение</h3><p><b>${esc(dec.name)}</b> должен выбрать итоговую сторону дискуссии.</p><div class="choices"><button class="choice" onclick="decide('for')">Я за</button><button class="choice" onclick="decide('against')">Я против</button></div>`);
+}
+function decide(side){
+ const dec=game.players.find(p=>p.role==="Принимает решение")||game.players[0];
+ dec.score+=1;game.players.forEach(p=>{if(p.position===side)p.score+=1});
+ closeModal();openReveal();
+}
+function openReveal(){
+ let cards=game.players.map(p=>`<div class="reveal"><b>${esc(p.name)}</b><div class="tag">${esc(p.role)}</div><p style="color:#aaa">${esc(p.manip)}</p><div class="score">${p.score>0?"+":""}${p.score}</div></div>`).join("");
+ openModal(`<h3>🎭 Раскрытие карт</h3><p>Все роли и манипуляции раскрыты. Очки этой партии:</p><div class="revealgrid">${cards}</div><div class="actions"><button class="btn primary" onclick="newRound()">Новый раунд</button><button class="btn ghost" onclick="closeModal()">Закрыть</button></div>`);
+}
+function newRound(){closeModal();game.topic=topics[Math.floor(Math.random()*topics.length)];game.seconds=600;game.current=0;game.players.forEach(p=>{p.used=false;p.accused=false;p.score=0});renderGame();startTimer()}
+function openModal(html){document.getElementById("modalBody").innerHTML=html;document.getElementById("modal").classList.remove("hidden")}
+function closeModal(){document.getElementById("modal").classList.add("hidden")}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[c]))}
+</script>
+</body>
+</html>
