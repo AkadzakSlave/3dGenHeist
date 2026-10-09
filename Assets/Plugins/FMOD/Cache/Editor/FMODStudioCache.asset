@@ -1,5 +1,32 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-8967942520550260905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Enemy/Enemy_Land
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Enemy/Enemy_Land
+  Guid:
+    Data1: 649229069
+    Data2: 1168238186
+    Data3: -1482445137
+    Data4: 1392448962
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 230
 --- !u!114 &-8313363887159190381
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -43,7 +70,7 @@ MonoBehaviour:
     Data3: -731161419
     Data4: 1263539467
   Banks:
-  - {fileID: -5812317088245496783}
+  - {fileID: 8653955135295942059}
   IsStream: 0
   Is3D: 1
   IsOneShot: 1
@@ -51,7 +78,36 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 300
---- !u!114 &-8240240929840104328
+--- !u!114 &-8286321178031692223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Environment/Items/Secondary/Secondary_Activate
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Environment/Items/Secondary/Secondary_Activate
+  Guid:
+    Data1: -1765468708
+    Data2: 1228585946
+    Data3: -1894741365
+    Data4: 689013800
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: 7190848530779978707}
+  - {fileID: -2329838392323547733}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &-8094217897264600107
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -61,7 +117,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
-  m_Name: parameter:/Secondary_Switch/ActiveItem
+  m_Name: parameter:/Safe_Action/ActiveItem
   m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
   Name: ActiveItem
   StudioPath: 
@@ -75,7 +131,34 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
---- !u!114 &-7766859746924533832
+--- !u!114 &-7912401722306097780
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Environment/Items/Main/Hammer_Swing
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Environment/Items/Main/Hammer_Swing
+  Guid:
+    Data1: -1338610746
+    Data2: 1220392060
+    Data3: 1498668933
+    Data4: 1957042275
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 360
+--- !u!114 &-7855855824673703870
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -85,25 +168,27 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
-  m_Name: parameter:/Secondary_PickUp/SecondaryType
+  m_Name: parameter:/Iron_Door/Action
   m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
-  Name: SecondaryType
+  Name: Action
   StudioPath: 
   Min: 0
-  Max: 3
+  Max: 5
   Default: 0
   ID:
-    data1: 3975689180
-    data2: 2621069174
+    data1: 499375739
+    data2: 2392174139
   Type: 2
   IsGlobal: 0
   Labels:
-  - "\u0421igar"
-  - Dynamite
-  - Fire
-  - DoorCloser
+  - Open
+  - Close
+  - Lock
+  - Spin
+  - Unlock
+  - Fail
   Exists: 1
---- !u!114 &-5812317088245496783
+--- !u!114 &-7580877983824263646
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -112,15 +197,111 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Master.bank
-  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
-  Path: Assets/FMOD_banks/Master.bank
-  Name: Master
-  StudioPath: bank:/Master
-  lastModified: 639271774528549835
-  FileSizes: []
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Closet_Action/Action
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: Action
+  StudioPath: 
+  Min: 0
+  Max: 5
+  Default: 0
+  ID:
+    data1: 499375739
+    data2: 2392174139
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Open
+  - Close
+  - Lock
+  - Spin
+  - Unlock
+  - Fail
   Exists: 1
+--- !u!114 &-7245607421748685905
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Environment/Siren_Bell
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Environment/Siren_Bell
+  Guid:
+    Data1: 1268973143
+    Data2: 1184384183
+    Data3: -1623923038
+    Data4: 758575761
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 0
+  Parameters: []
+  MinDistance: 2
+  MaxDistance: 50
+  Length: 16382
+--- !u!114 &-6124114576371216027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Weapons/Weapon_DryFire
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Weapons/Weapon_DryFire
+  Guid:
+    Data1: -2096308470
+    Data2: 1304240856
+    Data3: -459354469
+    Data4: 1759097607
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: -759778789595145775}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &-5825832298488905804
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Environment/Items/Secondary/Secondary_SwitchPickUp
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Environment/Items/Secondary/Secondary_SwitchPickUp
+  Guid:
+    Data1: 680688270
+    Data2: 1120059533
+    Data3: -1493629022
+    Data4: 1429848624
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: -3287523181986092683}
+  - {fileID: 3277992341876988439}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 860
 --- !u!114 &-5248559901264437167
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -149,7 +330,7 @@ MonoBehaviour:
   - Case
   - Brilliant
   Exists: 1
---- !u!114 &-4761426732042491848
+--- !u!114 &-5170625044314134257
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -158,17 +339,51 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
-  m_Name: bank:/Master.strings.bank
-  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
-  Path: Assets/FMOD_banks/Master.strings.bank
-  Name: Master.strings
-  StudioPath: bank:/Master.strings
-  lastModified: 639271774528559425
-  FileSizes:
-  - Name: 
-    Value: 1560
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Enemy_Footstep/IsSprinting
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: IsSprinting
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 3296832830
+    data2: 2894138143
+  Type: 1
+  IsGlobal: 0
+  Labels: []
   Exists: 1
+--- !u!114 &-4999037049392617957
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Enemy/Enemy_Footstep
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Enemy/Enemy_Footstep
+  Guid:
+    Data1: 296300255
+    Data2: 1164054944
+    Data3: 819264697
+    Data4: 1521341651
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: -480754175253518085}
+  - {fileID: -5170625044314134257}
+  - {fileID: -3789518832255190158}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
 --- !u!114 &-4414437387773260070
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -186,6 +401,89 @@ MonoBehaviour:
   StudioPath: bank:/Master (2)
   lastModified: 639138393399262838
   FileSizes: []
+  Exists: 1
+--- !u!114 &-4084404010987175750
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Environment/Furniture/Closet_Action
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Environment/Furniture/Closet_Action
+  Guid:
+    Data1: 65366599
+    Data2: 1221931382
+    Data3: -869069409
+    Data4: 1078704341
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: -7580877983824263646}
+  - {fileID: -2199471482353670954}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &-3991419060242707651
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/BigTable_Action/Action
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: Action
+  StudioPath: 
+  Min: 0
+  Max: 5
+  Default: 0
+  ID:
+    data1: 499375739
+    data2: 2392174139
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Open
+  - Close
+  - Lock
+  - Spin
+  - Unlock
+  - Fail
+  Exists: 1
+--- !u!114 &-3789518832255190158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Enemy_Footstep/WeightStage
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: WeightStage
+  StudioPath: 
+  Min: 0
+  Max: 2
+  Default: 0
+  ID:
+    data1: 3418879034
+    data2: 2529812893
+  Type: 1
+  IsGlobal: 0
+  Labels: []
   Exists: 1
 --- !u!114 &-3714536659950039299
 MonoBehaviour:
@@ -214,6 +512,64 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 230
+--- !u!114 &-3328583313585015442
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Environment/Furniture/Safe_Action
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Environment/Furniture/Safe_Action
+  Guid:
+    Data1: 638593905
+    Data2: 1185158504
+    Data3: -1193824098
+    Data4: -1730917847
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: -8094217897264600107}
+  - {fileID: 7920077511745215578}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &-3287523181986092683
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Secondary_SwitchPickUp/SecondaryType
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: SecondaryType
+  StudioPath: 
+  Min: 0
+  Max: 4
+  Default: 0
+  ID:
+    data1: 3975689180
+    data2: 2621069174
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - "\u0421igar"
+  - Dynamite
+  - Fire
+  - Mine
+  - DoorCloser
+  Exists: 1
 --- !u!114 &-3247403046699756172
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -238,6 +594,36 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
+--- !u!114 &-3175047199371469465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Weapon_Reload/WeaponType
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: WeaponType
+  StudioPath: 
+  Min: 0
+  Max: 5
+  Default: 0
+  ID:
+    data1: 3323245526
+    data2: 2762934003
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Revolver
+  - Pistol
+  - Shotgun_Lever
+  - Shotgun_Double
+  - SMG
+  - Rifle
+  Exists: 1
 --- !u!114 &-2678255815591097509
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -257,7 +643,7 @@ MonoBehaviour:
     Data3: -982478713
     Data4: -2129454106
   Banks:
-  - {fileID: -5812317088245496783}
+  - {fileID: 8653955135295942059}
   IsStream: 0
   Is3D: 1
   IsOneShot: 1
@@ -267,7 +653,7 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 0
---- !u!114 &-2253910936740565759
+--- !u!114 &-2528804924909264272
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -277,25 +663,105 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
-  m_Name: event:/Environment/Items/Secondary/Secondary_PickUp
+  m_Name: event:/Environment/Iron_Door
   m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
-  Path: event:/Environment/Items/Secondary/Secondary_PickUp
+  Path: event:/Environment/Iron_Door
   Guid:
-    Data1: 680688270
-    Data2: 1120059533
-    Data3: -1493629022
-    Data4: 1429848624
+    Data1: -501582928
+    Data2: 1245681212
+    Data3: -105100405
+    Data4: 234855212
   Banks:
-  - {fileID: -5812317088245496783}
+  - {fileID: 8653955135295942059}
   IsStream: 0
   Is3D: 1
   IsOneShot: 1
   Parameters:
-  - {fileID: -7766859746924533832}
-  - {fileID: -2129865419478851375}
+  - {fileID: -7855855824673703870}
   MinDistance: 1
   MaxDistance: 20
   Length: 0
+--- !u!114 &-2371661213157916753
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Weapons/Bullet_Impact
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Weapons/Bullet_Impact
+  Guid:
+    Data1: -451691234
+    Data2: 1316467222
+    Data3: 1844381887
+    Data4: 1545937511
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: 3794240597092672722}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &-2329838392323547733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Secondary_Activate/SecondaryType
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: SecondaryType
+  StudioPath: 
+  Min: 0
+  Max: 4
+  Default: 0
+  ID:
+    data1: 3975689180
+    data2: 2621069174
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - "\u0421igar"
+  - Dynamite
+  - Fire
+  - Mine
+  - DoorCloser
+  Exists: 1
+--- !u!114 &-2199471482353670954
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Closet_Action/ActiveItem
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: ActiveItem
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 1681185418
+    data2: 2087629819
+  Type: 1
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &-2193979475528841841
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -315,7 +781,7 @@ MonoBehaviour:
     Data3: 1612940952
     Data4: -889130441
   Banks:
-  - {fileID: -5812317088245496783}
+  - {fileID: 8653955135295942059}
   IsStream: 0
   Is3D: 1
   IsOneShot: 1
@@ -324,54 +790,6 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 0
---- !u!114 &-2129865419478851375
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
-  m_Name: parameter:/Secondary_PickUp/ActiveItem
-  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
-  Name: ActiveItem
-  StudioPath: 
-  Min: 0
-  Max: 1
-  Default: 0
-  ID:
-    data1: 1681185418
-    data2: 2087629819
-  Type: 1
-  IsGlobal: 0
-  Labels: []
-  Exists: 1
---- !u!114 &-2121077030739276103
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
-  m_Name: parameter:/Loot_PickUp/ActiveItem
-  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
-  Name: ActiveItem
-  StudioPath: 
-  Min: 0
-  Max: 1
-  Default: 0
-  ID:
-    data1: 1681185418
-    data2: 2087629819
-  Type: 1
-  IsGlobal: 0
-  Labels: []
-  Exists: 1
 --- !u!114 &-2039029750440431752
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -387,7 +805,7 @@ MonoBehaviour:
   Name: SecondaryType
   StudioPath: 
   Min: 0
-  Max: 3
+  Max: 4
   Default: 0
   ID:
     data1: 3975689180
@@ -398,6 +816,7 @@ MonoBehaviour:
   - "\u0421igar"
   - Dynamite
   - Fire
+  - Mine
   - DoorCloser
   Exists: 1
 --- !u!114 &-1887565362601325890
@@ -419,7 +838,7 @@ MonoBehaviour:
     Data3: -1147107193
     Data4: -1213939127
   Banks:
-  - {fileID: -5812317088245496783}
+  - {fileID: 8653955135295942059}
   IsStream: 0
   Is3D: 1
   IsOneShot: 1
@@ -427,6 +846,192 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 230
+--- !u!114 &-1658336327507360942
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Ambience_Street/IndoorOutdoor
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: IndoorOutdoor
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 1386599592
+    data2: 1297042537
+  Type: 0
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
+--- !u!114 &-1049110670933555441
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.strings.bank
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
+  Path: Assets/FMOD_banks/Master.strings.bank
+  Name: Master.strings
+  StudioPath: bank:/Master.strings
+  lastModified: 639271808585115003
+  FileSizes:
+  - Name: 
+    Value: 2716
+  Exists: 1
+--- !u!114 &-1001025660775199814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Environment/Ambience_Street
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Environment/Ambience_Street
+  Guid:
+    Data1: 243703207
+    Data2: 1100056876
+    Data3: 1344642456
+    Data4: 497579436
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 1
+  Is3D: 1
+  IsOneShot: 0
+  Parameters:
+  - {fileID: -1658336327507360942}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 390500
+--- !u!114 &-759778789595145775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Weapon_DryFire/WeaponType
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: WeaponType
+  StudioPath: 
+  Min: 0
+  Max: 5
+  Default: 0
+  ID:
+    data1: 3323245526
+    data2: 2762934003
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Revolver
+  - Pistol
+  - Shotgun_Lever
+  - Shotgun_Double
+  - SMG
+  - Rifle
+  Exists: 1
+--- !u!114 &-627110000152249659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Weapons/Weapon_Reload
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Weapons/Weapon_Reload
+  Guid:
+    Data1: -1420244257
+    Data2: 1086315322
+    Data3: -634836563
+    Data4: -773081832
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 0
+  Parameters:
+  - {fileID: -488824228332987606}
+  - {fileID: -3175047199371469465}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 2174
+--- !u!114 &-488824228332987606
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Weapon_Reload/ReloadPhase
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: ReloadPhase
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 2265825562
+    data2: 3368229704
+  Type: 1
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
+--- !u!114 &-480754175253518085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Enemy_Footstep/SurfaceType
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: SurfaceType
+  StudioPath: 
+  Min: 0
+  Max: 6
+  Default: 0
+  ID:
+    data1: 2539969006
+    data2: 380973331
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Concrete
+  - Metal
+  - WallSand
+  - Glass
+  - Bag
+  - Wood
+  - Flesh
+  Exists: 1
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -440,47 +1045,101 @@ MonoBehaviour:
   m_Name: FMODStudioCache
   m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EventCache
   EditorBanks:
-  - {fileID: -4761426732042491848}
-  - {fileID: -5812317088245496783}
+  - {fileID: -1049110670933555441}
+  - {fileID: 8653955135295942059}
   EditorEvents:
   - {fileID: 3202646312209666427}
-  - {fileID: 1141176684879164653}
   - {fileID: 8213302036668605354}
   - {fileID: 6435235899962936876}
-  - {fileID: -2253910936740565759}
   - {fileID: -2678255815591097509}
   - {fileID: 8998012727247422464}
   - {fileID: -1887565362601325890}
   - {fileID: -2193979475528841841}
   - {fileID: -8307925679149401164}
+  - {fileID: -6124114576371216027}
+  - {fileID: -8967942520550260905}
+  - {fileID: -2371661213157916753}
+  - {fileID: 1572394783984901412}
+  - {fileID: -4084404010987175750}
+  - {fileID: 2179257478773425904}
+  - {fileID: -7245607421748685905}
+  - {fileID: -3328583313585015442}
+  - {fileID: 1821356001569204152}
+  - {fileID: -5825832298488905804}
+  - {fileID: 9219284059634184224}
+  - {fileID: -1001025660775199814}
+  - {fileID: -2528804924909264272}
+  - {fileID: 2368483619794241296}
+  - {fileID: -7912401722306097780}
+  - {fileID: -8286321178031692223}
+  - {fileID: -4999037049392617957}
+  - {fileID: -627110000152249659}
+  - {fileID: 4320499909177344476}
+  - {fileID: 5400229775239836245}
   EditorParameters: []
   MasterBanks:
-  - {fileID: -5812317088245496783}
+  - {fileID: 8653955135295942059}
   StringsBanks:
-  - {fileID: -4761426732042491848}
+  - {fileID: -1049110670933555441}
   cacheVersion: 131859
-  cacheTime: 639271774528559425
+  cacheTime: 639271808585387339
   SerializableEventsDict:
   - key: event:/Environment/Items/Main/Main_SwitchPickUp
     index: 0
-  - key: event:/Environment/Items/Secondary/Secondary_Switch
-    index: 1
   - key: event:/Player/Player_Footstep
-    index: 2
+    index: 1
   - key: event:/Environment/Items/Main/Main_Drop
-    index: 3
-  - key: event:/Environment/Items/Secondary/Secondary_PickUp
-    index: 4
+    index: 2
   - key: event:/Environment/Items/Secondary/Secondary_Drop
-    index: 5
+    index: 3
   - key: event:/Environment/Items/Loot/Loot_PickUp
-    index: 6
+    index: 4
   - key: event:/Player/Player_Land
-    index: 7
+    index: 5
   - key: event:/Environment/Wall/WallHit
-    index: 8
+    index: 6
   - key: event:/Player/Player_Jump
+    index: 7
+  - key: event:/Weapons/Weapon_DryFire
+    index: 8
+  - key: event:/Enemy/Enemy_Land
     index: 9
+  - key: event:/Weapons/Bullet_Impact
+    index: 10
+  - key: event:/Environment/Items/Main/Hammer_Impact
+    index: 11
+  - key: event:/Environment/Furniture/Closet_Action
+    index: 12
+  - key: event:/Weapons/Weapon_SwitchPickUp
+    index: 13
+  - key: event:/Environment/Siren_Bell
+    index: 14
+  - key: event:/Environment/Furniture/Safe_Action
+    index: 15
+  - key: event:/Environment/Furniture/BigTable_Action
+    index: 16
+  - key: event:/Environment/Items/Secondary/Secondary_SwitchPickUp
+    index: 17
+  - key: event:/Environment/Items/Secondary/Secondary_Explode
+    index: 18
+  - key: event:/Environment/Ambience_Street
+    index: 19
+  - key: event:/Environment/Iron_Door
+    index: 20
+  - key: event:/Weapons/Weapon_Inspect
+    index: 21
+  - key: event:/Environment/Items/Main/Hammer_Swing
+    index: 22
+  - key: event:/Environment/Items/Secondary/Secondary_Activate
+    index: 23
+  - key: event:/Enemy/Enemy_Footstep
+    index: 24
+  - key: event:/Weapons/Weapon_Reload
+    index: 25
+  - key: event:/Environment/Furniture/Destruction
+    index: 26
+  - key: event:/Weapons/Weapon_Fire
+    index: 27
 --- !u!114 &255722579985621476
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -532,63 +1191,6 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
---- !u!114 &1141176684879164653
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
-  m_Name: event:/Environment/Items/Secondary/Secondary_Switch
-  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
-  Path: event:/Environment/Items/Secondary/Secondary_Switch
-  Guid:
-    Data1: 1673407554
-    Data2: 1100104191
-    Data3: 1378129543
-    Data4: 1499642542
-  Banks:
-  - {fileID: -5812317088245496783}
-  IsStream: 0
-  Is3D: 1
-  IsOneShot: 1
-  Parameters:
-  - {fileID: -8240240929840104328}
-  - {fileID: 1327778766114144101}
-  MinDistance: 1
-  MaxDistance: 20
-  Length: 0
---- !u!114 &1327778766114144101
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
-  m_Name: parameter:/Secondary_Switch/SecondaryType
-  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
-  Name: SecondaryType
-  StudioPath: 
-  Min: 0
-  Max: 3
-  Default: 0
-  ID:
-    data1: 3975689180
-    data2: 2621069174
-  Type: 2
-  IsGlobal: 0
-  Labels:
-  - "\u0421igar"
-  - Dynamite
-  - Fire
-  - DoorCloser
-  Exists: 1
 --- !u!114 &1551286530305740982
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -609,6 +1211,91 @@ MonoBehaviour:
   - Name: 
     Value: 936
   Exists: 1
+--- !u!114 &1572394783984901412
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Environment/Items/Main/Hammer_Impact
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Environment/Items/Main/Hammer_Impact
+  Guid:
+    Data1: 1464207409
+    Data2: 1302784407
+    Data3: -348665454
+    Data4: -219745309
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: 4460746249627898941}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &1821356001569204152
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Environment/Furniture/BigTable_Action
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Environment/Furniture/BigTable_Action
+  Guid:
+    Data1: -235955331
+    Data2: 1128550828
+    Data3: 1701392804
+    Data4: -1938677276
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: 8838664088890711218}
+  - {fileID: -3991419060242707651}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &2179257478773425904
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Weapons/Weapon_SwitchPickUp
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Weapons/Weapon_SwitchPickUp
+  Guid:
+    Data1: 1633789772
+    Data2: 1226067099
+    Data3: -902934887
+    Data4: 90440886
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: 4094730608243452915}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
 --- !u!114 &2185534830299704248
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -634,6 +1321,34 @@ MonoBehaviour:
   IsOneShot: 1
   Parameters:
   - {fileID: 8861198006163055450}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &2368483619794241296
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Weapons/Weapon_Inspect
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Weapons/Weapon_Inspect
+  Guid:
+    Data1: -1193879101
+    Data2: 1118455992
+    Data3: 1293075587
+    Data4: -2110442342
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: 7762577907487829263}
   MinDistance: 1
   MaxDistance: 20
   Length: 0
@@ -664,6 +1379,36 @@ MonoBehaviour:
   - Hammer
   - Bag
   Exists: 1
+--- !u!114 &2982028098096357883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Weapon_Fire/WeaponType
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: WeaponType
+  StudioPath: 
+  Min: 0
+  Max: 5
+  Default: 0
+  ID:
+    data1: 3323245526
+    data2: 2762934003
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Revolver
+  - Pistol
+  - Shotgun_Lever
+  - Shotgun_Double
+  - SMG
+  - Rifle
+  Exists: 1
 --- !u!114 &3202646312209666427
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -683,7 +1428,7 @@ MonoBehaviour:
     Data3: 1800991632
     Data4: -1736076445
   Banks:
-  - {fileID: -5812317088245496783}
+  - {fileID: 8653955135295942059}
   IsStream: 0
   Is3D: 1
   IsOneShot: 1
@@ -692,7 +1437,31 @@ MonoBehaviour:
   - {fileID: -3247403046699756172}
   MinDistance: 1
   MaxDistance: 20
-  Length: 0
+  Length: 400
+--- !u!114 &3277992341876988439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Secondary_SwitchPickUp/ActiveItem
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: ActiveItem
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 1681185418
+    data2: 2087629819
+  Type: 1
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &3331609980405383325
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -743,6 +1512,37 @@ MonoBehaviour:
   Type: 1
   IsGlobal: 0
   Labels: []
+  Exists: 1
+--- !u!114 &3794240597092672722
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Bullet_Impact/SurfaceType
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: SurfaceType
+  StudioPath: 
+  Min: 0
+  Max: 6
+  Default: 0
+  ID:
+    data1: 2539969006
+    data2: 380973331
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Concrete
+  - Metal
+  - WallSand
+  - Glass
+  - Bag
+  - Wood
+  - Flesh
   Exists: 1
 --- !u!114 &3834275115271567026
 MonoBehaviour:
@@ -799,6 +1599,95 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 0
+--- !u!114 &4094730608243452915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Weapon_SwitchPickUp/WeaponType
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: WeaponType
+  StudioPath: 
+  Min: 0
+  Max: 5
+  Default: 0
+  ID:
+    data1: 3323245526
+    data2: 2762934003
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Revolver
+  - Pistol
+  - Shotgun_Lever
+  - Shotgun_Double
+  - SMG
+  - Rifle
+  Exists: 1
+--- !u!114 &4320499909177344476
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Environment/Furniture/Destruction
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Environment/Furniture/Destruction
+  Guid:
+    Data1: -331333657
+    Data2: 1190000111
+    Data3: 118879897
+    Data4: -1018927257
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: 6780076518946712483}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
+--- !u!114 &4460746249627898941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Hammer_Impact/SurfaceType
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: SurfaceType
+  StudioPath: 
+  Min: 0
+  Max: 6
+  Default: 0
+  ID:
+    data1: 2539969006
+    data2: 380973331
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Concrete
+  - Metal
+  - WallSand
+  - Glass
+  - Bag
+  - Wood
+  - Flesh
+  Exists: 1
 --- !u!114 &5162071760120552659
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -817,6 +1706,34 @@ MonoBehaviour:
   lastModified: 639123077213499871
   FileSizes: []
   Exists: 1
+--- !u!114 &5400229775239836245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Weapons/Weapon_Fire
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Weapons/Weapon_Fire
+  Guid:
+    Data1: 793605372
+    Data2: 1252993664
+    Data3: -1421014117
+    Data4: 990607667
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: 2982028098096357883}
+  MinDistance: 5
+  MaxDistance: 50
+  Length: 0
 --- !u!114 &5538897098039162538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -920,7 +1837,7 @@ MonoBehaviour:
     Data3: -1395734653
     Data4: -72831372
   Banks:
-  - {fileID: -5812317088245496783}
+  - {fileID: 8653955135295942059}
   IsStream: 0
   Is3D: 1
   IsOneShot: 1
@@ -930,6 +1847,37 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 20
   Length: 0
+--- !u!114 &6780076518946712483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Destruction/SurfaceType
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: SurfaceType
+  StudioPath: 
+  Min: 0
+  Max: 6
+  Default: 0
+  ID:
+    data1: 2539969006
+    data2: 380973331
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Concrete
+  - Metal
+  - WallSand
+  - Glass
+  - Bag
+  - Wood
+  - Flesh
+  Exists: 1
 --- !u!114 &6822248651520242708
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -995,6 +1943,30 @@ MonoBehaviour:
   - Hammer
   - Bag
   Exists: 1
+--- !u!114 &7190848530779978707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Secondary_Activate/ActiveItem
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: ActiveItem
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 1681185418
+    data2: 2087629819
+  Type: 1
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &7384855823690797389
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1019,6 +1991,97 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
+--- !u!114 &7762577907487829263
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Weapon_Inspect/WeaponType
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: WeaponType
+  StudioPath: 
+  Min: 0
+  Max: 5
+  Default: 0
+  ID:
+    data1: 3323245526
+    data2: 2762934003
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Revolver
+  - Pistol
+  - Shotgun_Lever
+  - Shotgun_Double
+  - SMG
+  - Rifle
+  Exists: 1
+--- !u!114 &7920077511745215578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Safe_Action/Action
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: Action
+  StudioPath: 
+  Min: 0
+  Max: 5
+  Default: 0
+  ID:
+    data1: 499375739
+    data2: 2392174139
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Open
+  - Close
+  - Lock
+  - Spin
+  - Unlock
+  - Fail
+  Exists: 1
+--- !u!114 &8171166185662329059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Player_Footstep/SurfaceType
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: SurfaceType
+  StudioPath: 
+  Min: 0
+  Max: 6
+  Default: 0
+  ID:
+    data1: 2539969006
+    data2: 380973331
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - Concrete
+  - Metal
+  - WallSand
+  - Glass
+  - Bag
+  - Wood
+  - Flesh
+  Exists: 1
 --- !u!114 &8213302036668605354
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1038,7 +2101,7 @@ MonoBehaviour:
     Data3: -1493886048
     Data4: -1012864717
   Banks:
-  - {fileID: -5812317088245496783}
+  - {fileID: 8653955135295942059}
   IsStream: 0
   Is3D: 1
   IsOneShot: 1
@@ -1046,9 +2109,52 @@ MonoBehaviour:
   - {fileID: 5560857666200496166}
   - {fileID: 5682241745382186559}
   - {fileID: 8907990995774596676}
+  - {fileID: 8171166185662329059}
   MinDistance: 1
   MaxDistance: 20
   Length: 0
+--- !u!114 &8653955135295942059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.bank
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorBankRef
+  Path: Assets/FMOD_banks/Master.bank
+  Name: Master
+  StudioPath: bank:/Master
+  lastModified: 639271808585387339
+  FileSizes: []
+  Exists: 1
+--- !u!114 &8838664088890711218
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/BigTable_Action/ActiveItem
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: ActiveItem
+  StudioPath: 
+  Min: 0
+  Max: 1
+  Default: 0
+  ID:
+    data1: 1681185418
+    data2: 2087629819
+  Type: 1
+  IsGlobal: 0
+  Labels: []
+  Exists: 1
 --- !u!114 &8861198006163055450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1097,6 +2203,35 @@ MonoBehaviour:
   IsGlobal: 0
   Labels: []
   Exists: 1
+--- !u!114 &8952045871011039334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/Secondary_Explode/SecondaryType
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorParamRef
+  Name: SecondaryType
+  StudioPath: 
+  Min: 0
+  Max: 4
+  Default: 0
+  ID:
+    data1: 3975689180
+    data2: 2621069174
+  Type: 2
+  IsGlobal: 0
+  Labels:
+  - "\u0421igar"
+  - Dynamite
+  - Fire
+  - Mine
+  - DoorCloser
+  Exists: 1
 --- !u!114 &8998012727247422464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1116,13 +2251,40 @@ MonoBehaviour:
     Data3: -1576399740
     Data4: 642664294
   Banks:
-  - {fileID: -5812317088245496783}
+  - {fileID: 8653955135295942059}
   IsStream: 0
   Is3D: 1
   IsOneShot: 1
   Parameters:
-  - {fileID: -2121077030739276103}
   - {fileID: -5248559901264437167}
   MinDistance: 1
   MaxDistance: 20
-  Length: 850
+  Length: 685
+--- !u!114 &9219284059634184224
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Environment/Items/Secondary/Secondary_Explode
+  m_EditorClassIdentifier: FMODUnityEditor::FMODUnity.EditorEventRef
+  Path: event:/Environment/Items/Secondary/Secondary_Explode
+  Guid:
+    Data1: -1537756776
+    Data2: 1178749729
+    Data3: -1936985684
+    Data4: -335770484
+  Banks:
+  - {fileID: 8653955135295942059}
+  IsStream: 1
+  Is3D: 1
+  IsOneShot: 1
+  Parameters:
+  - {fileID: 8952045871011039334}
+  MinDistance: 1
+  MaxDistance: 20
+  Length: 0
