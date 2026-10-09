@@ -471,25 +471,25 @@ MonoBehaviour:
   minWeightSpeed: 2
   footstepEvent:
     Guid:
-      Data1: 0
-      Data2: 0
-      Data3: 0
-      Data4: 0
-    Path: 
+      Data1: -1315216641
+      Data2: 1151331948
+      Data3: 1016496260
+      Data4: -1767202063
+    Path: event:/Player/Player_Footstep
   landEvent:
     Guid:
-      Data1: 0
-      Data2: 0
-      Data3: 0
-      Data4: 0
-    Path: 
+      Data1: -321180480
+      Data2: 1138887087
+      Data3: -1147107193
+      Data4: -1213939127
+    Path: event:/Player/Player_Land
   jumpEvent:
     Guid:
-      Data1: 0
-      Data2: 0
-      Data3: 0
-      Data4: 0
-    Path: 
+      Data1: -675212058
+      Data2: 1276544780
+      Data3: -731161419
+      Data4: 1263539467
+    Path: event:/Player/Player_Jump
   walkFootstepInterval: 0.5
   sprintFootstepInterval: 0.3
   animator: {fileID: 0}

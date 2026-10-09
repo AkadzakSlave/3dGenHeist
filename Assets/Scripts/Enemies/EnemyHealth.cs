@@ -66,6 +66,12 @@ public class EnemyHealth : MonoBehaviour
         // Trigger red flash visual feedback
         FlashRed();
 
+        // Alert enemy AI of attacker position
+        if (enemyController != null)
+        {
+            enemyController.OnDamagedAlert(transform.position);
+        }
+
         onDamaged?.Invoke();
 
         Debug.Log($"[EnemyHealth] {name} took {damage} damage. HP: {currentHealth}/{maxHealth}");
@@ -127,6 +133,25 @@ public class EnemyHealth : MonoBehaviour
 
         isDead = true;
         onDeath?.Invoke();
+
+        // Disable NavMeshAgent immediately so dead body doesn't block pathfinding
+        var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();
+        if (agent != null)
+        {
+            agent.enabled = false;
+        }
+
+        // Disable colliders so other enemies can pass through
+        var colliders = GetComponentsInChildren<Collider>();
+        foreach (var c in colliders)
+        {
+            c.enabled = false;
+        }
+
+        if (enemyController != null)
+        {
+            enemyController.ReleaseCover();
+        }
 
         if (EnemyManager.Instance != null && enemyController != null)
         {

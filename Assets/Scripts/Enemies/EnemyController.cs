@@ -38,6 +38,13 @@ public class EnemyController : MonoBehaviour
     public float preferredMinDistance = 6.0f;
     public float hearingRadius = 22.0f;
 
+    [Header("Sensory Perception & Alert")]
+    public float fieldOfViewAngle = 120.0f;
+    public float sneakDetectionDistance = 2.5f;
+    public bool isAlerted = false;
+    public float alertDuration = 12.0f;
+    private float alertTimer = 0f;
+
     [Header("Cover System")]
     public bool useCoverSystem = true;
     public float coverSearchInterval = 3.0f;
@@ -140,6 +147,8 @@ public class EnemyController : MonoBehaviour
     {
         lastHeardSoundPos = soundPosition;
         soundAlertTimer = 10.0f;
+        isAlerted = true;
+        alertTimer = alertDuration;
 
         if (currentCoverPoint == null && useCoverSystem)
         {
@@ -149,6 +158,54 @@ public class EnemyController : MonoBehaviour
                 currentCoverPoint = bestPoint;
             }
         }
+    }
+
+    public void OnDamagedAlert(Vector3 attackerPosition)
+    {
+        lastHeardSoundPos = attackerPosition;
+        soundAlertTimer = 12.0f;
+        isAlerted = true;
+        alertTimer = alertDuration;
+
+        if (currentCoverPoint == null && useCoverSystem)
+        {
+            CoverPoint bestPoint = CoverPoint.FindBestCoverPoint(transform.position, attackerPosition, 20f);
+            if (bestPoint != null && bestPoint.Claim(this))
+            {
+                currentCoverPoint = bestPoint;
+            }
+        }
+    }
+
+    private bool IsPlayerSpotted(float distanceToPlayer)
+    {
+        if (playerTarget == null) return false;
+
+        // 1. If bank heist/alarm is actively underway, guards are in 360 alert
+        if (GameManager.Instance != null && GameManager.Instance.isHeistActive)
+        {
+            return distanceToPlayer <= DetectionRadius && HasLineOfSight();
+        }
+
+        // 2. Sneak proximity detection (even from behind)
+        if (distanceToPlayer <= sneakDetectionDistance && HasLineOfSight())
+        {
+            return true;
+        }
+
+        // 3. Field of View check (120 degree frontal cone)
+        if (distanceToPlayer <= DetectionRadius)
+        {
+            Vector3 dirToPlayer = (playerTarget.position - transform.position).normalized;
+            float angle = Vector3.Angle(transform.forward, dirToPlayer);
+
+            if (angle <= fieldOfViewAngle * 0.5f)
+            {
+                return HasLineOfSight();
+            }
+        }
+
+        return false;
     }
 
     private void UpdateOverheadDebugText(string status, Color color)
@@ -173,6 +230,15 @@ public class EnemyController : MonoBehaviour
         if (soundAlertTimer > 0f)
         {
             soundAlertTimer -= Time.deltaTime;
+        }
+
+        if (alertTimer > 0f)
+        {
+            alertTimer -= Time.deltaTime;
+            if (alertTimer <= 0f)
+            {
+                isAlerted = false;
+            }
         }
 
         if (isReloading)
@@ -205,11 +271,26 @@ public class EnemyController : MonoBehaviour
             }
 
             StopMoving();
-            UpdateOverheadDebugText("IDLE / PATROL", Color.gray);
+            UpdateOverheadDebugText("PATROL", Color.gray);
             return;
         }
 
         float distanceToPlayer = Vector3.Distance(transform.position, playerTarget.position);
+
+        // Update visual sensory spotting
+        if (IsPlayerSpotted(distanceToPlayer))
+        {
+            isAlerted = true;
+            alertTimer = alertDuration;
+        }
+
+        // If not alerted and haven't heard sound, stay in calm patrol
+        if (!isAlerted && soundAlertTimer <= 0f)
+        {
+            StopMoving();
+            UpdateOverheadDebugText("PATROL", Color.gray);
+            return;
+        }
 
         // Tactical Cover Management
         if (useCoverSystem)
@@ -296,7 +377,7 @@ public class EnemyController : MonoBehaviour
         }
     }
 
-    private void ReleaseCover()
+    public void ReleaseCover()
     {
         if (currentCoverPoint != null)
         {

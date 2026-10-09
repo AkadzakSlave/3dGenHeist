@@ -360,23 +360,52 @@ public class LevelGenerator : MonoBehaviour
     private List<RoomTemplate> GetValidTemplates(int depth)
     {
         List<RoomTemplate> valid = new List<RoomTemplate>();
+        
+        int minR = 10;
+        int maxR = 20;
+        if (GameManager.Instance != null && GameManager.Instance.selectedDossier != null)
+        {
+            minR = GameManager.Instance.selectedDossier.minRooms;
+            maxR = GameManager.Instance.selectedDossier.maxRooms;
+        }
+
+        // Vault depth requirement scales with bank size (depth >= 2 for small banks, >= 3 for normal/large)
+        int minVaultDepth = Mathf.Clamp(minR / 3, 2, 4);
+        bool forceVault = !vaultSpawned && (generatedRoomsCount >= maxR - 3 || depth >= minVaultDepth);
+
         foreach (var t in activePreset.availableRooms)
         {
             if (t.category == RoomCategory.Vault)
             {
-                if (vaultSpawned || depth < 5) continue;
+                if (vaultSpawned) continue;
+                if (!forceVault && depth < minVaultDepth) continue;
             }
             else if (t.category == RoomCategory.Security)
             {
                 if (securitySpawned) continue;
+                if (depth < 2) continue;
             }
             else if (t.category == RoomCategory.VIP)
             {
                 if (vipSpawned) continue;
+                if (depth < 2) continue;
             }
             
             valid.Add(t);
         }
+
+        // Fallback to Normal rooms if list is empty
+        if (valid.Count == 0)
+        {
+            foreach (var t in activePreset.availableRooms)
+            {
+                if (t.category == RoomCategory.Normal)
+                {
+                    valid.Add(t);
+                }
+            }
+        }
+
         return valid;
     }
 
