@@ -16,10 +16,14 @@ public class PlayerInventory : MonoBehaviour
     public List<EquipableItem> allPossibleItems;
 
     [Header("Inventory Status")]
-    [Tooltip("Slot 0: Tool. Slot 1: Weapon.")]
-    public EquipableItem[] slots = new EquipableItem[2];
+    [Tooltip("Slot 0: Tool. Slot 1: Weapon. Slot 2: Utility.")]
+    public EquipableItem[] slots = new EquipableItem[3];
     public int activeSlotIndex = 0;
     public string emptyWeaponText = "Нет оружия";
+
+    [Header("Physical Toss Settings")]
+    public float dropThrowForce = 3.5f;
+    public float dropUpwardForce = 1.2f;
 
     [Header("Input")]
     public InputReader inputReader;
@@ -67,13 +71,15 @@ public class PlayerInventory : MonoBehaviour
 
     private void OnScrollSlot(float scrollValue)
     {
-        if (scrollValue > 0.1f) SwitchSlot(activeSlotIndex - 1);
-        else if (scrollValue < -0.1f) SwitchSlot(activeSlotIndex + 1);
+        if (slots == null || slots.Length == 0) return;
+        int currentIndex = activeSlotIndex < 0 ? 0 : activeSlotIndex;
+        if (scrollValue > 0.1f) SwitchSlot((currentIndex - 1 + slots.Length) % slots.Length);
+        else if (scrollValue < -0.1f) SwitchSlot((currentIndex + 1) % slots.Length);
     }
 
     private void OnPrimaryActionTriggered()
     {
-        if (slots[activeSlotIndex] != null)
+        if (activeSlotIndex >= 0 && activeSlotIndex < slots.Length && slots[activeSlotIndex] != null)
         {
             if (slots[activeSlotIndex] is WeaponItem weapon && weapon.isAutomatic)
             {
@@ -112,7 +118,7 @@ public class PlayerInventory : MonoBehaviour
 
     private void HandlePrimaryAction()
     {
-        if (slots[activeSlotIndex] != null)
+        if (activeSlotIndex >= 0 && activeSlotIndex < slots.Length && slots[activeSlotIndex] != null)
         {
             bool isHeld = inputReader != null && inputReader.IsPrimaryActionPressed;
 
@@ -130,6 +136,16 @@ public class PlayerInventory : MonoBehaviour
     {
         if (slots == null || slots.Length == 0) return;
 
+        // Повторное нажатие на активный слот — убираем предмет (пустые руки)
+        if (activeSlotIndex == newIndex && activeSlotIndex >= 0 && activeSlotIndex < slots.Length && slots[activeSlotIndex] != null)
+        {
+            slots[activeSlotIndex].Unequip();
+            activeSlotIndex = -1;
+            onInventoryChanged?.Invoke();
+            UpdateWeaponText();
+            return;
+        }
+
         if (newIndex < 0) newIndex = slots.Length - 1;
         if (newIndex >= slots.Length) newIndex = 0;
 
@@ -139,14 +155,14 @@ public class PlayerInventory : MonoBehaviour
             return;
         }
 
-        if (slots[activeSlotIndex] != null)
+        if (activeSlotIndex >= 0 && activeSlotIndex < slots.Length && slots[activeSlotIndex] != null)
         {
             slots[activeSlotIndex].Unequip();
         }
 
         activeSlotIndex = newIndex;
 
-        if (slots[activeSlotIndex] != null)
+        if (activeSlotIndex >= 0 && activeSlotIndex < slots.Length && slots[activeSlotIndex] != null)
         {
             EnsureItemActive(slots[activeSlotIndex]);
             slots[activeSlotIndex].Equip();
@@ -160,18 +176,15 @@ public class PlayerInventory : MonoBehaviour
     {
         if (data == null) return false;
 
-        int targetIndex = (int)data.itemType;
-        if (slots == null || targetIndex >= slots.Length)
+        if (slots == null || slots.Length < 3)
         {
-            Debug.LogError($"[Inventory] Missing slot for {data.itemType}.");
-            return false;
+            System.Array.Resize(ref slots, 3);
         }
 
-        if (slots[targetIndex] != null)
+        int targetIndex = (int)data.itemType;
+        if (targetIndex >= slots.Length)
         {
-            string occupiedBy = slots[targetIndex].itemData != null ? slots[targetIndex].itemData.itemName : slots[targetIndex].name;
-            Debug.Log($"[Inventory] {data.itemType} slot is already occupied by {occupiedBy}.");
-            return false;
+            System.Array.Resize(ref slots, targetIndex + 1);
         }
 
         EquipableItem itemToEnable = allPossibleItems.Find(item => item != null && item.itemData == data);
@@ -181,7 +194,16 @@ public class PlayerInventory : MonoBehaviour
             return false;
         }
 
-        if (slots[activeSlotIndex] != null)
+        // АВТО-СВАП: если слот для предмета уже занят, выбрасываем старый предмет на пол!
+        if (slots[targetIndex] != null)
+        {
+            string oldName = slots[targetIndex].itemData != null ? slots[targetIndex].itemData.itemName : slots[targetIndex].name;
+            Debug.Log($"[Inventory] Слот {data.itemType} занят ({oldName}). Выполняем авто-свап!");
+            DropItemAtSlot(targetIndex);
+        }
+
+        // Убираем предмет, который сейчас был в руках (если это не целевой слот)
+        if (activeSlotIndex >= 0 && activeSlotIndex < slots.Length && slots[activeSlotIndex] != null)
         {
             slots[activeSlotIndex].Unequip();
         }
@@ -201,21 +223,29 @@ public class PlayerInventory : MonoBehaviour
     public void DropCurrentItem()
     {
         if (slots == null || activeSlotIndex < 0 || activeSlotIndex >= slots.Length) return;
+        DropItemAtSlot(activeSlotIndex);
+        onInventoryChanged?.Invoke();
+        UpdateWeaponText();
+    }
 
-        EquipableItem currentItem = slots[activeSlotIndex];
-        if (currentItem == null) return;
+    public void DropItemAtSlot(int slotIndex)
+    {
+        if (slots == null || slotIndex < 0 || slotIndex >= slots.Length) return;
 
-        currentItem.Unequip();
+        EquipableItem itemToDrop = slots[slotIndex];
+        if (itemToDrop == null) return;
+
+        itemToDrop.Unequip();
 
         Vector3 dropPosition;
         Transform cam = Camera.main != null ? Camera.main.transform : transform;
 
         Vector3 customPosOffset = Vector3.zero;
         Vector3 customRotOffset = Vector3.zero;
-        if (currentItem.itemData != null)
+        if (itemToDrop.itemData != null)
         {
-            customPosOffset = currentItem.itemData.dropPositionOffset;
-            customRotOffset = currentItem.itemData.dropRotationOffset;
+            customPosOffset = itemToDrop.itemData.dropPositionOffset;
+            customRotOffset = itemToDrop.itemData.dropRotationOffset;
         }
 
         // Base drop position: 1.2m forward and 0.4m down (waist height)
@@ -243,11 +273,11 @@ public class PlayerInventory : MonoBehaviour
         Quaternion baseRotation = camForwardFlat.sqrMagnitude > 0.001f ? Quaternion.LookRotation(camForwardFlat) : Quaternion.identity;
         Quaternion dropRotation = baseRotation * Quaternion.Euler(customRotOffset);
 
-        if (currentItem.itemData != null && currentItem.itemData.dropPrefab != null)
+        if (itemToDrop.itemData != null && itemToDrop.itemData.dropPrefab != null)
         {
-            GameObject droppedObj = Instantiate(currentItem.itemData.dropPrefab, dropPosition, dropRotation);
+            GameObject droppedObj = Instantiate(itemToDrop.itemData.dropPrefab, dropPosition, dropRotation);
 
-            if (currentItem is BagTool bag)
+            if (itemToDrop is BagTool bag)
             {
                 WorldEquipment worldEq = droppedObj.GetComponent<WorldEquipment>();
                 if (worldEq != null)
@@ -256,15 +286,21 @@ public class PlayerInventory : MonoBehaviour
                     worldEq.storedWeight = bag.storedWeight;
                 }
             }
+
+            // Физический бросок предмета вперед (как в Quota играх)
+            Rigidbody rb = droppedObj.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = false;
+                Vector3 throwVel = cam.forward * dropThrowForce + Vector3.up * dropUpwardForce;
+                rb.AddForce(throwVel, ForceMode.VelocityChange);
+                rb.AddTorque(Random.insideUnitSphere * 2.5f, ForceMode.Impulse);
+            }
         }
 
-        string itemName = currentItem.itemData != null ? currentItem.itemData.itemName : currentItem.name;
-        slots[activeSlotIndex] = null;
-
-        onInventoryChanged?.Invoke();
-        UpdateWeaponText();
-
-        Debug.Log($"[Inventory] {itemName} dropped.");
+        string itemName = itemToDrop.itemData != null ? itemToDrop.itemData.itemName : itemToDrop.name;
+        slots[slotIndex] = null;
+        Debug.Log($"[Inventory] {itemName} dropped from slot {slotIndex}.");
     }
 
     public int GetTotalWeight()
@@ -340,13 +376,46 @@ public class PlayerInventory : MonoBehaviour
     {
         if (GameManager.Instance == null || GameManager.Instance.heistUI == null) return;
 
-        if (slots != null && slots.Length > 1 && slots[1] is WeaponItem weapon)
+        EquipableItem activeItem = (slots != null && activeSlotIndex >= 0 && activeSlotIndex < slots.Length) ? slots[activeSlotIndex] : null;
+
+        if (activeItem is WeaponItem weapon)
         {
             weapon.RefreshWeaponUI();
         }
+        else if (activeItem is BagTool bag)
+        {
+            Sprite icon = bag.itemData != null ? bag.itemData.icon : null;
+            GameManager.Instance.heistUI.UpdateWeapon($"${bag.storedMoney} ({bag.storedWeight}/{bag.maxCapacity} кг)", icon);
+        }
+        else if (activeItem is HammerTool hammer)
+        {
+            Sprite icon = hammer.itemData != null ? hammer.itemData.icon : null;
+            GameManager.Instance.heistUI.UpdateWeapon("[ЛКМ] Проломить стену", icon);
+        }
+        else if (activeItem is DynamiteItem dynamite)
+        {
+            Sprite icon = dynamite.itemData != null ? dynamite.itemData.icon : null;
+            GameManager.Instance.heistUI.UpdateWeapon("[ПКМ] Примерить  [ЛКМ] Закрепить", icon);
+        }
+        else if (activeItem is MolotovItem molotov)
+        {
+            Sprite icon = molotov.itemData != null ? molotov.itemData.icon : null;
+            GameManager.Instance.heistUI.UpdateWeapon("[ПКМ] Траектория  [ЛКМ] Бросить", icon);
+        }
+        else if (activeItem is MineItem mine)
+        {
+            Sprite icon = mine.itemData != null ? mine.itemData.icon : null;
+            GameManager.Instance.heistUI.UpdateWeapon("[ПКМ] Примерить  [ЛКМ] Поставить", icon);
+        }
+        else if (activeItem is BarricadeItem barricade)
+        {
+            Sprite icon = barricade.itemData != null ? barricade.itemData.icon : null;
+            GameManager.Instance.heistUI.UpdateWeapon("[ПКМ] Примерить  [ЛКМ] Поставить", icon);
+        }
         else
         {
-            GameManager.Instance.heistUI.UpdateWeapon(emptyWeaponText);
+            // Руки пусты (кобура)
+            GameManager.Instance.heistUI.UpdateWeapon("", null);
         }
     }
 }

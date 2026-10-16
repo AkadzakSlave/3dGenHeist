@@ -10,6 +10,8 @@ public class InputReader : ScriptableObject
     public event UnityAction<Vector2> LookEvent;
     public event UnityAction JumpEvent;
     public event UnityAction JumpCanceledEvent;
+    public event UnityAction CrouchEvent;
+    public event UnityAction CrouchCanceledEvent;
     public event UnityAction SprintEvent;
     public event UnityAction SprintCanceledEvent;
     public event UnityAction InteractEvent;
@@ -31,6 +33,7 @@ public class InputReader : ScriptableObject
     private InputAction moveAction;
     private InputAction lookAction;
     private InputAction jumpAction;
+    private InputAction crouchAction;
     private InputAction sprintAction;
     private InputAction interactAction;
     private InputAction attackAction;
@@ -95,6 +98,17 @@ public class InputReader : ScriptableObject
             jumpAction.performed += ctx => JumpEvent?.Invoke();
             jumpAction.canceled += ctx => JumpCanceledEvent?.Invoke();
         }
+
+        // Crouch
+        crouchAction = playerMap.FindAction("Crouch");
+        if (crouchAction == null)
+        {
+            crouchAction = new InputAction("Crouch");
+            crouchAction.AddBinding("<Keyboard>/leftCtrl");
+            crouchAction.AddBinding("<Keyboard>/c");
+        }
+        crouchAction.performed += ctx => CrouchEvent?.Invoke();
+        crouchAction.canceled += ctx => CrouchCanceledEvent?.Invoke();
 
         // Sprint
         sprintAction = playerMap.FindAction("Sprint");
@@ -216,6 +230,12 @@ public class InputReader : ScriptableObject
         jumpAction.performed += ctx => JumpEvent?.Invoke();
         jumpAction.canceled += ctx => JumpCanceledEvent?.Invoke();
 
+        crouchAction = new InputAction("Crouch");
+        crouchAction.AddBinding("<Keyboard>/leftCtrl");
+        crouchAction.AddBinding("<Keyboard>/c");
+        crouchAction.performed += ctx => CrouchEvent?.Invoke();
+        crouchAction.canceled += ctx => CrouchCanceledEvent?.Invoke();
+
         sprintAction = new InputAction("Sprint", binding: "<Keyboard>/leftShift");
         sprintAction.performed += ctx => SprintEvent?.Invoke();
         sprintAction.canceled += ctx => SprintCanceledEvent?.Invoke();
@@ -261,6 +281,7 @@ public class InputReader : ScriptableObject
         moveAction?.Enable();
         lookAction?.Enable();
         jumpAction?.Enable();
+        crouchAction?.Enable();
         sprintAction?.Enable();
         interactAction?.Enable();
         attackAction?.Enable();
@@ -281,6 +302,7 @@ public class InputReader : ScriptableObject
         moveAction?.Disable();
         lookAction?.Disable();
         jumpAction?.Disable();
+        crouchAction?.Disable();
         sprintAction?.Disable();
         interactAction?.Disable();
         attackAction?.Disable();
@@ -299,6 +321,7 @@ public class InputReader : ScriptableObject
     public Vector2 MoveInput => moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
     public Vector2 LookInput => lookAction != null ? lookAction.ReadValue<Vector2>() : Vector2.zero;
     public bool IsSprintPressed => sprintAction != null && sprintAction.IsPressed();
+    public bool IsCrouchPressed => crouchAction != null && crouchAction.IsPressed();
     public bool IsPrimaryActionPressed => attackAction != null && attackAction.IsPressed();
     public bool IsSecondaryActionPressed => secondaryAction != null && secondaryAction.IsPressed();
 }

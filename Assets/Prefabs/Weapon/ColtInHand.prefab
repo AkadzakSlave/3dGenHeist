@@ -5146,7 +5146,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   muzzlePoint: {fileID: 5180030842694133830}
   muzzleFlash: {fileID: 3677941389038285101}
-  animatorLayerName: Weapon Layer
+  animatorLayerName: Colt Layer
   fireEvent:
     Guid:
       Data1: 0

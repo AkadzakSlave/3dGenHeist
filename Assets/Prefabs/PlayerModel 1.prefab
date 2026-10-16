@@ -562,7 +562,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   muzzlePoint: {fileID: 1167117891118268757}
   muzzleFlash: {fileID: 7267658774739359806}
-  animatorLayerName: Weapon Layer
+  animatorLayerName: Colt Layer
   fireEvent:
     Guid:
       Data1: 0
@@ -24936,7 +24936,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   muzzlePoint: {fileID: 7694032155279570501}
   muzzleFlash: {fileID: 8862875555368504302}
-  animatorLayerName: Weapon Layer
+  animatorLayerName: Shotgun Layer
   fireEvent:
     Guid:
       Data1: 0
@@ -36971,7 +36971,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   muzzlePoint: {fileID: 3254903694480588176}
   muzzleFlash: {fileID: 3038305075252062258}
-  animatorLayerName: Weapon Layer
+  animatorLayerName: Thompson Layer
   fireEvent:
     Guid:
       Data1: 0

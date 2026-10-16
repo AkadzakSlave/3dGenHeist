@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: Molotov
   itemType: 2
   fmodMainType: 0
-  icon: {fileID: 21300000, guid: 2e4b50bcb22150848a560ef8017aa281, type: 3}
+  icon: {fileID: 21300000, guid: 4d58a0189bfee684f9d1fd2b54deec5c, type: 3}
   baseWeight: 5
   dropPrefab: {fileID: 7347926640277245534, guid: 7cbb0dac31dc2b74ea63c4b71ca0e073, type: 3}
   dropPositionOffset: {x: 0, y: 0, z: 0}

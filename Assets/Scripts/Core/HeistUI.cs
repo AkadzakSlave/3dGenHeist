@@ -10,6 +10,7 @@ public class HeistUI : MonoBehaviour
     public TextMeshProUGUI staminaText;
     public TextMeshProUGUI healthText;
     public TextMeshProUGUI weaponText;
+    public Image weaponIcon;
     public GameObject quotaMetBanner;
 
     [Header("Mission HUD Info")]
@@ -29,6 +30,21 @@ public class HeistUI : MonoBehaviour
     public string staminaFormat = "Stamina: {0}/{1}";
     public string healthFormat = "HP: {0}/{1}";
 
+    [System.Serializable]
+    public class HotbarSlotUI
+    {
+        public GameObject slotRoot;
+        public Image borderHighlight;
+        public Image iconImage;
+        public TextMeshProUGUI keyNumberText;
+    }
+
+    [Header("Hotbar HUD")]
+    public GameObject hotbarRoot;
+    public HotbarSlotUI[] hotbarSlots = new HotbarSlotUI[3];
+    public Color activeSlotColor = new Color(1f, 0.85f, 0.2f, 1f);
+    public Color inactiveSlotColor = new Color(0.2f, 0.2f, 0.2f, 0.65f);
+
     [Header("Placeholders (Future)")]
     public GameObject healthBarPlaceholder;
     public GameObject inventoryPlaceholder;
@@ -41,6 +57,24 @@ public class HeistUI : MonoBehaviour
 
     private int lastTimerSecond = -1;
     private int lastStaminaInt = -1;
+
+    private void Awake()
+    {
+        if (weaponIcon == null && weaponText != null)
+        {
+            Transform parent = weaponText.transform.parent;
+            if (parent != null)
+            {
+                Transform found = parent.Find("WeaponIcon");
+                if (found != null)
+                {
+                    weaponIcon = found.GetComponent<Image>();
+                }
+            }
+        }
+
+        EnsureHotbarCreated();
+    }
 
     void Start()
     {
@@ -151,6 +185,8 @@ public class HeistUI : MonoBehaviour
                 weightText.color = Color.white;
             }
         }
+
+        UpdateHotbar();
     }
 
     public void UpdateMapLootInfo(int totalMapLoot, int count)
@@ -197,10 +233,28 @@ public class HeistUI : MonoBehaviour
 
     public void UpdateWeapon(string text)
     {
+        UpdateWeapon(text, null);
+    }
+
+    public void UpdateWeapon(string text, Sprite icon)
+    {
         if (weaponText != null)
         {
             weaponText.text = text;
             weaponText.gameObject.SetActive(!string.IsNullOrEmpty(text));
+        }
+
+        if (weaponIcon != null)
+        {
+            if (icon != null)
+            {
+                weaponIcon.sprite = icon;
+                weaponIcon.gameObject.SetActive(true);
+            }
+            else
+            {
+                weaponIcon.gameObject.SetActive(false);
+            }
         }
     }
 
@@ -252,6 +306,142 @@ public class HeistUI : MonoBehaviour
         {
             interactionText.text = text;
             interactionText.gameObject.SetActive(!string.IsNullOrEmpty(text));
+        }
+    }
+
+    private void EnsureHotbarCreated()
+    {
+        if (hotbarRoot != null && hotbarSlots != null && hotbarSlots.Length >= 3 && hotbarSlots[0] != null && hotbarSlots[0].slotRoot != null)
+        {
+            return;
+        }
+
+        Transform existing = transform.Find("Hotbar");
+        if (existing != null)
+        {
+            hotbarRoot = existing.gameObject;
+        }
+        else
+        {
+            GameObject hbObj = new GameObject("Hotbar", typeof(RectTransform));
+            hbObj.transform.SetParent(transform, false);
+            RectTransform hbRt = hbObj.GetComponent<RectTransform>();
+            hbRt.anchorMin = new Vector2(0.5f, 0f);
+            hbRt.anchorMax = new Vector2(0.5f, 0f);
+            hbRt.pivot = new Vector2(0.5f, 0f);
+            hbRt.anchoredPosition = new Vector2(0f, 30f);
+            hbRt.sizeDelta = new Vector2(240f, 70f);
+            hotbarRoot = hbObj;
+
+            hotbarSlots = new HotbarSlotUI[3];
+            string[] keyLabels = new string[] { "[1]", "[2]", "[3]" };
+            float[] xOffsets = new float[] { -75f, 0f, 75f };
+
+            for (int i = 0; i < 3; i++)
+            {
+                hotbarSlots[i] = new HotbarSlotUI();
+
+                // Slot Container Background
+                GameObject slotObj = new GameObject($"Slot_{i + 1}", typeof(RectTransform), typeof(Image));
+                slotObj.transform.SetParent(hbObj.transform, false);
+                RectTransform slotRt = slotObj.GetComponent<RectTransform>();
+                slotRt.anchorMin = new Vector2(0.5f, 0.5f);
+                slotRt.anchorMax = new Vector2(0.5f, 0.5f);
+                slotRt.pivot = new Vector2(0.5f, 0.5f);
+                slotRt.anchoredPosition = new Vector2(xOffsets[i], 0f);
+                slotRt.sizeDelta = new Vector2(64f, 64f);
+
+                Image slotBg = slotObj.GetComponent<Image>();
+                slotBg.color = new Color(0.08f, 0.08f, 0.1f, 0.85f);
+                hotbarSlots[i].slotRoot = slotObj;
+
+                // Border Highlight
+                GameObject borderObj = new GameObject("Border", typeof(RectTransform), typeof(Outline));
+                borderObj.transform.SetParent(slotObj.transform, false);
+                RectTransform borderRt = borderObj.GetComponent<RectTransform>();
+                borderRt.anchorMin = Vector2.zero;
+                borderRt.anchorMax = Vector2.one;
+                borderRt.sizeDelta = Vector2.zero;
+
+                // We also add an Image for the border frame
+                Image borderImg = slotObj.GetComponent<Image>();
+                hotbarSlots[i].borderHighlight = borderImg;
+
+                // Icon image
+                GameObject iconObj = new GameObject("Icon", typeof(RectTransform), typeof(Image));
+                iconObj.transform.SetParent(slotObj.transform, false);
+                RectTransform iconRt = iconObj.GetComponent<RectTransform>();
+                iconRt.anchorMin = new Vector2(0.12f, 0.12f);
+                iconRt.anchorMax = new Vector2(0.88f, 0.88f);
+                iconRt.sizeDelta = Vector2.zero;
+
+                Image iconImg = iconObj.GetComponent<Image>();
+                iconImg.preserveAspect = true;
+                iconImg.raycastTarget = false;
+                iconImg.gameObject.SetActive(false);
+                hotbarSlots[i].iconImage = iconImg;
+
+                // Key Number Text
+                GameObject keyObj = new GameObject("KeyText", typeof(RectTransform), typeof(TextMeshProUGUI));
+                keyObj.transform.SetParent(slotObj.transform, false);
+                RectTransform keyRt = keyObj.GetComponent<RectTransform>();
+                keyRt.anchorMin = new Vector2(0f, 1f);
+                keyRt.anchorMax = new Vector2(0f, 1f);
+                keyRt.pivot = new Vector2(0f, 1f);
+                keyRt.anchoredPosition = new Vector2(5f, -3f);
+                keyRt.sizeDelta = new Vector2(30f, 20f);
+
+                TextMeshProUGUI keyTmp = keyObj.GetComponent<TextMeshProUGUI>();
+                keyTmp.text = keyLabels[i];
+                keyTmp.fontSize = 13;
+                keyTmp.fontStyle = FontStyles.Bold;
+                keyTmp.color = Color.white;
+                hotbarSlots[i].keyNumberText = keyTmp;
+            }
+        }
+    }
+
+    public void UpdateHotbar()
+    {
+        if (hotbarSlots == null || hotbarSlots.Length == 0) return;
+        if (PlayerInventory.Instance == null) return;
+
+        int activeIdx = PlayerInventory.Instance.activeSlotIndex;
+        var invSlots = PlayerInventory.Instance.slots;
+
+        for (int i = 0; i < hotbarSlots.Length; i++)
+        {
+            var slotUI = hotbarSlots[i];
+            if (slotUI == null || slotUI.slotRoot == null) continue;
+
+            bool isCurrent = (activeIdx == i);
+
+            // Border color
+            if (slotUI.borderHighlight != null)
+            {
+                slotUI.borderHighlight.color = isCurrent ? activeSlotColor : inactiveSlotColor;
+            }
+
+            // Key text color
+            if (slotUI.keyNumberText != null)
+            {
+                slotUI.keyNumberText.color = isCurrent ? activeSlotColor : Color.white;
+            }
+
+            // Icon
+            if (slotUI.iconImage != null)
+            {
+                if (invSlots != null && i < invSlots.Length && invSlots[i] != null && invSlots[i].itemData != null && invSlots[i].itemData.icon != null)
+                {
+                    slotUI.iconImage.sprite = invSlots[i].itemData.icon;
+                    slotUI.iconImage.gameObject.SetActive(true);
+                    slotUI.iconImage.color = isCurrent ? Color.white : new Color(0.75f, 0.75f, 0.75f, 0.55f);
+                }
+                else
+                {
+                    slotUI.iconImage.gameObject.SetActive(false);
+                }
+            }
         }
     }
 }

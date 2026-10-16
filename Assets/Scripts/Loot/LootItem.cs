@@ -38,24 +38,51 @@ public class LootItem : MonoBehaviour, IInteractable
     public string GetInteractText()
     {
         string name = data != null ? data.itemName : "Loot";
-        return $"{name} (${value}, {weight}kg)";
+        BagTool bag = null;
+        if (PlayerInventory.Instance != null && PlayerInventory.Instance.GetActiveItem() is BagTool heldBag)
+        {
+            bag = heldBag;
+        }
+        else if (GameManager.Instance != null)
+        {
+            bag = GameManager.Instance.GetHeldBag();
+        }
+
+        if (bag == null)
+        {
+            return $"<color=#FF6666>{name} (${value}) - Нужна сумка!</color>";
+        }
+        else if (bag.storedWeight + weight > bag.maxCapacity)
+        {
+            return $"<color=#FF9933>{name} (${value}) - Сумка полна!</color>";
+        }
+
+        return $"Забрать {name} (${value}, {weight}kg)";
     }
 
     public void Collect()
     {
         if (PlayerInventory.Instance == null) return;
 
-        EquipableItem activeItem = PlayerInventory.Instance.GetActiveItem();
+        BagTool bag = null;
+        if (PlayerInventory.Instance.GetActiveItem() is BagTool heldBag)
+        {
+            bag = heldBag;
+        }
+        else if (GameManager.Instance != null)
+        {
+            bag = GameManager.Instance.GetHeldBag();
+        }
         
-        // Лут можно собирать только когда в руках Сумка
-        if (activeItem is BagTool bag)
+        // Лут собирается в сумку (в руках или в слоте инвентаря)
+        if (bag != null)
         {
             if (bag.AddLoot(value, weight))
             {
                 if (GameManager.Instance != null) 
                 {
                     string itemName = data != null ? data.itemName : "Loot";
-                    Debug.Log($"[Loot] Подобрано: {itemName}. В сумке: ${GameManager.Instance.bagMoney}, Вес: {GameManager.Instance.currentWeight}/{GameManager.Instance.maxWeight}кг");
+                    Debug.Log($"[Loot] Подобрано: {itemName}. В сумке: ${bag.storedMoney}, Вес: {GameManager.Instance.currentWeight}/{GameManager.Instance.maxWeight}кг");
                     GameManager.Instance.onMoneyChanged?.Invoke();
                     GameManager.Instance.RecalculateMapLoot();
                 }
@@ -66,11 +93,19 @@ public class LootItem : MonoBehaviour, IInteractable
             else
             {
                 Debug.Log("<color=red>[Loot] СУМКА ЗАПОЛНЕНА!</color>");
+                if (GameManager.Instance != null && GameManager.Instance.heistUI != null)
+                {
+                    GameManager.Instance.heistUI.SetInteractionText("<color=red>Сумка переполнена!</color>");
+                }
             }
         }
         else
         {
-            Debug.Log("[Loot] Нужна сумка в руках!");
+            Debug.Log("[Loot] Нужна сумка в инвентаре!");
+            if (GameManager.Instance != null && GameManager.Instance.heistUI != null)
+            {
+                GameManager.Instance.heistUI.SetInteractionText("<color=yellow>Нужна сумка в инвентаре!</color>");
+            }
         }
     }
 

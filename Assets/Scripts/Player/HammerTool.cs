@@ -60,16 +60,7 @@ public class HammerTool : EquipableItem
             if (layerIndex != -1) 
             {
                 animator.SetLayerWeight(layerIndex, 1f);
-                Debug.Log($"[Hammer] Слой {animatorLayerName} (индекс {layerIndex}) активирован. Вес: {animator.GetLayerWeight(layerIndex)}");
             }
-            else
-            {
-                Debug.LogWarning($"[Hammer] ОШИБКА: Слой с именем '{animatorLayerName}' не найден в Аниматоре!");
-            }
-        }
-        else
-        {
-            Debug.LogError("[Hammer] ОШИБКА: Ссылка на Animator не назначена в инспекторе!");
         }
         
         if (hammerMesh != null) hammerMesh.SetActive(true); 
@@ -87,13 +78,11 @@ public class HammerTool : EquipableItem
             animator.SetBool("IsArmed", false);
         }
         
-        // Модель скрываем после задержки или сразу, если нужно быстро. 
-        // Если есть анимация убирания 'remove', лучше скрыть в корутине.
         StopAllCoroutines();
         if (isActiveAndEnabled) StartCoroutine(UnequipRoutine());
         else
         {
-            if (hammerMesh != null) hammerMesh.SetActive(false);
+            if (hammerMesh != null) hammerMesh.SetActive(false); 
             isTransitioning = false;
         }
     }
@@ -107,8 +96,6 @@ public class HammerTool : EquipableItem
         }
     }
 
-    // Старый ToggleHammer удален, так как этим теперь занимается PlayerInventory
-
     IEnumerator EquipRoutine()
     {
         yield return new WaitForSeconds(equipDelay);
@@ -121,7 +108,6 @@ public class HammerTool : EquipableItem
         yield return new WaitForSeconds(unequipDelay);
         if (hammerMesh != null) hammerMesh.SetActive(false); 
         
-        // Сбрасываем вес слоя в 0, чтобы ходьба из Base Layer снова стала видна полностью
         if (animator != null)
         {
             int layerIndex = animator.GetLayerIndex(animatorLayerName);
@@ -134,25 +120,26 @@ public class HammerTool : EquipableItem
 
     void Swing()
     {
-        if (playerCamera == null) return;
+        Transform cam = playerCamera != null ? playerCamera : (Camera.main != null ? Camera.main.transform : null);
+        if (cam == null) return;
 
         RaycastHit hit;
-        bool hasHit = Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, hitDistance, hitMask);
+        bool hasHit = Physics.Raycast(cam.position, cam.forward, out hit, hitDistance, hitMask);
 
-        if (animator != null)
+        if (hasHit)
         {
-            if (hasHit)
+            if (animator != null) animator.SetTrigger("Hit");
+
+            DestructibleWall wall = hit.collider.GetComponentInParent<DestructibleWall>();
+            if (wall != null)
             {
-                animator.SetTrigger("Hit");
-                Debug.Log("[Hammer] Триггер Hit отправлен.");
-                DestructibleWall wall = hit.collider.GetComponentInParent<DestructibleWall>();
-                if (wall != null) wall.TakeDamage(damage);
+                wall.TakeDamage(damage);
+                Debug.Log($"[Hammer] Нанесен урон {damage} по стене!");
             }
-            else
-            {
-                animator.SetTrigger("Miss");
-                Debug.Log("[Hammer] Триггер Miss отправлен.");
-            }
+        }
+        else
+        {
+            if (animator != null) animator.SetTrigger("Miss");
         }
     }
 }

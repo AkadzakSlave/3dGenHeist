@@ -13,7 +13,8 @@ public class PlayerInteraction : MonoBehaviour
     public Transform playerCamera;
     public Transform playerBody;
     public float interactDistance = 3.0f;
-    public LayerMask interactLayer;
+    public float sphereRadius = 0.22f; // Объемный луч для легкого подбора предметов
+    public LayerMask interactLayer = ~0;
 
     [Header("Item Holding Mode Settings")]
     public ItemHoldingMode holdingMode = ItemHoldingMode.CameraBound;
@@ -141,29 +142,59 @@ public class PlayerInteraction : MonoBehaviour
         if (playerCamera == null) return;
         if (GameManager.Instance == null || GameManager.Instance.heistUI == null) return;
 
-        RaycastHit hit;
+        cachedInteractable = FindBestInteractable(out lastHitCollider);
+
         string prompt = "";
-
-        if (Physics.Raycast(playerCamera.position, playerCamera.forward, out hit, interactDistance, interactLayer))
+        if (cachedInteractable != null)
         {
-            if (hit.collider != lastHitCollider)
-            {
-                lastHitCollider = hit.collider;
-                cachedInteractable = hit.collider.GetComponentInParent<IInteractable>();
-            }
-
-            if (cachedInteractable != null)
-            {
-                prompt = $"[{interactKey}] {cachedInteractable.GetInteractText()}";
-            }
-        }
-        else
-        {
-            lastHitCollider = null;
-            cachedInteractable = null;
+            prompt = $"[{interactKey}] {cachedInteractable.GetInteractText()}";
         }
 
         GameManager.Instance.heistUI.SetInteractionText(prompt);
+    }
+
+    private IInteractable FindBestInteractable(out Collider bestCollider)
+    {
+        bestCollider = null;
+        if (playerCamera == null) return null;
+
+        Vector3 origin = playerCamera.position;
+        Vector3 forward = playerCamera.forward;
+
+        // 1. Прямой точный луч
+        if (Physics.Raycast(origin, forward, out RaycastHit rayHit, interactDistance, interactLayer, QueryTriggerInteraction.Ignore))
+        {
+            IInteractable direct = rayHit.collider.GetComponentInParent<IInteractable>();
+            if (direct != null)
+            {
+                bestCollider = rayHit.collider;
+                return direct;
+            }
+        }
+
+        // 2. Объемный луч SphereCastAll — захватывает мелкие предметы на столах и полу, игнорируя мешающие поверхности
+        RaycastHit[] hits = Physics.SphereCastAll(origin, sphereRadius, forward, interactDistance, interactLayer, QueryTriggerInteraction.Ignore);
+        if (hits == null || hits.Length == 0) return null;
+
+        IInteractable bestInteractable = null;
+        float closestDistance = float.MaxValue;
+        Collider closestCol = null;
+
+        foreach (var hit in hits)
+        {
+            IInteractable candidate = hit.collider.GetComponentInParent<IInteractable>();
+            if (candidate == null) continue;
+
+            if (hit.distance < closestDistance)
+            {
+                closestDistance = hit.distance;
+                bestInteractable = candidate;
+                closestCol = hit.collider;
+            }
+        }
+
+        bestCollider = closestCol;
+        return bestInteractable;
     }
 
     private void TryInteract()

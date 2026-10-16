@@ -44,6 +44,10 @@ public class WeaponItem : EquipableItem
     private void Awake()
     {
         ammoInMagazine = Mathf.Clamp(ammoInMagazine, 0, magazineSize);
+        if (animator == null)
+        {
+            animator = GetComponentInParent<Animator>();
+        }
     }
 
     private void OnDisable()
@@ -88,8 +92,17 @@ public class WeaponItem : EquipableItem
         if (animator != null)
         {
             animator.SetBool("IsEquipped", true);
-            int idx = animator.GetLayerIndex(animatorLayerName);
-            if (idx != -1) animator.SetLayerWeight(idx, 1f);
+            string layer = GetTargetLayerName();
+            int idx = animator.GetLayerIndex(layer);
+            if (idx != -1)
+            {
+                animator.SetLayerWeight(idx, 1f);
+            }
+            else
+            {
+                idx = animator.GetLayerIndex("Upper Layer");
+                if (idx != -1) animator.SetLayerWeight(idx, 1f);
+            }
         }
 
         Debug.Log($"[Weapon] {GetDisplayName()} equipped.");
@@ -109,11 +122,41 @@ public class WeaponItem : EquipableItem
         if (animator != null)
         {
             animator.SetBool("IsEquipped", false);
-            int idx = animator.GetLayerIndex(animatorLayerName);
-            if (idx != -1) animator.SetLayerWeight(idx, 0f);
+            string layer = GetTargetLayerName();
+            int idx = animator.GetLayerIndex(layer);
+            if (idx != -1)
+            {
+                animator.SetLayerWeight(idx, 0f);
+            }
+            else
+            {
+                idx = animator.GetLayerIndex("Upper Layer");
+                if (idx != -1) animator.SetLayerWeight(idx, 0f);
+            }
         }
 
         Debug.Log($"[Weapon] {GetDisplayName()} hidden.");
+    }
+
+    public string GetTargetLayerName()
+    {
+        if (!string.IsNullOrEmpty(animatorLayerName) && animatorLayerName != "Weapon Layer")
+        {
+            return animatorLayerName;
+        }
+
+        string idName = itemData != null ? itemData.itemName : name;
+        if (!string.IsNullOrEmpty(idName))
+        {
+            if (idName.IndexOf("Colt", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                return "Colt Layer";
+            if (idName.IndexOf("Tompson", System.StringComparison.OrdinalIgnoreCase) >= 0 || idName.IndexOf("Thompson", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                return "Thompson Layer";
+            if (idName.IndexOf("Steven", System.StringComparison.OrdinalIgnoreCase) >= 0)
+                return "Shotgun Layer";
+        }
+
+        return animatorLayerName;
     }
 
     public override void PrimaryAction()
@@ -248,7 +291,8 @@ public class WeaponItem : EquipableItem
                 label = $"{GetDisplayName()}: Reloading";
             }
 
-            GameManager.Instance.heistUI.UpdateWeapon(label);
+            Sprite icon = itemData != null ? itemData.icon : null;
+            GameManager.Instance.heistUI.UpdateWeapon(label, icon);
         }
     }
 

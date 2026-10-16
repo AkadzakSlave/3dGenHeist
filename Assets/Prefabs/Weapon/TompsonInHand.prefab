@@ -5266,7 +5266,7 @@ MonoBehaviour:
   animator: {fileID: 0}
   muzzlePoint: {fileID: 5092269581209765532}
   muzzleFlash: {fileID: 4731849171378393918}
-  animatorLayerName: Weapon Layer
+  animatorLayerName: Thompson Layer
   fireEvent:
     Guid:
       Data1: 0

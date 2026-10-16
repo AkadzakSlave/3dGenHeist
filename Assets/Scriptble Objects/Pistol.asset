@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: Pistol
   itemType: 1
   fmodMainType: 0
-  icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  icon: {fileID: 21300000, guid: 72add1b11a823dd41941d9c9fce7841f, type: 3}
   baseWeight: 5
   dropPrefab: {fileID: 8103231340759717907, guid: cb736ca614b73164f8820f3d4969bd8c, type: 3}
   dropPositionOffset: {x: 0, y: -1.5, z: -1}

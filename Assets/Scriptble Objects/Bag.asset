@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: Bag
   itemType: 0
   fmodMainType: 2
-  icon: {fileID: 10901, guid: 0000000000000000f000000000000000, type: 0}
+  icon: {fileID: 21300000, guid: ce952cc4afa4a6d42b30261a35e4272e, type: 3}
   baseWeight: 0
   dropPrefab: {fileID: 6851520784523018912, guid: 3390625443742c54c999c54a72e12fb8, type: 3}
   dropPositionOffset: {x: 0, y: 0, z: 0}

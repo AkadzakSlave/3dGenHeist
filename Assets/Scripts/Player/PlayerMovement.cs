@@ -9,8 +9,21 @@ public class PlayerMovement : MonoBehaviour
     [Header("Speed & Movement")]
     public float walkSpeed = 5.0f;
     public float sprintSpeed = 8.0f;
+    public float crouchSpeed = 2.5f;
     public float jumpHeight = 1.5f;
     public float gravity = -9.81f;
+
+    [Header("Crouch Settings")]
+    public float standingHeight = 1.8f;
+    public float crouchHeight = 1.0f;
+    public float crouchTransitionSpeed = 10f;
+    public float crouchFootstepInterval = 0.65f;
+    public LayerMask ceilingCheckMask = ~0;
+
+    [Header("Inertia & Physics")]
+    public float acceleration = 22f;
+    public float deceleration = 55f;
+    public float airAcceleration = 8f;
     
     [Header("Stamina System")]
     public float maxStamina = 100f;
@@ -38,6 +51,9 @@ public class PlayerMovement : MonoBehaviour
     [Header("UI Reference")]
     public HeistUI uiRef;
 
+    [Header("Camera Reference")]
+    public PlayerCamera playerCamera;
+
     [Header("Input")]
     public InputReader inputReader;
 
@@ -46,10 +62,25 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float currentSpeedDisplay;
     [SerializeField] private float currentWeightDisplay;
     [SerializeField] private bool isGroundedDisplay;
+    [SerializeField] private bool isCrouchingDisplay;
+
     private Vector3 velocity;
+    private Vector3 currentHorizontalVelocity;
+    private float previousVerticalVelocity = 0f;
     private float footstepTimer = 0f;
     private bool wasGrounded = true;
     private bool jumpRequested = false;
+    private bool isCrouching = false;
+    private bool isMoving = false;
+    private bool isSprinting = false;
+
+    // Public properties for camera and interaction feedback
+    public bool IsCrouching => isCrouching;
+    public bool IsMoving => isMoving;
+    public bool IsSprinting => isSprinting;
+    public bool IsGrounded => controller != null && controller.isGrounded;
+    public float CurrentSpeed => currentHorizontalVelocity.magnitude;
+    public Vector2 MoveInputVector => inputReader != null ? inputReader.MoveInput : Vector2.zero;
 
     private void OnEnable()
     {
@@ -76,6 +107,16 @@ public class PlayerMovement : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         currentStamina = maxStamina;
+
+        if (playerCamera == null)
+        {
+            playerCamera = GetComponentInChildren<PlayerCamera>();
+        }
+
+        if (controller != null)
+        {
+            standingHeight = controller.height;
+        }
     }
 
     void Update()
@@ -92,7 +133,7 @@ public class PlayerMovement : MonoBehaviour
         float x = 0f;
         float z = 0f;
         bool isSprintPressed = false;
-        bool isMoving = false;
+        isMoving = false;
 
         if (inputReader != null)
         {
@@ -100,7 +141,30 @@ public class PlayerMovement : MonoBehaviour
             x = moveInput.x;
             z = moveInput.y;
             isSprintPressed = inputReader.IsSprintPressed;
+
+            // Логика приседания
+            bool isCrouchPressed = inputReader.IsCrouchPressed;
+            if (isCrouchPressed)
+            {
+                isCrouching = true;
+            }
+            else if (isCrouching)
+            {
+                // Проверяем, свободен ли потолок для вставания
+                Vector3 castOrigin = transform.position + Vector3.up * (crouchHeight * 0.5f);
+                float checkDist = standingHeight - (crouchHeight * 0.5f);
+                bool ceilingBlocked = Physics.SphereCast(castOrigin, controller.radius * 0.85f, Vector3.up, out RaycastHit hit, checkDist, ceilingCheckMask, QueryTriggerInteraction.Ignore);
+                if (!ceilingBlocked)
+                {
+                    isCrouching = false;
+                }
+            }
         }
+
+        // Плавная регулировка высоты коллайдера при приседании
+        float targetHeight = isCrouching ? crouchHeight : standingHeight;
+        controller.height = Mathf.Lerp(controller.height, targetHeight, Time.deltaTime * crouchTransitionSpeed);
+        controller.center = new Vector3(0f, controller.height * 0.5f, 0f);
 
         Vector3 move = transform.right * x + transform.forward * z;
         if (move.magnitude > 0.1f)
@@ -135,11 +199,17 @@ public class PlayerMovement : MonoBehaviour
             currentMaxSprint = sprintSpeed * sprintFactor;
         }
 
+        if (isCrouching)
+        {
+            currentMaxSpeed = crouchSpeed * weightFactor;
+            isSprintPressed = false; // Приседание отменяет спринт
+        }
+
         float applySpeed = currentMaxSpeed;
-        bool isSprinting = false;
+        isSprinting = false;
 
         // Логика Стамины и Спринта
-        if (isSprintPressed && isMoving && currentStamina > 0)
+        if (isSprintPressed && isMoving && !isCrouching && currentStamina > 0)
         {
             isSprinting = true;
             applySpeed = currentMaxSprint; 
@@ -161,7 +231,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // Звуки шагов (FMOD)
-        float currentStepInterval = isSprinting ? sprintFootstepInterval : walkFootstepInterval;
+        float currentStepInterval = isCrouching ? crouchFootstepInterval : (isSprinting ? sprintFootstepInterval : walkFootstepInterval);
         
         if (isMoving && isGrounded)
         {
@@ -183,51 +253,75 @@ public class PlayerMovement : MonoBehaviour
             jumpRequested = false;
             if (isGrounded)
             {
-                float weight = GameManager.Instance != null ? GameManager.Instance.currentWeight : 0;
-                
-                // Прыжок выкл при весе 70+ кг
-                if (weight < 70)
+                if (isCrouching)
                 {
-                    if (currentStamina >= jumpStaminaCost) 
+                    // Проверяем, можно ли встать перед прыжком
+                    Vector3 castOrigin = transform.position + Vector3.up * (crouchHeight * 0.5f);
+                    float checkDist = standingHeight - (crouchHeight * 0.5f);
+                    bool ceilingBlocked = Physics.SphereCast(castOrigin, controller.radius * 0.85f, Vector3.up, out RaycastHit hit, checkDist, ceilingCheckMask, QueryTriggerInteraction.Ignore);
+                    if (!ceilingBlocked)
                     {
-                        currentStamina -= jumpStaminaCost;
-                        velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-                        PlayJumpSound();
+                        isCrouching = false;
                     }
                 }
-                else
+
+                if (!isCrouching)
                 {
-                    Debug.Log("[Movement] Слишком тяжело для прыжка!");
+                    float weight = GameManager.Instance != null ? GameManager.Instance.currentWeight : 0;
+                    
+                    // Прыжок выкл при весе 70+ кг
+                    if (weight < 70)
+                    {
+                        if (currentStamina >= jumpStaminaCost) 
+                        {
+                            currentStamina -= jumpStaminaCost;
+                            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+                            PlayJumpSound();
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log("[Movement] Слишком тяжело для прыжка!");
+                    }
                 }
             }
         }
         else
         {
-            // Reset the flag even if not grounded, so jump request isn't queued indefinitely
             if (isGrounded)
             {
                 jumpRequested = false;
             }
         }
 
+        // Плавная инерция разгона и торможения (Smooth Horizontal Inertia)
+        Vector3 targetHorizontalVelocity = move * applySpeed;
+        float accelRate = isGrounded ? (isMoving ? acceleration : deceleration) : airAcceleration;
+        currentHorizontalVelocity = Vector3.MoveTowards(currentHorizontalVelocity, targetHorizontalVelocity, accelRate * Time.deltaTime);
 
         // Применяем гравитацию
         velocity.y += gravity * Time.deltaTime;
 
-        // Движение
-        Vector3 finalVelocity = (move * applySpeed) + velocity;
+        // Движение с плавной инерцией
+        Vector3 finalVelocity = currentHorizontalVelocity + velocity;
         controller.Move(finalVelocity * Time.deltaTime);
 
         // --- ПРИЗЕМЛЕНИЕ ---
         if (isGrounded && !wasGrounded)
         {
             PlayLandSound();
+            if (playerCamera != null)
+            {
+                playerCamera.TriggerLandingImpact(Mathf.Abs(previousVerticalVelocity));
+            }
         }
+
+        previousVerticalVelocity = velocity.y;
 
         // --- Анимации ---
         if (animator != null)
         {
-            float animSpeed = isMoving ? (isSprinting ? 2f : 1f) : 0f;
+            float animSpeed = isMoving ? (isSprinting ? 2f : (isCrouching ? 0.5f : 1f)) : 0f;
             animator.SetFloat("Speed", animSpeed, 0.1f, Time.deltaTime);
             animator.SetBool("IsGrounded", isGrounded);
         }
@@ -235,9 +329,10 @@ public class PlayerMovement : MonoBehaviour
         wasGrounded = isGrounded;
 
         // Обновляем дебаг-поля для Инспектора
-        currentSpeedDisplay = applySpeed;
+        currentSpeedDisplay = currentHorizontalVelocity.magnitude;
         currentWeightDisplay = GameManager.Instance != null ? GameManager.Instance.currentWeight : 0;
         isGroundedDisplay = isGrounded;
+        isCrouchingDisplay = isCrouching;
     }
 
     private void PlayFootstepSound()
