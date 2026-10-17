@@ -21,9 +21,11 @@ public class PlayerInventory : MonoBehaviour
     public int activeSlotIndex = 0;
     public string emptyWeaponText = "Нет оружия";
 
-    [Header("Physical Toss Settings")]
-    public float dropThrowForce = 3.5f;
-    public float dropUpwardForce = 1.2f;
+    [Header("Physical Toss Settings (CS2-Style)")]
+    public float dropThrowForce = 4.2f;
+    public float dropUpwardForce = 1.0f;
+    public float dropTorqueForce = 1.2f;
+    public PlayerMovement playerMovement;
 
     [Header("Input")]
     public InputReader inputReader;
@@ -237,8 +239,11 @@ public class PlayerInventory : MonoBehaviour
 
         itemToDrop.Unequip();
 
-        Vector3 dropPosition;
         Transform cam = Camera.main != null ? Camera.main.transform : transform;
+        if (playerMovement == null)
+        {
+            playerMovement = GetComponentInParent<PlayerMovement>();
+        }
 
         Vector3 customPosOffset = Vector3.zero;
         Vector3 customRotOffset = Vector3.zero;
@@ -248,25 +253,34 @@ public class PlayerInventory : MonoBehaviour
             customRotOffset = itemToDrop.itemData.dropRotationOffset;
         }
 
-        // Base drop position: 1.2m forward and 0.4m down (waist height)
-        Vector3 spawnOffset = cam.forward * 1.2f - Vector3.up * 0.4f;
-        Vector3 cameraRelativeOffset = cam.right * customPosOffset.x + cam.up * customPosOffset.y + cam.forward * customPosOffset.z;
-        spawnOffset += cameraRelativeOffset;
+        // CS2-style forward spawn: directly along camera forward vector, slightly below eye center
+        float targetDistance = 0.55f;
+        Vector3 eyePos = cam.position;
+        Vector3 forwardDir = cam.forward;
 
-        if (Physics.Raycast(cam.position, spawnOffset.normalized, out RaycastHit hit, spawnOffset.magnitude))
+        // Wall safety check: don't spawn inside or through walls if player is right against a wall
+        Vector3 targetDropPos;
+        LayerMask wallCheckMask = ~0;
+        if (Physics.SphereCast(eyePos, 0.12f, forwardDir, out RaycastHit wallHit, targetDistance, wallCheckMask, QueryTriggerInteraction.Ignore))
         {
-            if (hit.collider.transform.IsChildOf(transform))
+            if (!wallHit.collider.transform.IsChildOf(transform))
             {
-                dropPosition = cam.position + spawnOffset;
+                targetDropPos = eyePos + forwardDir * Mathf.Max(0.15f, wallHit.distance - 0.08f);
             }
             else
             {
-                dropPosition = hit.point - spawnOffset.normalized * 0.15f;
+                targetDropPos = eyePos + forwardDir * targetDistance - cam.up * 0.08f;
             }
         }
         else
         {
-            dropPosition = cam.position + spawnOffset;
+            targetDropPos = eyePos + forwardDir * targetDistance - cam.up * 0.08f;
+        }
+
+        // Apply optional extra offset if specified
+        if (customPosOffset.sqrMagnitude > 0.001f)
+        {
+            targetDropPos += cam.right * customPosOffset.x + cam.up * customPosOffset.y + cam.forward * customPosOffset.z;
         }
 
         Vector3 camForwardFlat = new Vector3(cam.forward.x, 0f, cam.forward.z).normalized;
@@ -275,8 +289,40 @@ public class PlayerInventory : MonoBehaviour
 
         if (itemToDrop.itemData != null && itemToDrop.itemData.dropPrefab != null)
         {
-            GameObject droppedObj = Instantiate(itemToDrop.itemData.dropPrefab, dropPosition, dropRotation);
+            GameObject droppedObj = Instantiate(itemToDrop.itemData.dropPrefab, targetDropPos, dropRotation);
 
+            // Center the physical collider precisely at targetDropPos, regardless of FBX pivot eccentricity
+            Collider dropCollider = droppedObj.GetComponentInChildren<Collider>();
+            if (dropCollider != null)
+            {
+                Vector3 centerWorldOffset = dropCollider.bounds.center - droppedObj.transform.position;
+                droppedObj.transform.position = targetDropPos - centerWorldOffset;
+            }
+
+            // Ignore collisions between dropped item and player body + CharacterController
+            Collider[] playerColliders = GetComponentsInChildren<Collider>();
+            Collider[] dropColliders = droppedObj.GetComponentsInChildren<Collider>();
+            CharacterController cc = GetComponent<CharacterController>();
+            if (cc == null && playerMovement != null) cc = playerMovement.GetComponent<CharacterController>();
+
+            if (dropColliders != null)
+            {
+                foreach (var dCol in dropColliders)
+                {
+                    if (dCol == null) continue;
+                    if (cc != null) Physics.IgnoreCollision(dCol, cc, true);
+                    if (playerColliders != null)
+                    {
+                        foreach (var pCol in playerColliders)
+                        {
+                            if (pCol == null) continue;
+                            Physics.IgnoreCollision(dCol, pCol, true);
+                        }
+                    }
+                }
+            }
+
+            // Carry over bag contents
             if (itemToDrop is BagTool bag)
             {
                 WorldEquipment worldEq = droppedObj.GetComponent<WorldEquipment>();
@@ -287,14 +333,47 @@ public class PlayerInventory : MonoBehaviour
                 }
             }
 
-            // Физический бросок предмета вперед (как в Quota играх)
+            // Setup pickup cooldown so player doesn't instantly re-pickup on the run
+            WorldEquipment we = droppedObj.GetComponent<WorldEquipment>();
+            if (we != null)
+            {
+                we.SetPickupCooldown(0.4f);
+            }
+
+            // CS2 physics toss: inherit player momentum, clean arc forward, stable rotation
             Rigidbody rb = droppedObj.GetComponent<Rigidbody>();
             if (rb != null)
             {
                 rb.isKinematic = false;
-                Vector3 throwVel = cam.forward * dropThrowForce + Vector3.up * dropUpwardForce;
-                rb.AddForce(throwVel, ForceMode.VelocityChange);
-                rb.AddTorque(Random.insideUnitSphere * 2.5f, ForceMode.Impulse);
+                rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+                rb.interpolation = RigidbodyInterpolation.Interpolate;
+
+                // Set center of mass at the physical center of the collider (prevents wild spinning)
+                if (dropCollider is BoxCollider bc)
+                {
+                    rb.centerOfMass = bc.center;
+                }
+                else if (dropCollider != null)
+                {
+                    rb.centerOfMass = droppedObj.transform.InverseTransformPoint(dropCollider.bounds.center);
+                }
+
+                // Damping for realistic weapon landing
+                rb.linearDamping = 0.4f;
+                rb.angularDamping = 1.2f;
+
+                // Inherit player velocity
+                Vector3 playerVel = playerMovement != null ? playerMovement.Velocity : Vector3.zero;
+                if (playerMovement != null && playerMovement.IsGrounded && playerVel.y < 0)
+                {
+                    playerVel.y = 0f;
+                }
+
+                Vector3 throwVel = playerVel + cam.forward * dropThrowForce + Vector3.up * dropUpwardForce;
+                rb.linearVelocity = throwVel;
+
+                // Controlled, subtle pitch tilt around camera right (like CS2), no chaotic multi-axis spin
+                rb.angularVelocity = cam.right * dropTorqueForce;
             }
         }
 
@@ -341,6 +420,7 @@ public class PlayerInventory : MonoBehaviour
 
     public EquipableItem GetActiveItem()
     {
+        if (slots == null || activeSlotIndex < 0 || activeSlotIndex >= slots.Length) return null;
         return slots[activeSlotIndex];
     }
 

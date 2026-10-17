@@ -17,7 +17,7 @@ MonoBehaviour:
     \u0441 \u0440\u0430\u0437\u0432\u0438\u0442\u043E\u0439 \u0431\u0430\u043D\u043A\u043E\u0432\u0441\u043A\u043E\u0439
     \u0441\u0435\u0442\u044C\u044E \u0438 \u0443\u0441\u0438\u043B\u0435\u043D\u043D\u043E\u0439
     \u043E\u0445\u0440\u0430\u043D\u043E\u0439."
-  stateIcon: {fileID: 21300000, guid: 71a8c927613868645a8d364b5a16f0dd, type: 3}
+  stateIcon: {fileID: 21300000, guid: 0804d186ac813684bb070cc723247044, type: 3}
   cities:
   - cityName: "\u0414\u0430\u043B\u043B\u0430\u0441"
     minDifficulty: 1
@@ -41,11 +41,12 @@ MonoBehaviour:
   vanZonePrefab: {fileID: 2218685468410544309, guid: 2006e2e306c223847acb5fec4837a0c4, type: 3}
   availableRooms:
   - {fileID: 11400000, guid: d438b2b7197600d42b2f1e380e7e60c0, type: 2}
-  - {fileID: 11400000, guid: 0f715591f2ee6b543bb8aad7a076accf, type: 2}
   - {fileID: 11400000, guid: 2f9ce1e3606c0034c98434fee73d085a, type: 2}
   - {fileID: 11400000, guid: e7e8771726512a74d866a50b3215a0a1, type: 2}
   - {fileID: 11400000, guid: becc93c83389cdd45b2430bdeefaee97, type: 2}
   - {fileID: 11400000, guid: 9271a53e1714c8046aa49e295c608f75, type: 2}
   - {fileID: 11400000, guid: 2a4ff5e1901fa7f49a40fbfcf1b3bff4, type: 2}
-  - {fileID: 11400000, guid: 0d196d9390cc98b45a3aaa89ab599002, type: 2}
-  - {fileID: 11400000, guid: 0d196d9390cc98b45a3aaa89ab599002, type: 2}
+  - {fileID: 11400000, guid: 571a45585d704b7449487c99e3f46877, type: 2}
+  - {fileID: 11400000, guid: 435736a3a5ccc2243bf8c639c988d3f3, type: 2}
+  - {fileID: 11400000, guid: 903aefac9c230ad4588f41821db3c0e8, type: 2}
+  - {fileID: 11400000, guid: 551bedd9057d7a940bd2c10da0a61a75, type: 2}

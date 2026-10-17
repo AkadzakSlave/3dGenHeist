@@ -47,6 +47,32 @@ public class PauseMenuUI : MonoBehaviour
         if (settingsPanel != null) settingsPanel.SetActive(false);
     }
 
+    private float lastToggleTime = -1f;
+
+    private void Update()
+    {
+        if (isPaused)
+        {
+            if (Cursor.lockState != CursorLockMode.None)
+            {
+                Cursor.lockState = CursorLockMode.None;
+            }
+            if (!Cursor.visible)
+            {
+                Cursor.visible = true;
+            }
+
+            if (UnityEngine.InputSystem.Keyboard.current != null)
+            {
+                if (UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame ||
+                    UnityEngine.InputSystem.Keyboard.current.pKey.wasPressedThisFrame)
+                {
+                    OnTogglePauseInput();
+                }
+            }
+        }
+    }
+
     private void OnEnable()
     {
         if (inputReader != null)
@@ -65,6 +91,16 @@ public class PauseMenuUI : MonoBehaviour
 
     private void OnTogglePauseInput()
     {
+        if (Time.unscaledTime - lastToggleTime < 0.2f) return;
+        lastToggleTime = Time.unscaledTime;
+
+        // If Settings panel is open inside pause menu, pressing Esc closes settings instead of unpausing immediately
+        if (isPaused && settingsPanel != null && settingsPanel.activeSelf)
+        {
+            OnSettingsCloseButtonClicked();
+            return;
+        }
+
         // Don't toggle pause if Main Menu, Store UI, Map Selection UI, or Dossier Selection UI is currently open
         if (MainMenuUI.Instance != null && MainMenuUI.Instance.IsMainMenuActive) return;
         if (MapSelectionUI.Instance != null && MapSelectionUI.Instance.IsMapOpen) return;
@@ -97,7 +133,7 @@ public class PauseMenuUI : MonoBehaviour
             surrenderButton.gameObject.SetActive(!isInLobby);
         }
 
-        if (inputReader != null) inputReader.DisableAllActions();
+        if (inputReader != null) inputReader.DisableGameplayActions();
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -139,10 +175,17 @@ public class PauseMenuUI : MonoBehaviour
         Debug.Log("[PauseMenu] Player chose to SURRENDER!");
         ResumeGame();
 
-        PlayerHealth player = FindAnyObjectByType<PlayerHealth>();
-        if (player != null)
+        if (GameManager.Instance != null)
         {
-            player.TakeDamage(9999);
+            GameManager.Instance.SurrenderToLobby();
+        }
+        else
+        {
+            PlayerHealth player = FindAnyObjectByType<PlayerHealth>();
+            if (player != null)
+            {
+                player.Die();
+            }
         }
     }
 

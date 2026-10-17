@@ -36,6 +36,15 @@ public class DynamiteItem : EquipableItem
         HandlePreviewProjection();
     }
 
+    private bool IsPlayerCollider(Collider col)
+    {
+        if (col == null) return false;
+        if (col.transform.IsChildOf(transform.root)) return true;
+        if (col.GetComponentInParent<PlayerHealth>() != null) return true;
+        if (col.GetComponentInParent<CharacterController>() != null) return true;
+        return false;
+    }
+
     private void HandlePreviewProjection()
     {
         if (inputReader == null) return;
@@ -45,17 +54,21 @@ public class DynamiteItem : EquipableItem
 
         if (cam != null && inputReader.IsSecondaryActionPressed)
         {
-            RaycastHit hit;
-            if (Physics.Raycast(cam.position, cam.forward, out hit, attachDistance, interactLayer))
+            RaycastHit[] hits = Physics.RaycastAll(cam.position, cam.forward, attachDistance, interactLayer, QueryTriggerInteraction.Ignore);
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            foreach (var hit in hits)
             {
+                if (IsPlayerCollider(hit.collider)) continue;
+
                 DestructibleWall wall = hit.collider.GetComponentInParent<DestructibleWall>();
                 if (wall != null)
                 {
                     targetWall = wall;
-                    placePosition = hit.point;
-                    // Place it flat against the wall normal
+                    placePosition = hit.point + hit.normal * 0.04f;
                     placeRotation = Quaternion.LookRotation(hit.normal);
                     showPreview = true;
+                    break;
                 }
             }
         }
@@ -119,6 +132,8 @@ public class DynamiteItem : EquipableItem
             // Parent it to the wall so it stays attached if the wall moves/is destroyed
             spawnedDynamite.transform.SetParent(targetWall.transform, true);
 
+            IgnorePlayerCollisions(spawnedDynamite);
+
             PlacedDynamite placedScript = spawnedDynamite.GetComponent<PlacedDynamite>();
             if (placedScript != null)
             {
@@ -134,6 +149,24 @@ public class DynamiteItem : EquipableItem
 
             // Consume dynamite item from inventory
             ConsumeFromInventory();
+        }
+    }
+
+    private void IgnorePlayerCollisions(GameObject placedObj)
+    {
+        if (placedObj == null) return;
+        GameObject playerObj = PlayerInventory.Instance != null ? PlayerInventory.Instance.gameObject : transform.root.gameObject;
+        Collider[] placedCols = placedObj.GetComponentsInChildren<Collider>();
+        Collider[] playerCols = playerObj.GetComponentsInChildren<Collider>();
+        foreach (var pCol in playerCols)
+        {
+            foreach (var objCol in placedCols)
+            {
+                if (pCol != null && objCol != null)
+                {
+                    Physics.IgnoreCollision(pCol, objCol, true);
+                }
+            }
         }
     }
 

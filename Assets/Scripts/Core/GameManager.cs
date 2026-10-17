@@ -91,6 +91,7 @@ public class GameManager : MonoBehaviour
     private float zeroTimerDelay = 3f;
     private float currentZeroDelay = 0f;
     private bool isProcessingPlayerWipe = false;
+    private bool isSurrendering = false;
 
     private void Awake()
     {
@@ -106,6 +107,13 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
+        // Register all players present in scene
+        PlayerHealth[] players = FindObjectsByType<PlayerHealth>(FindObjectsInactive.Include);
+        foreach (var p in players)
+        {
+            RegisterPlayerHealth(p);
+        }
+
         onGlobalBalanceChanged?.Invoke();
         onMoneyChanged?.Invoke();
 
@@ -331,9 +339,14 @@ public class GameManager : MonoBehaviour
 
     public void NotifyPlayerDied(PlayerHealth deadPlayer)
     {
-        if (isProcessingPlayerWipe || isInLobby)
+        if (isSurrendering || isProcessingPlayerWipe)
         {
             return;
+        }
+
+        if (deadPlayer != null && !activePlayers.Contains(deadPlayer))
+        {
+            activePlayers.Add(deadPlayer);
         }
 
         activePlayers.RemoveAll(player => player == null);
@@ -350,7 +363,96 @@ public class GameManager : MonoBehaviour
             }
         }
 
+        if (isInLobby)
+        {
+            StartCoroutine(LobbyRespawnRoutine());
+            return;
+        }
+
         StartCoroutine(AllPlayersDeadRoutine());
+    }
+
+    private IEnumerator LobbyRespawnRoutine()
+    {
+        isProcessingPlayerWipe = true;
+        if (heistUI != null) heistUI.ShowLoadingScreen();
+        yield return new WaitForSecondsRealtime(0.5f);
+        if (lobbySpawnPoint != null)
+        {
+            yield return StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));
+        }
+        ReviveAllPlayers();
+        if (heistUI != null) heistUI.HideLoadingScreen();
+        isProcessingPlayerWipe = false;
+    }
+
+    public void SurrenderToLobby()
+    {
+        StartCoroutine(SurrenderToLobbyRoutine());
+    }
+
+    private IEnumerator SurrenderToLobbyRoutine()
+    {
+        isSurrendering = true;
+        Time.timeScale = 1f;
+
+        // Player dies
+        PlayerHealth health = FindAnyObjectByType<PlayerHealth>();
+        if (health != null && !health.isDead)
+        {
+            health.Die();
+        }
+
+        yield return new WaitForSecondsRealtime(0.8f);
+
+        if (heistUI != null) heistUI.ShowLoadingScreen();
+
+        isHeistActive = false;
+        isInLobby = true;
+        isProcessingPlayerWipe = false;
+
+        ApplyPlayerWipePenalty();
+        accumulatedOperationMoney = 0;
+        depositedMoney = 0;
+        currentDay = 1;
+        activeOperationPreset = null;
+        selectedDossier = null;
+        onMoneyChanged?.Invoke();
+
+        if (PlayerInventory.Instance != null)
+        {
+            PlayerInventory.Instance.ClearInventory();
+        }
+
+        if (EnemyManager.Instance != null)
+        {
+            EnemyManager.Instance.ResetForNewHeist();
+        }
+
+        if (levelGenerator != null)
+        {
+            levelGenerator.ClearLevel();
+        }
+
+        if (lobbySpawnPoint != null)
+        {
+            yield return StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));
+        }
+
+        ReviveAllPlayers();
+
+        yield return new WaitForSecondsRealtime(0.2f);
+
+        if (heistUI != null)
+        {
+            heistUI.HideLoadingScreen();
+            heistUI.UpdateUI();
+        }
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        isSurrendering = false;
     }
 
     private IEnumerator ExtractionRoutine()
@@ -362,8 +464,8 @@ public class GameManager : MonoBehaviour
 
         if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
         if (levelGenerator != null) levelGenerator.ClearLevel();
+        if (PlayerInventory.Instance != null) PlayerInventory.Instance.ClearInventory();
 
-        isInLobby = true;
         isHeistActive = false;
 
         if (currentDay < 3)
@@ -376,6 +478,7 @@ public class GameManager : MonoBehaviour
             {
                 yield return StartCoroutine(TeleportPlayer(motelSpawnPoint.position, motelSpawnPoint.rotation));
             }
+            isInLobby = false;
             if (heistUI != null) heistUI.HideLoadingScreen();
         }
         else
@@ -385,6 +488,7 @@ public class GameManager : MonoBehaviour
             {
                 yield return StartCoroutine(TeleportPlayer(bossRoomSpawnPoint.position, bossRoomSpawnPoint.rotation));
             }
+            isInLobby = false;
             if (heistUI != null) heistUI.HideLoadingScreen();
         }
     }
@@ -399,20 +503,19 @@ public class GameManager : MonoBehaviour
         accumulatedOperationMoney += depositedMoney;
         depositedMoney = 0;
 
-        Debug.Log($"<color=red>[Heist] All players are dead. Day {currentDay} ended. Penalty: ${allPlayersDeadPenalty}. Total: ${accumulatedOperationMoney} / ${operationTargetQuota}</color>");
+        Debug.Log($"<color=red>[Heist] All players died. Day {currentDay} ended. Penalty: ${allPlayersDeadPenalty}. Total: ${accumulatedOperationMoney} / ${operationTargetQuota}</color>");
 
         if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
         if (levelGenerator != null) levelGenerator.ClearLevel();
+        if (PlayerInventory.Instance != null) PlayerInventory.Instance.ClearInventory();
 
         isHeistActive = false;
-        isInLobby = true;
 
-        yield return new WaitForSeconds(1f);
-
-        ReviveAllPlayers();
+        yield return new WaitForSecondsRealtime(1.0f);
 
         if (currentDay < 3)
         {
+            // Начинаем следующий день заезда!
             currentDay++;
             SetupDossiers();
 
@@ -420,12 +523,23 @@ public class GameManager : MonoBehaviour
             {
                 yield return StartCoroutine(TeleportPlayer(motelSpawnPoint.position, motelSpawnPoint.rotation));
             }
+
+            ReviveAllPlayers();
+            isInLobby = false; // Игрок в мотеле планирует следующий день
         }
         else
         {
             if (bossRoomSpawnPoint != null)
             {
                 yield return StartCoroutine(TeleportPlayer(bossRoomSpawnPoint.position, bossRoomSpawnPoint.rotation));
+                ReviveAllPlayers();
+                isInLobby = false;
+            }
+            else if (lobbySpawnPoint != null)
+            {
+                yield return StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));
+                ReviveAllPlayers();
+                isInLobby = true;
             }
         }
 
@@ -580,16 +694,21 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator ReturnToMainMenuRoutine()
     {
+        Time.timeScale = 1f;
+
         if (heistUI != null) heistUI.ShowLoadingScreen();
 
         isHeistActive = false;
         isInLobby = true;
         isProcessingPlayerWipe = false;
 
-        // Reset session money
+        // Reset session money & operation run
         sessionMoney = 0;
         depositedMoney = 0;
         accumulatedOperationMoney = 0;
+        currentDay = 1;
+        activeOperationPreset = null;
+        selectedDossier = null;
         onMoneyChanged?.Invoke();
 
         // Clear player inventory and held items
@@ -610,21 +729,16 @@ public class GameManager : MonoBehaviour
             EnemyManager.Instance.ResetForNewHeist();
         }
 
-        // Reset player health
-        PlayerHealth health = FindAnyObjectByType<PlayerHealth>();
-        if (health != null)
-        {
-            health.currentHealth = health.maxHealth;
-            health.isDead = false;
-        }
+        // Revive players with full controls restored
+        ReviveAllPlayers();
 
         // Teleport player back to initial lobby spawn point
-        if (lobbySpawnPoint != null && playerController != null)
+        if (lobbySpawnPoint != null)
         {
             yield return StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));
         }
 
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSecondsRealtime(0.2f);
 
         // Show Main Menu UI
         if (MainMenuUI.Instance != null)
@@ -644,6 +758,18 @@ public class GameManager : MonoBehaviour
             playerTransform.rotation = rot;
             yield return new WaitForEndOfFrame();
             playerController.enabled = true;
+        }
+        else if (playerTransform != null)
+        {
+            playerTransform.position = pos;
+            playerTransform.rotation = rot;
+            yield return new WaitForEndOfFrame();
+        }
+
+        PlayerMovement pm = FindAnyObjectByType<PlayerMovement>();
+        if (pm != null)
+        {
+            pm.ResetVelocity();
         }
     }
 }

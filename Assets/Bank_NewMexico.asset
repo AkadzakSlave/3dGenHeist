@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LevelPreset
   levelName: New Mexico
   stateDescription: "\u041E\u043F\u0430\u0441\u043Dsadasdasdadad"
-  stateIcon: {fileID: 21300000, guid: 2e4b50bcb22150848a560ef8017aa281, type: 3}
+  stateIcon: {fileID: 21300000, guid: 2679678d9dc57ff4eaeb94cb7d888702, type: 3}
   cities:
   - cityName: "\u041B\u0430\u0441-\u041A\u0440\u0443\u0441\u0435\u0441"
     minDifficulty: 2

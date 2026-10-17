@@ -21,6 +21,20 @@ public class HeistUI : MonoBehaviour
     public GameObject[] difficultySkulls; 
     public TextMeshProUGUI interactionText; // Текст при наведении на предмет
 
+    [Header("Crosshair / Reticle")]
+    public GameObject reticleRoot;
+    public Image reticleDot;
+    public Image reticleRing;
+    public Color reticleIdleColor = new Color(1f, 1f, 1f, 0.75f);
+    public Color reticleFocusColor = new Color(0.35f, 0.9f, 1f, 1f);
+    public float reticleIdleSize = 5f;
+    public float reticleFocusSize = 8.5f;
+    public float reticleSmoothSpeed = 16f;
+
+    private bool isReticleFocused = false;
+    private float currentReticleSize = 5f;
+    private Color currentReticleColor = new Color(1f, 1f, 1f, 0.75f);
+
     [Header("UI Localization/Text")]
     public string bagMoneyFormat = "Bag: ${0}";
     public string weightFormat = "Weight: {0} / {1}kg";
@@ -73,6 +87,7 @@ public class HeistUI : MonoBehaviour
             }
         }
 
+        EnsureReticleCreated();
         EnsureHotbarCreated();
     }
 
@@ -128,6 +143,8 @@ public class HeistUI : MonoBehaviour
             // Таймер виден только тогда, когда ограбление началось (разрушена стена)
             timerText.gameObject.SetActive(GameManager.Instance.isHeistActive);
         }
+
+        UpdateReticle();
 
         if (isInLobby) return;
 
@@ -307,6 +324,157 @@ public class HeistUI : MonoBehaviour
             interactionText.text = text;
             interactionText.gameObject.SetActive(!string.IsNullOrEmpty(text));
         }
+
+        SetReticleFocus(!string.IsNullOrEmpty(text));
+    }
+
+    public void SetReticleFocus(bool focused)
+    {
+        isReticleFocused = focused;
+    }
+
+    private void UpdateReticle()
+    {
+        if (reticleDot == null) return;
+
+        bool isMenuOpen = (MainMenuUI.Instance != null && MainMenuUI.Instance.IsMainMenuActive) ||
+                          (PauseMenuUI.Instance != null && PauseMenuUI.Instance.IsPaused);
+
+        if (reticleRoot != null)
+        {
+            if (isMenuOpen && reticleRoot.activeSelf)
+            {
+                reticleRoot.SetActive(false);
+                return;
+            }
+            else if (!isMenuOpen && !reticleRoot.activeSelf)
+            {
+                reticleRoot.SetActive(true);
+            }
+        }
+
+        if (isMenuOpen) return;
+
+        float targetSize = isReticleFocused ? reticleFocusSize : reticleIdleSize;
+        Color targetColor = isReticleFocused ? reticleFocusColor : reticleIdleColor;
+
+        currentReticleSize = Mathf.Lerp(currentReticleSize, targetSize, Time.deltaTime * reticleSmoothSpeed);
+        currentReticleColor = Color.Lerp(currentReticleColor, targetColor, Time.deltaTime * reticleSmoothSpeed);
+
+        reticleDot.rectTransform.sizeDelta = new Vector2(currentReticleSize, currentReticleSize);
+        reticleDot.color = currentReticleColor;
+
+        if (reticleRing != null)
+        {
+            float targetAlpha = isReticleFocused ? 0.75f : 0f;
+            Color rc = reticleFocusColor;
+            rc.a = Mathf.Lerp(reticleRing.color.a, targetAlpha, Time.deltaTime * reticleSmoothSpeed);
+            reticleRing.color = rc;
+
+            float ringTargetSize = isReticleFocused ? 18f : 10f;
+            float curRingSize = Mathf.Lerp(reticleRing.rectTransform.sizeDelta.x, ringTargetSize, Time.deltaTime * reticleSmoothSpeed);
+            reticleRing.rectTransform.sizeDelta = new Vector2(curRingSize, curRingSize);
+        }
+    }
+
+    private void EnsureReticleCreated()
+    {
+        if (reticleRoot != null && reticleDot != null) return;
+
+        Transform existing = transform.Find("Reticle");
+        if (existing != null)
+        {
+            reticleRoot = existing.gameObject;
+            Transform dotT = existing.Find("ReticleDot");
+            if (dotT != null) reticleDot = dotT.GetComponent<Image>();
+            Transform ringT = existing.Find("ReticleRing");
+            if (ringT != null) reticleRing = ringT.GetComponent<Image>();
+            return;
+        }
+
+        GameObject rRoot = new GameObject("Reticle", typeof(RectTransform));
+        rRoot.transform.SetParent(transform, false);
+        RectTransform rRt = rRoot.GetComponent<RectTransform>();
+        rRt.anchorMin = new Vector2(0.5f, 0.5f);
+        rRt.anchorMax = new Vector2(0.5f, 0.5f);
+        rRt.pivot = new Vector2(0.5f, 0.5f);
+        rRt.anchoredPosition = Vector2.zero;
+        rRt.sizeDelta = new Vector2(40f, 40f);
+        reticleRoot = rRoot;
+
+        Sprite circleSprite = CreateCircleSprite(32);
+        Sprite ringSprite = CreateRingSprite(32, 2);
+
+        // Ring (faint glowing ring when looking at an interactable)
+        GameObject ringObj = new GameObject("ReticleRing", typeof(RectTransform), typeof(Image));
+        ringObj.transform.SetParent(rRoot.transform, false);
+        RectTransform ringRt = ringObj.GetComponent<RectTransform>();
+        ringRt.anchorMin = ringRt.anchorMax = ringRt.pivot = new Vector2(0.5f, 0.5f);
+        ringRt.anchoredPosition = Vector2.zero;
+        ringRt.sizeDelta = new Vector2(10f, 10f);
+        reticleRing = ringObj.GetComponent<Image>();
+        reticleRing.sprite = ringSprite;
+        reticleRing.color = new Color(reticleFocusColor.r, reticleFocusColor.g, reticleFocusColor.b, 0f);
+        reticleRing.raycastTarget = false;
+
+        // Central Dot
+        GameObject dotObj = new GameObject("ReticleDot", typeof(RectTransform), typeof(Image));
+        dotObj.transform.SetParent(rRoot.transform, false);
+        RectTransform dotRt = dotObj.GetComponent<RectTransform>();
+        dotRt.anchorMin = dotRt.anchorMax = dotRt.pivot = new Vector2(0.5f, 0.5f);
+        dotRt.anchoredPosition = Vector2.zero;
+        dotRt.sizeDelta = new Vector2(5f, 5f);
+        reticleDot = dotObj.GetComponent<Image>();
+        reticleDot.sprite = circleSprite;
+        reticleDot.color = reticleIdleColor;
+        reticleDot.raycastTarget = false;
+    }
+
+    private static Sprite CreateCircleSprite(int size)
+    {
+        Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Bilinear;
+        float center = (size - 1) * 0.5f;
+        float radius = center;
+        Color[] colors = new Color[size * size];
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float dist = Vector2.Distance(new Vector2(x, y), new Vector2(center, center));
+                float alpha = Mathf.Clamp01((radius - dist) + 0.5f);
+                colors[y * size + x] = new Color(1f, 1f, 1f, alpha);
+            }
+        }
+        tex.SetPixels(colors);
+        tex.Apply();
+        return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
+    }
+
+    private static Sprite CreateRingSprite(int size, int thickness)
+    {
+        Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Bilinear;
+        float center = (size - 1) * 0.5f;
+        float outerRadius = center;
+        float innerRadius = outerRadius - thickness;
+        Color[] colors = new Color[size * size];
+
+        for (int y = 0; y < size; y++)
+        {
+            for (int x = 0; x < size; x++)
+            {
+                float dist = Vector2.Distance(new Vector2(x, y), new Vector2(center, center));
+                float outerAlpha = Mathf.Clamp01((outerRadius - dist) + 0.5f);
+                float innerAlpha = Mathf.Clamp01((dist - innerRadius) + 0.5f);
+                float alpha = Mathf.Min(outerAlpha, innerAlpha);
+                colors[y * size + x] = new Color(1f, 1f, 1f, alpha);
+            }
+        }
+        tex.SetPixels(colors);
+        tex.Apply();
+        return Sprite.Create(tex, new Rect(0, 0, size, size), new Vector2(0.5f, 0.5f));
     }
 
     private void EnsureHotbarCreated()

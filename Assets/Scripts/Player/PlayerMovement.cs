@@ -21,9 +21,11 @@ public class PlayerMovement : MonoBehaviour
     public LayerMask ceilingCheckMask = ~0;
 
     [Header("Inertia & Physics")]
-    public float acceleration = 22f;
-    public float deceleration = 55f;
-    public float airAcceleration = 8f;
+    public float acceleration = 28f;
+    public float deceleration = 65f;
+    public float airAcceleration = 10f;
+    [Tooltip("Сила сцепления с поверхностью при резких поворотах (устраняет занос на спринте)")]
+    public float turnGripSharpness = 3.5f;
     
     [Header("Stamina System")]
     public float maxStamina = 100f;
@@ -80,6 +82,7 @@ public class PlayerMovement : MonoBehaviour
     public bool IsSprinting => isSprinting;
     public bool IsGrounded => controller != null && controller.isGrounded;
     public float CurrentSpeed => currentHorizontalVelocity.magnitude;
+    public Vector3 Velocity => controller != null ? controller.velocity : (currentHorizontalVelocity + Vector3.up * velocity.y);
     public Vector2 MoveInputVector => inputReader != null ? inputReader.MoveInput : Vector2.zero;
 
     private void OnEnable()
@@ -296,7 +299,22 @@ public class PlayerMovement : MonoBehaviour
 
         // Плавная инерция разгона и торможения (Smooth Horizontal Inertia)
         Vector3 targetHorizontalVelocity = move * applySpeed;
-        float accelRate = isGrounded ? (isMoving ? acceleration : deceleration) : airAcceleration;
+
+        // Устранение скольжения/заноса при резких поворотах на бегу и спринте (Turn Grip)
+        float turnGripMultiplier = 1f;
+        if (isGrounded && isMoving && currentHorizontalVelocity.sqrMagnitude > 0.5f && targetHorizontalVelocity.sqrMagnitude > 0.5f)
+        {
+            float directionAlignment = Vector3.Dot(currentHorizontalVelocity.normalized, targetHorizontalVelocity.normalized);
+            if (directionAlignment < 0.9f)
+            {
+                // Чем сильнее угол поворота, тем активнее гасится боковой снос
+                float turnFactor = Mathf.Clamp01((0.9f - directionAlignment) / 1.9f);
+                turnGripMultiplier = Mathf.Lerp(1f, turnGripSharpness, turnFactor);
+            }
+        }
+
+        float baseAccel = isMoving ? (isSprinting ? acceleration * 1.25f : acceleration) : deceleration;
+        float accelRate = isGrounded ? (baseAccel * turnGripMultiplier) : airAcceleration;
         currentHorizontalVelocity = Vector3.MoveTowards(currentHorizontalVelocity, targetHorizontalVelocity, accelRate * Time.deltaTime);
 
         // Применяем гравитацию
@@ -379,5 +397,12 @@ public class PlayerMovement : MonoBehaviour
         RuntimeManager.AttachInstanceToGameObject(land, gameObject);
         land.start();
         land.release();
+    }
+
+    public void ResetVelocity()
+    {
+        velocity = Vector3.zero;
+        currentHorizontalVelocity = Vector3.zero;
+        previousVerticalVelocity = 0f;
     }
 }

@@ -67,8 +67,18 @@ public class PlayerCamera : MonoBehaviour
         }
     }
 
+    [Header("3rd Person Debug View (F5)")]
+    [Tooltip("Нажми F5 в игре, чтобы переключиться на вид от 3-го лица и увидеть своего персонажа так, как его видят другие игроки!")]
+    public bool isThirdPerson = false;
+    public Vector3 thirdPersonOffset = new Vector3(0.5f, 0.2f, -2.2f);
+
     void Update()
     {
+        if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.f5Key.wasPressedThisFrame)
+        {
+            ToggleThirdPersonView();
+        }
+
         if (Cursor.lockState != CursorLockMode.Locked) return;
 
         HandleMouseLook();
@@ -184,9 +194,21 @@ public class PlayerCamera : MonoBehaviour
         landingDipOffset = Mathf.Clamp(fallSpeed * landingDipMultiplier, 0.02f, maxLandingDip);
     }
 
+    public void ToggleThirdPersonView()
+    {
+        isThirdPerson = !isThirdPerson;
+        PlayerBodyVisibility bodyVis = GetComponentInParent<PlayerBodyVisibility>();
+        if (bodyVis != null)
+        {
+            bodyVis.SetLocalPlayer(!isThirdPerson);
+        }
+        Debug.Log($"<color=yellow>[Camera] Режим перспективы: {(isThirdPerson ? "3-е лицо (Вид других игроков)" : "1-е лицо")}</color>");
+    }
+
     private void ApplyCameraPosition()
     {
-        Vector3 targetPos = initialLocalPos + new Vector3(0f, currentCrouchOffset - landingDipOffset, 0f) + targetBobOffset;
+        Vector3 basePos = isThirdPerson ? (initialLocalPos + thirdPersonOffset) : initialLocalPos;
+        Vector3 targetPos = basePos + new Vector3(0f, currentCrouchOffset - landingDipOffset, 0f) + targetBobOffset;
         transform.localPosition = Vector3.Lerp(transform.localPosition, targetPos, Time.deltaTime * 14f);
     }
 }

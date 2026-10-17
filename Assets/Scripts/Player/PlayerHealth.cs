@@ -29,15 +29,21 @@ public class PlayerHealth : MonoBehaviour
 
     private void OnEnable()
     {
-        if (GameManager.Instance != null)
-        {
-            GameManager.Instance.RegisterPlayerHealth(this);
-        }
+        RegisterWithGameManager();
     }
 
     private void Start()
     {
+        RegisterWithGameManager();
         UpdateHealthUI();
+    }
+
+    private void RegisterWithGameManager()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RegisterPlayerHealth(this);
+        }
     }
 
     private void OnDisable()
@@ -79,7 +85,7 @@ public class PlayerHealth : MonoBehaviour
         UpdateHealthUI();
     }
 
-    private void Die()
+    public void Die()
     {
         if (isDead)
         {
@@ -92,6 +98,7 @@ public class PlayerHealth : MonoBehaviour
         onDeath?.Invoke();
         UpdateHealthUI();
 
+        RegisterWithGameManager();
         if (GameManager.Instance != null)
         {
             GameManager.Instance.NotifyPlayerDied(this);

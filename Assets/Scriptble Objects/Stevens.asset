@@ -18,5 +18,5 @@ MonoBehaviour:
   icon: {fileID: 21300000, guid: b2664deb0fd41034fa206dac06686849, type: 3}
   baseWeight: 5
   dropPrefab: {fileID: 1305968605704897820, guid: 59fb75cf99d287f47a92a0e5b1392a92, type: 3}
-  dropPositionOffset: {x: 0, y: -1.5, z: -1}
+  dropPositionOffset: {x: 0, y: 0, z: 0}
   dropRotationOffset: {x: 0, y: 0, z: 0}

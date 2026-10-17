@@ -18,6 +18,14 @@ public class WorldEquipment : MonoBehaviour, IInteractable
     public bool isFromTeamStorage = false;
 
     private float lastSoundTime = 0f;
+    private float pickupCooldownUntil = 0f;
+
+    public bool CanPickup => Time.time >= pickupCooldownUntil;
+
+    public void SetPickupCooldown(float duration = 0.4f)
+    {
+        pickupCooldownUntil = Time.time + duration;
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -54,6 +62,8 @@ public class WorldEquipment : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        if (!CanPickup) return;
+
         if (PlayerInventory.Instance != null && itemData != null)
         {
             // Пытаемся подобрать предмет
@@ -84,6 +94,7 @@ public class WorldEquipment : MonoBehaviour, IInteractable
 
     public string GetInteractText()
     {
+        if (!CanPickup) return "";
         return itemData != null ? $"Pick up {itemData.itemName}" : "Pick up";
     }
 }

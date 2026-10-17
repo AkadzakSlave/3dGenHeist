@@ -12,6 +12,7 @@ public class BarricadeItem : EquipableItem
 
     [Header("Settings")]
     public float placeDistance = 3.5f;
+    public float minPlayerDistance = 0.9f;
     public LayerMask doorLayer = ~0;
 
     private GameObject previewInstance;
@@ -35,6 +36,15 @@ public class BarricadeItem : EquipableItem
         HandlePreviewProjection();
     }
 
+    private bool IsPlayerCollider(Collider col)
+    {
+        if (col == null) return false;
+        if (col.transform.IsChildOf(transform.root)) return true;
+        if (col.GetComponentInParent<PlayerHealth>() != null) return true;
+        if (col.GetComponentInParent<CharacterController>() != null) return true;
+        return false;
+    }
+
     private void HandlePreviewProjection()
     {
         if (inputReader == null) return;
@@ -44,16 +54,37 @@ public class BarricadeItem : EquipableItem
 
         if (cam != null && inputReader.IsSecondaryActionPressed)
         {
-            if (Physics.Raycast(cam.position, cam.forward, out RaycastHit hit, placeDistance, doorLayer))
+            RaycastHit[] hits = Physics.RaycastAll(cam.position, cam.forward, placeDistance, doorLayer, QueryTriggerInteraction.Ignore);
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+
+            foreach (var hit in hits)
             {
+                if (IsPlayerCollider(hit.collider)) continue;
+
                 // Must target a valid PatrolDoor spawn point
                 EnemySpawnPoint spawnPoint = hit.collider.GetComponentInParent<EnemySpawnPoint>();
                 if (spawnPoint != null && spawnPoint.pointType == SpawnPointType.PatrolDoor)
                 {
+                    Vector3 playerPos = PlayerInventory.Instance != null ? PlayerInventory.Instance.transform.position : cam.position;
+                    float distToDoor = Vector2.Distance(new Vector2(hit.point.x, hit.point.z), new Vector2(playerPos.x, playerPos.z));
+
+                    if (distToDoor < minPlayerDistance)
+                    {
+                        // Player is standing directly in the doorway opening
+                        isValidTarget = false;
+                        var ui = GameManager.Instance != null ? GameManager.Instance.heistUI : null;
+                        if (ui != null)
+                        {
+                            ui.SetInteractionText("<color=yellow>Отойдите назад из проёма двери для установки!</color>");
+                        }
+                        break;
+                    }
+
                     targetDoorTransform = spawnPoint.transform;
                     placePosition = hit.point;
                     placeRotation = Quaternion.LookRotation(hit.normal);
                     isValidTarget = true;
+                    break;
                 }
             }
         }
@@ -116,6 +147,8 @@ public class BarricadeItem : EquipableItem
                 spawnedBarricade.transform.SetParent(targetDoorTransform, true);
             }
 
+            IgnorePlayerCollisions(spawnedBarricade);
+
             if (previewInstance != null)
             {
                 Destroy(previewInstance);
@@ -124,6 +157,24 @@ public class BarricadeItem : EquipableItem
             isValidTarget = false;
 
             ConsumeFromInventory();
+        }
+    }
+
+    private void IgnorePlayerCollisions(GameObject placedObj)
+    {
+        if (placedObj == null) return;
+        GameObject playerObj = PlayerInventory.Instance != null ? PlayerInventory.Instance.gameObject : transform.root.gameObject;
+        Collider[] placedCols = placedObj.GetComponentsInChildren<Collider>();
+        Collider[] playerCols = playerObj.GetComponentsInChildren<Collider>();
+        foreach (var pCol in playerCols)
+        {
+            foreach (var objCol in placedCols)
+            {
+                if (pCol != null && objCol != null)
+                {
+                    Physics.IgnoreCollision(pCol, objCol, true);
+                }
+            }
         }
     }
 

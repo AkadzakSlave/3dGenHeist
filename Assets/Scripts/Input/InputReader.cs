@@ -317,6 +317,26 @@ public class InputReader : ScriptableObject
         pauseAction?.Disable();
     }
 
+    public void DisableGameplayActions()
+    {
+        moveAction?.Disable();
+        lookAction?.Disable();
+        jumpAction?.Disable();
+        crouchAction?.Disable();
+        sprintAction?.Disable();
+        interactAction?.Disable();
+        attackAction?.Disable();
+        secondaryAction?.Disable();
+        reloadAction?.Disable();
+        dropAction?.Disable();
+        digit1Action?.Disable();
+        digit2Action?.Disable();
+        digit3Action?.Disable();
+        scrollAction?.Disable();
+        debugAction?.Disable();
+        pauseAction?.Enable();
+    }
+
     // Helper properties for direct value polling where necessary
     public Vector2 MoveInput => moveAction != null ? moveAction.ReadValue<Vector2>() : Vector2.zero;
     public Vector2 LookInput => lookAction != null ? lookAction.ReadValue<Vector2>() : Vector2.zero;
