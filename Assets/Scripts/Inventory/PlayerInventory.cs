@@ -49,6 +49,14 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        if (GameManager.Instance != null && GameManager.Instance.onMoneyChanged != null)
+        {
+            GameManager.Instance.onMoneyChanged.RemoveListener(RefreshActiveItemUI);
+        }
+    }
+
     private void OnEnable()
     {
         if (inputReader != null)
@@ -111,6 +119,11 @@ public class PlayerInventory : MonoBehaviour
 
         onInventoryChanged?.Invoke();
         UpdateWeaponText();
+
+        if (GameManager.Instance != null && GameManager.Instance.onMoneyChanged != null)
+        {
+            GameManager.Instance.onMoneyChanged.AddListener(RefreshActiveItemUI);
+        }
     }
 
     private void Update()
@@ -386,19 +399,13 @@ public class PlayerInventory : MonoBehaviour
                 rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                 rb.interpolation = RigidbodyInterpolation.Interpolate;
 
-                // Set center of mass at the physical center of the collider (prevents wild spinning)
-                if (dropCollider is BoxCollider bc)
-                {
-                    rb.centerOfMass = bc.center;
-                }
-                else if (dropCollider != null)
-                {
-                    rb.centerOfMass = droppedObj.transform.InverseTransformPoint(dropCollider.bounds.center);
-                }
+                // Let PhysX compute the natural center of mass and inertia tensor from the collider(s)
+                rb.ResetCenterOfMass();
+                rb.ResetInertiaTensor();
 
-                // Damping for realistic weapon landing
-                rb.linearDamping = 0.4f;
-                rb.angularDamping = 1.2f;
+                // Standard natural damping (allows object to topple and lay flat naturally)
+                rb.linearDamping = 0.05f;
+                rb.angularDamping = 0.05f;
 
                 // Inherit player velocity
                 Vector3 playerVel = playerMovement != null ? playerMovement.Velocity : Vector3.zero;
@@ -410,8 +417,8 @@ public class PlayerInventory : MonoBehaviour
                 Vector3 throwVel = playerVel + cam.forward * dropThrowForce + Vector3.up * dropUpwardForce;
                 rb.linearVelocity = throwVel;
 
-                // Controlled, subtle pitch tilt around camera right (like CS2), no chaotic multi-axis spin
-                rb.angularVelocity = cam.right * dropTorqueForce;
+                // Natural toss with slight tumble so weapon smoothly falls flat according to its collider
+                rb.angularVelocity = cam.right * dropTorqueForce + Random.insideUnitSphere * 1.5f;
             }
         }
 
@@ -488,6 +495,11 @@ public class PlayerInventory : MonoBehaviour
                 interaction.ApplyHoldingMode();
             }
         }
+    }
+
+    public void RefreshActiveItemUI()
+    {
+        UpdateWeaponText();
     }
 
     private void UpdateWeaponText()

@@ -54,10 +54,10 @@ public class LootItem : MonoBehaviour, IInteractable
         }
         else if (bag.storedWeight + weight > bag.maxCapacity)
         {
-            return $"<color=#FF9933>{name} (${value}) - Сумка полна!</color>";
+            return $"<color=#FF9933>{name} (${value}, {weight}kg) - Сумка полна! ({bag.storedWeight}/{bag.maxCapacity}кг)</color>";
         }
 
-        return $"Забрать {name} (${value}, {weight}kg)";
+        return $"Забрать {name} (${value}, {weight}kg) [{bag.storedWeight}/{bag.maxCapacity}кг]";
     }
 
     public void Collect()
@@ -85,6 +85,12 @@ public class LootItem : MonoBehaviour, IInteractable
                     Debug.Log($"[Loot] Подобрано: {itemName}. В сумке: ${bag.storedMoney}, Вес: {GameManager.Instance.currentWeight}/{GameManager.Instance.maxWeight}кг");
                     GameManager.Instance.onMoneyChanged?.Invoke();
                     GameManager.Instance.RecalculateMapLoot();
+                }
+
+                if (PlayerInventory.Instance != null)
+                {
+                    PlayerInventory.Instance.RefreshActiveItemUI();
+                    PlayerInventory.Instance.onInventoryChanged?.Invoke();
                 }
                 
                 PlayPickUpSound();

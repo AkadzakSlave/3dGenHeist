@@ -57,27 +57,31 @@ public class HeistUI : MonoBehaviour
 
     [Header("Revolver Drum Transform (Inspector Adjustable)")]
     [Tooltip("Позиция барабана от левого нижнего угла")]
-    public Vector2 drumAnchoredPosition = new Vector2(235f, 235f);
+    public Vector2 drumAnchoredPosition = new Vector2(175f, 175f);
     [Tooltip("Общий размер барабана в пикселях холста (увеличьте для большего размера)")]
-    public float drumSize = 440f;
+    public float drumSize = 410f;
     [Tooltip("Расстояние от центра барабана до центра камор")]
-    public float chamberRadius = 90f;
+    public float chamberRadius = 85f;
     [Tooltip("Диаметр каморы барабана")]
-    public float chamberSize = 106f;
+    public float chamberSize = 72f;
+
+    public static HeistUI Instance { get; private set; }
+    private float reticleHitmarkerTimer = 0f;
+
 
     [Header("Chamber Liquid Physics (Water / Honey Feel)")]
     [Tooltip("Вязкость жидкости (выше = как густой мёд/желе, ниже = как подвижная вода)")]
-    [Range(2f, 25f)]
-    public float liquidViscosity = 7.5f;
+    [Range(1f, 25f)]
+    public float liquidViscosity = 4.2f;
     [Tooltip("Упругость возврата мениска жидкости к горизонту")]
-    [Range(10f, 120f)]
-    public float liquidStiffness = 52f;
+    [Range(5f, 120f)]
+    public float liquidStiffness = 36f;
     [Tooltip("Чувствительность наклона жидкости при повороте камеры/головы")]
     [Range(0.2f, 5f)]
-    public float liquidLookSensitivity = 1.6f;
+    public float liquidLookSensitivity = 1.9f;
     [Tooltip("Сила искажения/колебаний при спринте, прыжках и уроне")]
     [Range(0.2f, 4f)]
-    public float liquidWobbleSensitivity = 1.3f;
+    public float liquidWobbleSensitivity = 1.5f;
 
     [Header("Revolver Drum HUD (Release)")]
     public Sprite drumSprite;
@@ -116,6 +120,7 @@ public class HeistUI : MonoBehaviour
         public Outline borderOutline;
         public Image iconImage;
         public TextMeshProUGUI keyNumberText;
+        public TextMeshProUGUI infoText;
     }
 
     [Header("Hotbar HUD")]
@@ -147,9 +152,12 @@ public class HeistUI : MonoBehaviour
     private float lastCamYaw = 0f;
     private float lastCamPitch = 0f;
     private bool wasPlayerGrounded = true;
+    private float lastPlayerVelY = 0f;
 
     private void Awake()
     {
+        Instance = this;
+
         if (weaponIcon == null && weaponText != null)
         {
             Transform parent = weaponText.transform.parent;
@@ -630,21 +638,32 @@ public class HeistUI : MonoBehaviour
         {
             Vector3 vel = pm.Velocity;
             Vector3 localVel = pm.transform.InverseTransformDirection(vel);
-            sloshTorque += (-localVel.x * liquidLookSensitivity * 1.6f);
+
+            // Усиленная инерция при стрейфе влево/вправо (localVel.x): жидкость заметно колышется и наклоняется
+            sloshTorque += (-localVel.x * liquidLookSensitivity * 4.2f);
+            wobbleForce += (Mathf.Abs(localVel.x) * liquidWobbleSensitivity * 0.45f);
 
             bool isGrounded = pm.IsGrounded;
             if (!wasPlayerGrounded && isGrounded)
             {
-                // Приземление: резкое сжатие жидкости вниз и отскок (как желе/капля в невесомости)
-                wobbleVelocity -= 0.38f * liquidWobbleSensitivity;
-                sloshVelocity += UnityEngine.Random.Range(-14f, 14f) * liquidLookSensitivity;
+                // Приземление: энергичный удар жидкости вниз с последующим отскоком и всплеском
+                float impactSpeed = Mathf.Max(2.5f, Mathf.Abs(lastPlayerVelY));
+                wobbleVelocity -= Mathf.Clamp(impactSpeed * 0.12f, 0.45f, 1.25f) * liquidWobbleSensitivity;
+                sloshVelocity += UnityEngine.Random.Range(-30f, 30f) * liquidLookSensitivity;
             }
             else if (wasPlayerGrounded && !isGrounded && vel.y > 0.5f)
             {
-                // Прыжок: подброс жидкости вверх
-                wobbleVelocity += 0.22f * liquidWobbleSensitivity;
+                // Прыжок: инерция в первый миг взлета резко вдавливает жидкость вниз
+                wobbleVelocity -= 0.52f * liquidWobbleSensitivity;
+                sloshVelocity += UnityEngine.Random.Range(-16f, 16f) * liquidLookSensitivity;
+            }
+            else if (!isGrounded)
+            {
+                // В воздухе: при снижении скорости и падении жидкость плавно подвсплывает и раскачивается
+                wobbleForce += (vel.y < 0f ? 0.95f : -0.35f) * liquidWobbleSensitivity;
             }
             wasPlayerGrounded = isGrounded;
+            lastPlayerVelY = vel.y;
 
             // Спринт: ритмичная раскачка жидкости с каждым шагом
             if (pm.IsSprinting && pm.IsMoving && isGrounded)
@@ -676,36 +695,111 @@ public class HeistUI : MonoBehaviour
         currentWobble += wobbleVelocity * dt;
         currentWobble = Mathf.Clamp(currentWobble, -0.25f, 0.25f);
 
-        // 6. Применение физики к каморе HP
+        // 6. Сердечная пульсация при критическом здоровье (< 20%)
+        float heartBeat = 0f;
+        if (currentHpRatio < 0.20f)
+        {
+            float rate = Mathf.Lerp(7.5f, 4.5f, currentHpRatio / 0.20f);
+            float ht = Time.time * rate;
+            float b1 = Mathf.Clamp01(Mathf.Sin(ht) * 2.8f - 1.4f);
+            float b2 = Mathf.Clamp01(Mathf.Sin(ht - 0.65f) * 2.8f - 1.4f) * 0.65f;
+            heartBeat = Mathf.Clamp01(b1 + b2);
+        }
+
+        // 7. Применение физики и пульсации к каморе HP
         if (hpLiquidImage != null)
         {
             hpLiquidImage.rectTransform.localRotation = Quaternion.Euler(0f, 0f, currentSloshAngle);
-            hpLiquidImage.rectTransform.localScale = new Vector3(1f - currentWobble * 0.55f, 1f + currentWobble, 1f);
+            // Фиксированная увеличенная ширина (1.18x), чтобы жидкость не сжималась в шарик по бокам
+            Vector3 scale = new Vector3(1.18f, 1f + currentWobble * 0.75f, 1f);
+            if (heartBeat > 0f)
+            {
+                scale *= (1f + heartBeat * 0.14f);
+            }
+            hpLiquidImage.rectTransform.localScale = scale;
 
             // Вязкое изменение уровня ХП (как густой мёд) с динамической волной поверхности
             currentHpRatio = Mathf.Lerp(currentHpRatio, targetHpRatio, dt * 7f);
-            hpLiquidImage.fillAmount = Mathf.Clamp01(currentHpRatio + (currentWobble * 0.08f));
+            float visualHpRatio = currentHpRatio > 0.001f ? Mathf.Lerp(0.06f, 1.0f, currentHpRatio) : 0f;
+            hpLiquidImage.fillAmount = Mathf.Clamp01(visualHpRatio + (currentWobble * 0.08f));
+
+            // Цветовая градация по заданным порогам:
+            // > 40%: Сочный изумрудно-зеленый оттенок
+            // 20% – 40%: Предупреждающий янтарно-желтый цвет
+            // < 20%: Кроваво-алый пульсирующий цвет
+            Color normalLiquidColor = new Color(0.18f, 0.90f, 0.45f, 1f);
+            Color midLiquidColor = new Color(0.96f, 0.80f, 0.12f, 1f);
+            Color critLiquidColor = Color.Lerp(new Color(0.85f, 0.15f, 0.15f, 1f), new Color(1.0f, 0.35f, 0.35f, 1f), heartBeat);
+
+            if (currentHpRatio > 0.40f)
+            {
+                float tGreen = Mathf.Clamp01((currentHpRatio - 0.40f) / 0.60f);
+                hpLiquidImage.color = Color.Lerp(midLiquidColor, normalLiquidColor, tGreen);
+            }
+            else if (currentHpRatio >= 0.20f)
+            {
+                float tYellow = Mathf.Clamp01((currentHpRatio - 0.20f) / 0.20f);
+                hpLiquidImage.color = Color.Lerp(critLiquidColor, midLiquidColor, tYellow);
+            }
+            else
+            {
+                hpLiquidImage.color = critLiquidColor;
+            }
         }
 
-        // 7. Применение физики к каморе Выносливости (более подвижная реакция)
+        // Пульсация фона каморы HP при уроне или критическом здоровье
+        if (hpBgImage != null)
+        {
+            if (hpDamageFlashTimer > 0f)
+            {
+                hpDamageFlashTimer -= dt;
+                hpBgImage.color = Color.Lerp(new Color(0.28f, 0.08f, 0.08f, 0.9f), new Color(0.95f, 0.15f, 0.15f, 1f), hpDamageFlashTimer * 2.8f);
+            }
+            else if (heartBeat > 0f)
+            {
+                hpBgImage.color = Color.Lerp(new Color(0.25f, 0.06f, 0.06f, 0.95f), new Color(0.85f, 0.12f, 0.12f, 1f), heartBeat);
+            }
+            else
+            {
+                hpBgImage.color = new Color(0.28f, 0.08f, 0.08f, 0.9f);
+            }
+        }
+
+        // Пульсация текста ХП при критическом здоровье
+        if (hpText != null)
+        {
+            if (heartBeat > 0f)
+            {
+                hpText.rectTransform.localScale = Vector3.one * (1f + heartBeat * 0.15f);
+                hpText.color = Color.Lerp(new Color(1f, 0.4f, 0.4f, 1f), Color.white, heartBeat);
+            }
+            else
+            {
+                hpText.rectTransform.localScale = Vector3.one;
+            }
+        }
+
+        // 8. Применение физики к каморе Выносливости (более подвижная реакция)
         if (staminaLiquidImage != null)
         {
             float stamSlosh = currentSloshAngle * 1.18f;
             float stamWobble = currentWobble * 1.25f;
             staminaLiquidImage.rectTransform.localRotation = Quaternion.Euler(0f, 0f, stamSlosh);
-            staminaLiquidImage.rectTransform.localScale = new Vector3(1f - stamWobble * 0.55f, 1f + stamWobble, 1f);
+            staminaLiquidImage.rectTransform.localScale = new Vector3(1.18f, 1f + stamWobble * 0.75f, 1f);
 
             currentStaminaRatio = Mathf.Lerp(currentStaminaRatio, targetStaminaRatio, dt * 9f);
-            staminaLiquidImage.fillAmount = Mathf.Clamp01(currentStaminaRatio + (stamWobble * 0.07f));
-        }
+            float visualStamRatio = currentStaminaRatio > 0.001f ? Mathf.Lerp(0.05f, 1.0f, currentStaminaRatio) : 0f;
+            staminaLiquidImage.fillAmount = Mathf.Clamp01(visualStamRatio + (stamWobble * 0.07f));
 
-        // 8. Вспышка урона по каморе ХП
-        if (hpDamageFlashTimer > 0f)
-        {
-            hpDamageFlashTimer -= dt;
-            if (hpBgImage != null)
+            // Если выносливость на исходе (< 20%) — тревожная янтарная пульсация
+            if (currentStaminaRatio < 0.20f)
             {
-                hpBgImage.color = Color.Lerp(new Color(0.28f, 0.08f, 0.08f, 0.9f), new Color(0.9f, 0.15f, 0.15f, 1f), hpDamageFlashTimer * 2.8f);
+                float stamBlink = (Mathf.Sin(Time.time * 9f) + 1f) * 0.5f;
+                staminaLiquidImage.color = Color.Lerp(new Color(1.0f, 0.83f, 0.15f, 1f), new Color(1.0f, 0.45f, 0.1f, 1f), stamBlink);
+            }
+            else
+            {
+                staminaLiquidImage.color = new Color(1.0f, 0.83f, 0.15f, 1f);
             }
         }
     }
@@ -844,6 +938,13 @@ public class HeistUI : MonoBehaviour
         float targetSize = isReticleFocused ? reticleFocusSize : reticleIdleSize;
         Color targetColor = isReticleFocused ? reticleFocusColor : reticleIdleColor;
 
+        if (reticleHitmarkerTimer > 0f)
+        {
+            reticleHitmarkerTimer -= Time.deltaTime;
+            targetColor = new Color(1f, 0.22f, 0.22f, 1f);
+            targetSize = reticleFocusSize * 1.6f;
+        }
+
         currentReticleSize = Mathf.Lerp(currentReticleSize, targetSize, Time.deltaTime * reticleSmoothSpeed);
         currentReticleColor = Color.Lerp(currentReticleColor, targetColor, Time.deltaTime * reticleSmoothSpeed);
 
@@ -953,6 +1054,14 @@ public class HeistUI : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Вызывается при попадании по врагу для сочного хитмаркер-отклика прицела
+    /// </summary>
+    public void TriggerHitmarker()
+    {
+        reticleHitmarkerTimer = 0.14f;
+    }
+
     private Sprite GetOrCreateCircleSprite()
     {
         if (cachedCircleSprite != null) return cachedCircleSprite;
@@ -1058,12 +1167,13 @@ public class HeistUI : MonoBehaviour
             chLayRt.anchorMax = Vector2.one;
             chLayRt.sizeDelta = Vector2.zero;
 
-            Vector2 posHp = new Vector2(0f, chamberRadius);
-            Vector2 posAmmo = new Vector2(chamberRadius * Mathf.Cos(30f * Mathf.Deg2Rad), chamberRadius * Mathf.Sin(30f * Mathf.Deg2Rad));
-            Vector2 posBR = new Vector2(chamberRadius * Mathf.Cos(-30f * Mathf.Deg2Rad), chamberRadius * Mathf.Sin(-30f * Mathf.Deg2Rad));
-            Vector2 posB = new Vector2(0f, -chamberRadius);
-            Vector2 posBL = new Vector2(chamberRadius * Mathf.Cos(-150f * Mathf.Deg2Rad), chamberRadius * Mathf.Sin(-150f * Mathf.Deg2Rad));
-            Vector2 posStamina = new Vector2(chamberRadius * Mathf.Cos(150f * Mathf.Deg2Rad), chamberRadius * Mathf.Sin(150f * Mathf.Deg2Rad));
+            float S = drumSize / 813f;
+            Vector2 posHp = new Vector2(8.1f * S, 167.3f * S);
+            Vector2 posAmmo = new Vector2(165.3f * S, 79.0f * S);
+            Vector2 posBR = new Vector2(165.6f * S, -100.9f * S);
+            Vector2 posB = new Vector2(8.2f * S, -194.7f * S);
+            Vector2 posBL = new Vector2(-150.0f * S, -101.0f * S);
+            Vector2 posStamina = new Vector2(-149.5f * S, 78.8f * S);
 
             // КАМОРА ХП: Красный фон (при уроне) + Зеленая "жидкость"
             GameObject hpSocket = CreateChamberSocket(chambersLayer.transform, "Socket_HP", posHp, chamberSize);
@@ -1272,6 +1382,22 @@ public class HeistUI : MonoBehaviour
                 keyTmp.fontStyle = FontStyles.Bold;
                 keyTmp.color = Color.white;
                 hotbarSlots[i].keyNumberText = keyTmp;
+
+                // Текст информации о предмете в слоте (вес / патроны)
+                GameObject infoObj = new GameObject("InfoText", typeof(RectTransform), typeof(TextMeshProUGUI));
+                infoObj.transform.SetParent(slotObj.transform, false);
+                RectTransform infoRt = infoObj.GetComponent<RectTransform>();
+                infoRt.anchorMin = infoRt.anchorMax = infoRt.pivot = new Vector2(1f, 0f);
+                infoRt.anchoredPosition = new Vector2(-4f, 4f);
+                infoRt.sizeDelta = new Vector2(56f, 18f);
+
+                TextMeshProUGUI infoTmp = infoObj.GetComponent<TextMeshProUGUI>();
+                infoTmp.alignment = TextAlignmentOptions.Right;
+                infoTmp.fontSize = 10;
+                infoTmp.fontStyle = FontStyles.Bold;
+                infoTmp.color = Color.white;
+                infoTmp.raycastTarget = false;
+                hotbarSlots[i].infoText = infoTmp;
             }
 
             ApplyHotbarHeaderLayout();
@@ -1291,6 +1417,17 @@ public class HeistUI : MonoBehaviour
                 if (ammoUsageBadge != null)
                 {
                     releaseAmmoUsageText = ammoUsageBadge.transform.Find("Text")?.GetComponent<TextMeshProUGUI>();
+                }
+            }
+            for (int i = 0; i < hotbarSlots.Length; i++)
+            {
+                if (hotbarSlots[i] != null && hotbarSlots[i].slotRoot != null)
+                {
+                    Transform it = hotbarSlots[i].slotRoot.transform.Find("InfoText");
+                    if (it != null)
+                    {
+                        hotbarSlots[i].infoText = it.GetComponent<TextMeshProUGUI>();
+                    }
                 }
             }
             ApplyHotbarHeaderLayout();
@@ -1338,12 +1475,13 @@ public class HeistUI : MonoBehaviour
         Transform chLayer = drumRoot.transform.Find("ChambersLayer");
         if (chLayer != null)
         {
-            Vector2 posHp = new Vector2(0f, chamberRadius);
-            Vector2 posAmmo = new Vector2(chamberRadius * Mathf.Cos(30f * Mathf.Deg2Rad), chamberRadius * Mathf.Sin(30f * Mathf.Deg2Rad));
-            Vector2 posBR = new Vector2(chamberRadius * Mathf.Cos(-30f * Mathf.Deg2Rad), chamberRadius * Mathf.Sin(-30f * Mathf.Deg2Rad));
-            Vector2 posB = new Vector2(0f, -chamberRadius);
-            Vector2 posBL = new Vector2(chamberRadius * Mathf.Cos(-150f * Mathf.Deg2Rad), chamberRadius * Mathf.Sin(-150f * Mathf.Deg2Rad));
-            Vector2 posStamina = new Vector2(chamberRadius * Mathf.Cos(150f * Mathf.Deg2Rad), chamberRadius * Mathf.Sin(150f * Mathf.Deg2Rad));
+            float S = drumSize / 813f;
+            Vector2 posHp = new Vector2(8.1f * S, 167.3f * S);
+            Vector2 posAmmo = new Vector2(165.3f * S, 79.0f * S);
+            Vector2 posBR = new Vector2(165.6f * S, -100.9f * S);
+            Vector2 posB = new Vector2(8.2f * S, -194.7f * S);
+            Vector2 posBL = new Vector2(-150.0f * S, -101.0f * S);
+            Vector2 posStamina = new Vector2(-149.5f * S, 78.8f * S);
 
             UpdateSocketTransform(chLayer.Find("Socket_HP"), posHp, chamberSize);
             UpdateSocketTransform(chLayer.Find("Socket_Ammo"), posAmmo, chamberSize);
@@ -1359,15 +1497,17 @@ public class HeistUI : MonoBehaviour
             Transform hpTxtT = lblLayer.Find("HP_Text");
             if (hpTxtT != null)
             {
+                float S = drumSize / 813f;
+                Vector2 posHp = new Vector2(8.1f * S, 167.3f * S);
                 RectTransform rt = hpTxtT.GetComponent<RectTransform>();
-                rt.anchoredPosition = new Vector2(0f, chamberRadius);
+                rt.anchoredPosition = posHp;
                 rt.sizeDelta = new Vector2(chamberSize * 0.95f, chamberSize * 0.55f);
 
                 TextMeshProUGUI tmp = hpTxtT.GetComponent<TextMeshProUGUI>();
                 if (tmp != null)
                 {
                     tmp.fontSizeMin = 10;
-                    tmp.fontSizeMax = 24f;
+                    tmp.fontSizeMax = 22f;
                     tmp.fontStyle = FontStyles.Bold;
                 }
             }
@@ -1547,6 +1687,34 @@ public class HeistUI : MonoBehaviour
                     {
                         slotUI.iconImage.gameObject.SetActive(false);
                     }
+                }
+            }
+
+            // Текст информации о предмете (вес сумки / патроны)
+            if (slotUI.infoText != null)
+            {
+                if (invSlots != null && i < invSlots.Length && invSlots[i] != null)
+                {
+                    if (invSlots[i] is BagTool b)
+                    {
+                        slotUI.infoText.text = $"{b.storedWeight}/{b.maxCapacity}k";
+                        slotUI.infoText.color = (b.storedWeight >= b.maxCapacity) ? new Color(1f, 0.35f, 0.35f, 1f) : new Color(0.95f, 0.85f, 0.45f, 1f);
+                        slotUI.infoText.gameObject.SetActive(true);
+                    }
+                    else if (invSlots[i] is WeaponItem w)
+                    {
+                        slotUI.infoText.text = $"{w.ammoInMagazine}/{w.reserveAmmo}";
+                        slotUI.infoText.color = Color.white;
+                        slotUI.infoText.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        slotUI.infoText.gameObject.SetActive(false);
+                    }
+                }
+                else
+                {
+                    slotUI.infoText.gameObject.SetActive(false);
                 }
             }
         }

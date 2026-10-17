@@ -19977,10 +19977,10 @@ MonoBehaviour:
   debugHudRoot: {fileID: 1500347987}
   releaseHudRoot: {fileID: 1107291253}
   isDebugHudActive: 0
-  drumAnchoredPosition: {x: 165, y: 165}
-  drumSize: 280
-  chamberRadius: 55
-  chamberSize: 65
+  drumAnchoredPosition: {x: 175, y: 175}
+  drumSize: 410
+  chamberRadius: 85
+  chamberSize: 72
   drumSprite: {fileID: 21300000, guid: 985dcdafcb6edf94caa6dffe5a223dc1, type: 3}
   drumRoot: {fileID: 1322406705}
   hpLiquidImage: {fileID: 1909283087}

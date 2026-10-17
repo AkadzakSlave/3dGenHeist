@@ -38,13 +38,30 @@ public class PlayerCamera : MonoBehaviour
     [Header("Input Protection")]
     public float maxMouseDeltaClamp = 35f;
 
+    [Header("Procedural Recoil (Arcade Friendly)")]
+    public float recoilRecoverySpeed = 14f;
+
+    public static PlayerCamera Instance { get; private set; }
+
     private float xRotation = 0f;
     private float currentTilt = 0f;
+    private Vector2 currentRecoil = Vector2.zero;
     private float bobTimer = 0f;
     private Vector3 initialLocalPos;
     private Vector3 targetBobOffset = Vector3.zero;
     private float currentCrouchOffset = 0f;
     private float landingDipOffset = 0f;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    public void AddRecoil(float verticalKick, float horizontalKick)
+    {
+        currentRecoil.x += verticalKick;
+        currentRecoil.y += horizontalKick;
+    }
 
     void Start()
     {
@@ -112,7 +129,10 @@ public class PlayerCamera : MonoBehaviour
         xRotation -= mouseY;
         xRotation = Mathf.Clamp(xRotation, -90f, 90f);
 
-        transform.localRotation = Quaternion.Euler(xRotation, 0f, currentTilt);
+        // Плавное самовосстановление отдачи к исходной точке прицеливания (игроку не нужно "душиться" и тянуть мышь)
+        currentRecoil = Vector2.Lerp(currentRecoil, Vector2.zero, Time.deltaTime * recoilRecoverySpeed);
+
+        transform.localRotation = Quaternion.Euler(xRotation - currentRecoil.x, currentRecoil.y, currentTilt);
         
         if (playerBody != null)
         {

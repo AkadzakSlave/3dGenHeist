@@ -59,6 +59,13 @@ public class BagTool : EquipableItem
         storedMoney += moneyAmt;
         storedWeight += weightAmt;
         Debug.Log($"[Bag] Добавлено лута. Теперь внутри: ${storedMoney}, вес: {storedWeight}кг / {maxCapacity}кг");
+
+        if (PlayerInventory.Instance != null)
+        {
+            PlayerInventory.Instance.RefreshActiveItemUI();
+            PlayerInventory.Instance.onInventoryChanged?.Invoke();
+        }
+
         return true;
     }
 

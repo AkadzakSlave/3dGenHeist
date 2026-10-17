@@ -49,8 +49,32 @@ public class WeaponItem : EquipableItem
     public FMODWeaponType weaponProfile = FMODWeaponType.Revolver;
     public bool autoDetectProfile = true;
 
+    [Header("Recoil & Shooting Feel (Arcade Friendly)")]
+    [Tooltip("Вертикальный подброс камеры (самовосстанавливающийся)")]
+    public float recoilVertical = 1.0f;
+    [Tooltip("Случайный горизонтальный разброс отдачи")]
+    public float recoilHorizontal = 0.25f;
+
+    [Header("Muzzle Flash Light")]
+    public bool enableMuzzleLight = true;
+    public Color muzzleLightColor = new Color(1f, 0.85f, 0.45f, 1f);
+    public float muzzleLightRange = 9f;
+    public float muzzleLightIntensity = 2.5f;
+
+    [Header("Debug Laser Tracers")]
+    [Tooltip("Тестовый белый лазерный луч выстрела (показывает траекторию и точку попадания)")]
+    public bool enableLaserTracer = true;
+    public float laserDuration = 0.12f;
+    public float laserWidth = 0.02f;
+
+    private static Material sharedLaserMaterial;
+
     [Header("Input")]
     public InputReader inputReader;
+
+    private Light runtimeMuzzleLight;
+    private float muzzleLightTimer = 0f;
+    private FMOD.Studio.EventInstance activeReloadInstance;
 
     private float nextFireTime = 0f;
     private float reloadFinishTime = 0f;
@@ -71,22 +95,32 @@ public class WeaponItem : EquipableItem
             if (idName.Contains("colt"))
             {
                 weaponProfile = FMODWeaponType.Pistol;
+                recoilVertical = 1.35f;
+                recoilHorizontal = 0.3f;
             }
             else if (idName.Contains("win") || idName.Contains("1887"))
             {
                 weaponProfile = FMODWeaponType.Shotgun_Lever;
+                recoilVertical = 2.4f;
+                recoilHorizontal = 0.45f;
             }
             else if (idName.Contains("steven"))
             {
                 weaponProfile = FMODWeaponType.Shotgun_Double;
+                recoilVertical = 2.6f;
+                recoilHorizontal = 0.5f;
             }
             else if (idName.Contains("tompson") || idName.Contains("thompson") || isAutomatic)
             {
                 weaponProfile = FMODWeaponType.SMG;
+                recoilVertical = 0.55f;
+                recoilHorizontal = 0.20f;
             }
             else
             {
                 weaponProfile = FMODWeaponType.Revolver;
+                recoilVertical = 1.5f;
+                recoilHorizontal = 0.35f;
             }
         }
     }
@@ -97,6 +131,12 @@ public class WeaponItem : EquipableItem
         {
             inputReader.ReloadEvent -= OnReloadAction;
         }
+        StopReloadSound();
+    }
+
+    private void OnDestroy()
+    {
+        StopReloadSound();
     }
 
     private void OnReloadAction()
@@ -124,6 +164,16 @@ public class WeaponItem : EquipableItem
             if (Keyboard.current.iKey.wasPressedThisFrame || Keyboard.current.hKey.wasPressedThisFrame)
             {
                 InspectWeapon();
+            }
+        }
+
+        // Таймер вспышки динамического света дула
+        if (muzzleLightTimer > 0f)
+        {
+            muzzleLightTimer -= Time.deltaTime;
+            if (muzzleLightTimer <= 0f && runtimeMuzzleLight != null)
+            {
+                runtimeMuzzleLight.enabled = false;
             }
         }
     }
@@ -161,6 +211,7 @@ public class WeaponItem : EquipableItem
     {
         isEquipped = false;
         isReloading = false; // Cancel reload when unequipping
+        StopReloadSound();
 
         if (inputReader != null)
         {
@@ -272,6 +323,29 @@ public class WeaponItem : EquipableItem
         }
     }
 
+    private void TriggerMuzzleLight()
+    {
+        if (!enableMuzzleLight || muzzlePoint == null) return;
+
+        if (runtimeMuzzleLight == null)
+        {
+            GameObject lightObj = new GameObject("MuzzleFlashLight", typeof(Light));
+            lightObj.transform.SetParent(muzzlePoint, false);
+            lightObj.transform.localPosition = Vector3.zero;
+
+            runtimeMuzzleLight = lightObj.GetComponent<Light>();
+            runtimeMuzzleLight.type = LightType.Point;
+            runtimeMuzzleLight.color = muzzleLightColor;
+            runtimeMuzzleLight.range = muzzleLightRange;
+            runtimeMuzzleLight.intensity = muzzleLightIntensity;
+            runtimeMuzzleLight.shadows = LightShadows.None;
+            runtimeMuzzleLight.enabled = false;
+        }
+
+        runtimeMuzzleLight.enabled = true;
+        muzzleLightTimer = 0.055f;
+    }
+
     private void Fire()
     {
         if (!infiniteAmmo)
@@ -279,14 +353,62 @@ public class WeaponItem : EquipableItem
             ammoInMagazine--;
         }
 
-        Vector3 soundPos = muzzlePoint != null ? muzzlePoint.position : transform.position;
+        Transform cam = Camera.main != null ? Camera.main.transform : null;
+        Vector3 soundPos = muzzlePoint != null ? muzzlePoint.position : (cam != null ? cam.position + cam.forward * 0.45f : transform.position);
+
+        // ==================== 1. ЗВУК ВЫСТРЕЛА СТРОГО ИЗ ДУЛА (FMOD) ====================
         try
         {
-            FMOD.Studio.EventInstance fireInst = !fireEvent.IsNull 
-                ? RuntimeManager.CreateInstance(fireEvent) 
-                : RuntimeManager.CreateInstance("event:/Weapons/Weapon_Fire");
-            fireInst.setParameterByName("WeaponType", (float)weaponProfile);
+            FMOD.Studio.EventInstance fireInst;
+            if (!fireEvent.IsNull)
+            {
+                fireInst = RuntimeManager.CreateInstance(fireEvent);
+            }
+            else
+            {
+                fireInst = RuntimeManager.CreateInstance("event:/Weapons/Weapon_Fire");
+            }
+
+            // В текущей сборке FMOD банка аудио-клипы добавлены для WeaponType = 0 (Revolver).
+            // Чтобы каждый вид оружия звучал всегда из дула и обладал уникальным тембром:
+            float pitch = 1.0f;
+            float paramType = 0f;
+
+            switch (weaponProfile)
+            {
+                case FMODWeaponType.SMG:
+                    pitch = 1.26f; // Томпсон: звонкая, резкая, скорострельная автоматная дробь
+                    paramType = 0f;
+                    break;
+                case FMODWeaponType.Pistol:
+                    pitch = 1.08f; // Кольт: хлесткий одиночный пистолетный выстрел
+                    paramType = 0f;
+                    break;
+                case FMODWeaponType.Shotgun_Lever:
+                case FMODWeaponType.Shotgun_Double:
+                    pitch = 0.82f; // Дробовики: мощный басовитый залп
+                    paramType = 0f;
+                    break;
+                default:
+                    pitch = 1.0f;
+                    paramType = (float)weaponProfile;
+                    break;
+            }
+
+            fireInst.setParameterByName("WeaponType", paramType);
+            fireInst.setPitch(pitch);
+
+            // Позиционируем звук строго на дуле (muzzlePoint)
             fireInst.set3DAttributes(RuntimeUtils.To3DAttributes(soundPos));
+            if (muzzlePoint != null)
+            {
+                RuntimeManager.AttachInstanceToGameObject(fireInst, muzzlePoint.gameObject);
+            }
+            else
+            {
+                RuntimeManager.AttachInstanceToGameObject(fireInst, gameObject);
+            }
+
             fireInst.start();
             fireInst.release();
         }
@@ -295,17 +417,27 @@ public class WeaponItem : EquipableItem
             Debug.LogWarning($"[Weapon] Fire sound error: {ex.Message}");
         }
 
+        // ==================== 2. ВИЗУАЛЬНЫЕ ЭФФЕКТЫ И ПРОЦЕДУРНАЯ ОТДАЧА ====================
         if (muzzleFlash != null)
         {
             muzzleFlash.Play();
         }
+
+        TriggerMuzzleLight();
 
         if (animator != null)
         {
             animator.SetTrigger("Fire");
         }
 
-        Transform cam = Camera.main != null ? Camera.main.transform : null;
+        // Мягкая камерная отдача (самовосстанавливающаяся)
+        if (PlayerCamera.Instance != null)
+        {
+            float randH = Random.Range(-recoilHorizontal, recoilHorizontal);
+            PlayerCamera.Instance.AddRecoil(recoilVertical, randH);
+        }
+
+        // ==================== 3. РАСЧЕТ ПОПАДАНИЙ (HITSCAN) ====================
         if (cam == null)
         {
             Debug.LogWarning("[Weapon] No main camera found for hitscan shot.");
@@ -316,6 +448,7 @@ public class WeaponItem : EquipableItem
         Vector3 rayOrigin = cam.position + cam.forward * 0.5f;
         float rayRange = Mathf.Max(0.1f, range - 0.5f);
         int actualPellets = Mathf.Max(1, pelletsPerShot);
+        Vector3 tracerOrigin = muzzlePoint != null ? muzzlePoint.position : rayOrigin;
 
         if (EnemyManager.Instance != null)
         {
@@ -332,17 +465,29 @@ public class WeaponItem : EquipableItem
                 shootDir = Quaternion.Euler(randomX, randomY, 0f) * cam.forward;
             }
 
+            Vector3 hitPoint;
             if (Physics.Raycast(rayOrigin, shootDir, out RaycastHit hit, rayRange, hitLayers, QueryTriggerInteraction.Ignore))
             {
+                hitPoint = hit.point;
                 PlayBulletImpact(hit);
 
                 EnemyHealth enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>();
                 if (enemyHealth != null)
                 {
                     enemyHealth.TakeDamage(damage);
+                    if (HeistUI.Instance != null)
+                    {
+                        HeistUI.Instance.TriggerHitmarker();
+                    }
                     Debug.Log($"[Weapon] Pellet hit {enemyHealth.name} for {damage}.");
                 }
             }
+            else
+            {
+                hitPoint = rayOrigin + shootDir * rayRange;
+            }
+
+            SpawnLaserTracer(tracerOrigin, hitPoint);
         }
 
         UpdateWeaponUI();
@@ -360,14 +505,14 @@ public class WeaponItem : EquipableItem
             FMOD.Studio.EventInstance impactInst = RuntimeManager.CreateInstance("event:/Weapons/Bullet_Impact");
             float surfaceType = 0f; // 0: Concrete, 1: Wood, 2: Metal, 3: Flesh
 
-            // 1. Проверяем врагов
-            if (hit.collider.GetComponentInParent<EnemyHealth>() != null)
+            // 1. Приоритет: Проверка врагов / живых целей -> Flesh (3)
+            if (hit.collider.GetComponentInParent<EnemyHealth>() != null || hit.collider.CompareTag("Enemy"))
             {
                 surfaceType = 3f; // Flesh
             }
             else
             {
-                // 2. Проверяем явный компонент SurfaceIdentifier
+                // 2. Явный компонент SurfaceIdentifier на объекте или его предках
                 SurfaceIdentifier surf = hit.collider.GetComponentInParent<SurfaceIdentifier>();
                 if (surf != null)
                 {
@@ -375,22 +520,35 @@ public class WeaponItem : EquipableItem
                 }
                 else
                 {
-                    // 3. Проверяем PhysicMaterial, если назначен на коллайдере
-                    string matName = hit.collider.sharedMaterial != null ? hit.collider.sharedMaterial.name.ToLower() : "";
-                    string cName = hit.collider.name.ToLower();
-                    string parentName = hit.collider.transform.parent != null ? hit.collider.transform.parent.name.ToLower() : "";
-
-                    if (matName.Contains("wood") || cName.Contains("wood") || cName.Contains("table") || cName.Contains("door") || parentName.Contains("door") || parentName.Contains("table"))
+                    // 3. Проверка материалов: PhysicMaterial коллайдера + Visual Material рендерера
+                    string physMatName = hit.collider.sharedMaterial != null ? hit.collider.sharedMaterial.name.ToLower() : "";
+                    string visualMatName = "";
+                    Renderer rend = hit.collider.GetComponent<Renderer>();
+                    if (rend != null && rend.sharedMaterial != null)
                     {
-                        surfaceType = 1f; // Wood
+                        visualMatName = rend.sharedMaterial.name.ToLower();
                     }
-                    else if (matName.Contains("metal") || matName.Contains("iron") || cName.Contains("iron") || cName.Contains("safe") || cName.Contains("metal") || cName.Contains("steel") || parentName.Contains("safe") || parentName.Contains("metal"))
+
+                    // 4. Имена объекта и родителя в иерархии
+                    string cName = hit.collider.name.ToLower();
+                    string pName = hit.collider.transform.parent != null ? hit.collider.transform.parent.name.ToLower() : "";
+                    string combined = $"{physMatName} {visualMatName} {cName} {pName}";
+
+                    if (combined.Contains("flesh") || combined.Contains("meat") || combined.Contains("body") || combined.Contains("skin"))
+                    {
+                        surfaceType = 3f; // Flesh
+                    }
+                    else if (combined.Contains("metal") || combined.Contains("iron") || combined.Contains("steel") || combined.Contains("safe") || combined.Contains("chrome") || combined.Contains("chain") || combined.Contains("grate") || combined.Contains("pipe") || combined.Contains("barrel"))
                     {
                         surfaceType = 2f; // Metal
                     }
-                    else if (matName.Contains("flesh") || cName.Contains("body") || cName.Contains("enemy"))
+                    else if (combined.Contains("wood") || combined.Contains("table") || combined.Contains("door") || combined.Contains("board") || combined.Contains("plank") || combined.Contains("crate") || combined.Contains("cabinet") || combined.Contains("closet") || combined.Contains("shelf"))
                     {
-                        surfaceType = 3f; // Flesh
+                        surfaceType = 1f; // Wood
+                    }
+                    else
+                    {
+                        surfaceType = 0f; // Concrete (бетон, стены, пол, кирпич, камень)
                     }
                 }
             }
@@ -403,6 +561,40 @@ public class WeaponItem : EquipableItem
         catch { }
     }
 
+    private void SpawnLaserTracer(Vector3 start, Vector3 end)
+    {
+        if (!enableLaserTracer) return;
+
+        GameObject tracerObj = new GameObject("LaserTracer", typeof(LineRenderer), typeof(LaserTracerEffect));
+        LineRenderer lr = tracerObj.GetComponent<LineRenderer>();
+        lr.startWidth = laserWidth;
+        lr.endWidth = laserWidth * 0.75f;
+
+        if (sharedLaserMaterial == null)
+        {
+            Shader unlit = Shader.Find("Sprites/Default");
+            if (unlit == null) unlit = Shader.Find("Universal Render Pipeline/Unlit");
+            sharedLaserMaterial = new Material(unlit != null ? unlit : Shader.Find("Unlit/Color"));
+            sharedLaserMaterial.color = Color.white;
+        }
+
+        lr.material = sharedLaserMaterial;
+        lr.startColor = Color.white;
+        lr.endColor = new Color(1f, 1f, 1f, 0.85f);
+        lr.positionCount = 2;
+        lr.SetPosition(0, start);
+        lr.SetPosition(1, end);
+        lr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        lr.receiveShadows = false;
+
+        LaserTracerEffect effect = tracerObj.GetComponent<LaserTracerEffect>();
+        if (effect != null)
+        {
+            effect.lineRenderer = lr;
+            effect.duration = laserDuration;
+        }
+    }
+
     private void StartReload()
     {
         if (isReloading || infiniteAmmo || ammoInMagazine >= magazineSize || reserveAmmo <= 0)
@@ -413,16 +605,21 @@ public class WeaponItem : EquipableItem
         isReloading = true;
         reloadFinishTime = Time.time + reloadTime;
 
+        StopReloadSound();
+
         try
         {
-            FMOD.Studio.EventInstance reloadInst = !reloadEvent.IsNull 
+            activeReloadInstance = !reloadEvent.IsNull 
                 ? RuntimeManager.CreateInstance(reloadEvent) 
                 : RuntimeManager.CreateInstance("event:/Weapons/Weapon_Reload");
-            reloadInst.setParameterByName("WeaponType", (float)weaponProfile);
-            reloadInst.setParameterByName("ReloadPhase", 0f);
-            reloadInst.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
-            reloadInst.start();
-            reloadInst.release();
+
+            if (activeReloadInstance.isValid())
+            {
+                activeReloadInstance.setParameterByName("WeaponType", (float)weaponProfile);
+                activeReloadInstance.setParameterByName("ReloadPhase", 0f);
+                RuntimeManager.AttachInstanceToGameObject(activeReloadInstance, gameObject);
+                activeReloadInstance.start();
+            }
         }
         catch (System.Exception ex)
         {
@@ -447,8 +644,34 @@ public class WeaponItem : EquipableItem
         reserveAmmo -= ammoToLoad;
         isReloading = false;
 
+        if (activeReloadInstance.isValid())
+        {
+            try
+            {
+                activeReloadInstance.setParameterByName("ReloadPhase", 1f);
+                activeReloadInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+                activeReloadInstance.release();
+            }
+            catch { }
+            activeReloadInstance.clearHandle();
+        }
+
         Debug.Log($"[Weapon] Reloaded {GetDisplayName()}: {ammoInMagazine}/{reserveAmmo}");
         UpdateWeaponUI();
+    }
+
+    private void StopReloadSound()
+    {
+        if (activeReloadInstance.isValid())
+        {
+            try
+            {
+                activeReloadInstance.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+                activeReloadInstance.release();
+            }
+            catch { }
+            activeReloadInstance.clearHandle();
+        }
     }
 
     private void UpdateWeaponUI()
@@ -474,5 +697,39 @@ public class WeaponItem : EquipableItem
     private string GetDisplayName()
     {
         return itemData != null ? itemData.itemName : name;
+    }
+}
+
+/// <summary>
+/// Автономный контроллер затухания и удаления тестового лазера.
+/// Не зависит от оружия и корутин — гарантированно самоуничтожается,
+/// даже если в момент выстрела игрок выбросил или сменил оружие.
+/// </summary>
+public class LaserTracerEffect : MonoBehaviour
+{
+    public LineRenderer lineRenderer;
+    public float duration = 0.12f;
+    private float timer = 0f;
+
+    private void Start()
+    {
+        // Безусловная подстраховка на уровне движка Unity
+        Destroy(gameObject, duration + 0.05f);
+    }
+
+    private void Update()
+    {
+        timer += Time.deltaTime;
+        float alpha = Mathf.Clamp01(1f - (timer / duration));
+        if (lineRenderer != null)
+        {
+            lineRenderer.startColor = new Color(1f, 1f, 1f, alpha);
+            lineRenderer.endColor = new Color(1f, 1f, 1f, alpha * 0.75f);
+        }
+
+        if (timer >= duration)
+        {
+            Destroy(gameObject);
+        }
     }
 }
