@@ -3,75 +3,56 @@ using UnityEngine;
 
 public class InteractableHighlighter : MonoBehaviour
 {
-    [Header("Highlight Visuals")]
-    [Tooltip("Цвет контура и легкого свечения (стильный яркий лазурный/синий)")]
-    public Color outlineColor = new Color(0.2f, 0.85f, 1.0f, 0.95f);
-    [Tooltip("Толщина обводки в метрах")]
-    public float outlineWidth = 0.015f;
+    [Header("Glow Colors")]
+    [Tooltip("Цвет мягкой подсветки для обычных интерактивных предметов (оружие, расходники, терминалы и т.д.)")]
+    public Color itemGlowColor = new Color(1.0f, 0.82f, 0.25f, 1f);
 
-    [Header("Material Override (Optional)")]
-    public Material customHighlightMaterial;
+    [Tooltip("Цвет мягкой подсветки для лута (деньги, золото, чемоданы и ценности)")]
+    public Color lootGlowColor = new Color(0.2f, 1.0f, 0.35f, 1f);
 
-    private Material runtimeHighlightMaterial;
+    [Header("Glow Intensity")]
+    [Range(0.05f, 2.0f)]
+    [Tooltip("Интенсивность подсветки (0.35 - мягкое элегантное свечение без потери текстуры)")]
+    public float baseGlowIntensity = 0.35f;
+    public bool enablePulse = true;
+    public float pulseSpeed = 3.5f;
+
+    private struct MatOriginalState
+    {
+        public Material mat;
+        public bool hadEmissionKeyword;
+        public Texture originalEmissionMap;
+    }
+
     private GameObject currentTarget;
-    private readonly List<GameObject> activeOutlineObjects = new List<GameObject>();
-    private readonly List<Renderer> glowingRenderers = new List<Renderer>();
+    private readonly List<Renderer> activeRenderers = new List<Renderer>();
+    private readonly List<MatOriginalState> modifiedMaterials = new List<MatOriginalState>();
     private MaterialPropertyBlock propBlock;
     private readonly int emissionColorId = Shader.PropertyToID("_EmissionColor");
+    private readonly int emissionMapId = Shader.PropertyToID("_EmissionMap");
+    private Color currentTargetColor;
 
     private void Awake()
     {
-        InitMaterial();
+        propBlock = new MaterialPropertyBlock();
     }
 
-    private void OnValidate()
+    private void Update()
     {
-        UpdateMaterialProperties();
-    }
+        if (currentTarget == null || activeRenderers.Count == 0) return;
 
-    private void InitMaterial()
-    {
-        if (customHighlightMaterial != null)
+        if (enablePulse)
         {
-            runtimeHighlightMaterial = new Material(customHighlightMaterial);
-        }
-        else
-        {
-            Material resMat = Resources.Load<Material>("M_InteractableHighlight");
-            if (resMat != null)
+            float pulse = 0.85f + 0.15f * Mathf.Sin(Time.time * pulseSpeed);
+            Color finalColor = currentTargetColor * (baseGlowIntensity * pulse);
+
+            foreach (var r in activeRenderers)
             {
-                runtimeHighlightMaterial = new Material(resMat);
+                if (r == null) continue;
+                r.GetPropertyBlock(propBlock);
+                propBlock.SetColor(emissionColorId, finalColor);
+                r.SetPropertyBlock(propBlock);
             }
-            else
-            {
-                Shader outlineShader = Shader.Find("Heist/InteractableOutline");
-                if (outlineShader == null)
-                {
-                    outlineShader = Shader.Find("Heist/InteractablePinkGlow");
-                }
-                if (outlineShader == null)
-                {
-                    outlineShader = Shader.Find("Universal Render Pipeline/Unlit");
-                }
-
-                if (outlineShader != null)
-                {
-                    runtimeHighlightMaterial = new Material(outlineShader);
-                }
-            }
-        }
-
-        UpdateMaterialProperties();
-    }
-
-    public void UpdateMaterialProperties()
-    {
-        if (runtimeHighlightMaterial != null)
-        {
-            runtimeHighlightMaterial.SetColor("_OutlineColor", outlineColor);
-            runtimeHighlightMaterial.SetFloat("_OutlineWidth", outlineWidth);
-            runtimeHighlightMaterial.SetColor("_HighlightColor", outlineColor);
-            runtimeHighlightMaterial.SetColor("_GlowColor", outlineColor);
         }
     }
 
@@ -84,78 +65,108 @@ public class InteractableHighlighter : MonoBehaviour
         if (target == null) return;
 
         currentTarget = target;
-
-        if (runtimeHighlightMaterial == null)
-        {
-            InitMaterial();
-        }
-
-        if (runtimeHighlightMaterial == null) return;
-
         if (propBlock == null) propBlock = new MaterialPropertyBlock();
 
-        MeshFilter[] meshFilters = target.GetComponentsInChildren<MeshFilter>();
-        if (meshFilters != null && meshFilters.Length > 0)
+        // 1. Определяем тип предмета: Лут (зеленый) или Обычный предмет (желтый)
+        bool isLoot = target.GetComponentInParent<LootItem>() != null || 
+                      target.GetComponentInChildren<LootItem>() != null;
+
+        currentTargetColor = isLoot ? lootGlowColor : itemGlowColor;
+
+        // 2. Находим все рендеры (включая SkinnedMeshRenderer и MeshRenderer)
+        Renderer[] renderers = target.GetComponentsInChildren<Renderer>(false);
+        if (renderers == null || renderers.Length == 0)
         {
-            foreach (var mf in meshFilters)
+            renderers = target.GetComponentsInParent<Renderer>();
+        }
+
+        if (renderers == null || renderers.Length == 0) return;
+
+        Color applyColor = currentTargetColor * baseGlowIntensity;
+
+        foreach (var r in renderers)
+        {
+            if (r == null || !r.enabled) continue;
+            // Игнорируем трейлы, партиклы и линии
+            if (r is ParticleSystemRenderer || r is TrailRenderer || r is LineRenderer) continue;
+
+            // Обрабатываем материалы инстанса
+            Material[] mats = r.materials;
+            if (mats != null)
             {
-                if (mf == null || mf.sharedMesh == null) continue;
-                MeshRenderer mr = mf.GetComponent<MeshRenderer>();
-                if (mr == null || !mr.enabled) continue;
+                for (int m = 0; m < mats.Length; m++)
+                {
+                    Material mat = mats[m];
+                    if (mat == null) continue;
 
-                // 1. Create a dedicated outline child object with inverted hull shader
-                GameObject outlineObj = new GameObject("__OutlineVisual");
-                outlineObj.hideFlags = HideFlags.DontSave;
-                outlineObj.transform.SetParent(mf.transform, false);
-                outlineObj.transform.localPosition = Vector3.zero;
-                outlineObj.transform.localRotation = Quaternion.identity;
-                outlineObj.transform.localScale = Vector3.one;
+                    bool hadKeyword = mat.IsKeywordEnabled("_EMISSION");
+                    Texture origMap = mat.HasProperty(emissionMapId) ? mat.GetTexture(emissionMapId) : null;
 
-                MeshFilter outMf = outlineObj.AddComponent<MeshFilter>();
-                outMf.sharedMesh = mf.sharedMesh;
+                    modifiedMaterials.Add(new MatOriginalState
+                    {
+                        mat = mat,
+                        hadEmissionKeyword = hadKeyword,
+                        originalEmissionMap = origMap
+                    });
 
-                MeshRenderer outMr = outlineObj.AddComponent<MeshRenderer>();
-                outMr.sharedMaterial = runtimeHighlightMaterial;
-                outMr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                outMr.receiveShadows = false;
+                    if (!hadKeyword)
+                    {
+                        mat.EnableKeyword("_EMISSION");
+                    }
 
-                activeOutlineObjects.Add(outlineObj);
-
-                // 2. Add subtle surface emission glow to the item
-                mr.GetPropertyBlock(propBlock);
-                propBlock.SetColor(emissionColorId, outlineColor * 0.35f);
-                mr.SetPropertyBlock(propBlock);
-                glowingRenderers.Add(mr);
+                    // Если у материала есть запеченная черная карта эмиссии (как у динамита, молота или части Томпсона),
+                    // временно подменяем её на whiteTexture, чтобы весь предмет светился равномерно
+                    if (origMap != null && origMap != Texture2D.whiteTexture)
+                    {
+                        mat.SetTexture(emissionMapId, Texture2D.whiteTexture);
+                    }
+                }
             }
+
+            // Устанавливаем эмиссию через MaterialPropertyBlock
+            r.GetPropertyBlock(propBlock);
+            propBlock.SetColor(emissionColorId, applyColor);
+            propBlock.SetTexture(emissionMapId, Texture2D.whiteTexture);
+            r.SetPropertyBlock(propBlock);
+
+            activeRenderers.Add(r);
         }
     }
 
     public void ClearHighlight()
     {
-        if (activeOutlineObjects.Count > 0)
-        {
-            foreach (var obj in activeOutlineObjects)
-            {
-                if (obj != null)
-                {
-                    Destroy(obj);
-                }
-            }
-            activeOutlineObjects.Clear();
-        }
-
-        if (glowingRenderers.Count > 0)
+        if (activeRenderers.Count > 0)
         {
             if (propBlock == null) propBlock = new MaterialPropertyBlock();
             propBlock.Clear();
-            foreach (var r in glowingRenderers)
+
+            foreach (var r in activeRenderers)
             {
                 if (r != null)
                 {
                     r.SetPropertyBlock(null);
                 }
             }
-            glowingRenderers.Clear();
+            activeRenderers.Clear();
+        }
+
+        if (modifiedMaterials.Count > 0)
+        {
+            foreach (var state in modifiedMaterials)
+            {
+                if (state.mat != null)
+                {
+                    if (!state.hadEmissionKeyword)
+                    {
+                        state.mat.DisableKeyword("_EMISSION");
+                    }
+                    if (state.originalEmissionMap != null)
+                    {
+                        state.mat.SetTexture(emissionMapId, state.originalEmissionMap);
+                    }
+                }
+            }
+            modifiedMaterials.Clear();
         }
 
         currentTarget = null;
@@ -169,9 +180,5 @@ public class InteractableHighlighter : MonoBehaviour
     private void OnDestroy()
     {
         ClearHighlight();
-        if (runtimeHighlightMaterial != null)
-        {
-            Destroy(runtimeHighlightMaterial);
-        }
     }
 }

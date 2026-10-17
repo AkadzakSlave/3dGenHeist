@@ -12741,7 +12741,7 @@ MonoBehaviour:
   m_SpriteState:
     m_HighlightedSprite: {fileID: 21300000, guid: b8fb8203b07a6014eabf206f30b366a7, type: 3}
     m_PressedSprite: {fileID: 21300000, guid: b8fb8203b07a6014eabf206f30b366a7, type: 3}
-    m_SelectedSprite: {fileID: 21300000, guid: 12998c7b830bccc46872a78854e7c219, type: 3}
+    m_SelectedSprite: {fileID: 0}
     m_DisabledSprite: {fileID: 21300000, guid: 8b504fa0c569a964bb9a8c57f9491eb8, type: 3}
   m_AnimationTriggers:
     m_NormalTrigger: Normal
@@ -16566,18 +16566,41 @@ MonoBehaviour:
     ${0} ({1} \u0448\u0442.)"
   staminaFormat: 'Stamina: {0}/{1}'
   healthFormat: 'HP: {0}/{1}'
+  debugHudRoot: {fileID: 0}
+  releaseHudRoot: {fileID: 0}
+  isDebugHudActive: 0
+  drumAnchoredPosition: {x: 165, y: 165}
+  drumSize: 280
+  chamberRadius: 55
+  chamberSize: 65
+  drumSprite: {fileID: 0}
+  drumRoot: {fileID: 0}
+  hpLiquidImage: {fileID: 0}
+  hpBgImage: {fileID: 0}
+  hpText: {fileID: 0}
+  staminaLiquidImage: {fileID: 0}
+  staminaBgImage: {fileID: 0}
+  releaseTimerText: {fileID: 0}
+  hotbarHeaderArea: {fileID: 0}
+  interactionBadge: {fileID: 0}
+  releaseInteractionText: {fileID: 0}
+  ammoUsageBadge: {fileID: 0}
+  releaseAmmoUsageText: {fileID: 0}
   hotbarRoot: {fileID: 0}
   hotbarSlots:
   - slotRoot: {fileID: 0}
     borderHighlight: {fileID: 0}
+    borderOutline: {fileID: 0}
     iconImage: {fileID: 0}
     keyNumberText: {fileID: 0}
   - slotRoot: {fileID: 0}
     borderHighlight: {fileID: 0}
+    borderOutline: {fileID: 0}
     iconImage: {fileID: 0}
     keyNumberText: {fileID: 0}
   - slotRoot: {fileID: 0}
     borderHighlight: {fileID: 0}
+    borderOutline: {fileID: 0}
     iconImage: {fileID: 0}
     keyNumberText: {fileID: 0}
   activeSlotColor: {r: 1, g: 0.85, b: 0.2, a: 1}
@@ -17370,6 +17393,14 @@ PrefabInstance:
       propertyPath: animator
       value: 
       objectReference: {fileID: 2699799679120535944}
+    - target: {fileID: 2938950609509887378, guid: 31e6ef9c278db9440acb80bb41d5c832, type: 3}
+      propertyPath: maxStamina
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: 2938950609509887378, guid: 31e6ef9c278db9440acb80bb41d5c832, type: 3}
+      propertyPath: staminaDrainRate
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 3290020262968882062, guid: 31e6ef9c278db9440acb80bb41d5c832, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.036
@@ -17381,6 +17412,14 @@ PrefabInstance:
     - target: {fileID: 3868173290157627756, guid: 31e6ef9c278db9440acb80bb41d5c832, type: 3}
       propertyPath: m_CastShadows
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4180986155629760432, guid: 31e6ef9c278db9440acb80bb41d5c832, type: 3}
+      propertyPath: maxHealth
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 4180986155629760432, guid: 31e6ef9c278db9440acb80bb41d5c832, type: 3}
+      propertyPath: currentHealth
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 4840210628521289663, guid: 31e6ef9c278db9440acb80bb41d5c832, type: 3}
       propertyPath: m_IsActive

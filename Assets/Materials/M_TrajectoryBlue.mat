@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: M_TrajectoryBlue
-  m_Shader: {fileID: 4800000, guid: 650dde9cbd49683409df038908129029, type: 3}
+  m_Shader: {fileID: 4800000, guid: b1a89c3745814e59892b11ea7a6df520, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
@@ -16,7 +16,7 @@ Material:
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 3000
+  m_CustomRenderQueue: 3200
   stringTagMap:
     RenderType: Transparent
   disabledShaderPasses: []
@@ -25,9 +25,6 @@ Material:
     serializedVersion: 3
     m_TexEnvs: []
     m_Ints: []
-    m_Floats:
-    - _Surface: 1
-    - _Blend: 0
+    m_Floats: []
     m_Colors:
-    - _BaseColor: {r: 0.2, g: 0.75, b: 1, a: 0.9}
-    - _Color: {r: 0.2, g: 0.75, b: 1, a: 0.9}
+    - _Color: {r: 0, g: 0.85, b: 1, a: 0.95}

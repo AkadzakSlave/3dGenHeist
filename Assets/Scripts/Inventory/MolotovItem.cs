@@ -35,13 +35,26 @@ public class MolotovItem : EquipableItem
     {
         if (blueLineMaterial != null) return;
 
-        Shader unlitShader = Shader.Find("Universal Render Pipeline/Unlit");
-        if (unlitShader == null) unlitShader = Shader.Find("Unlit/Color");
-
-        if (unlitShader != null)
+        Material loadedMat = Resources.Load<Material>("M_TrajectoryBlue");
+        if (loadedMat != null)
         {
-            blueLineMaterial = new Material(unlitShader);
-            Color blueColor = new Color(0.2f, 0.75f, 1.0f, 0.92f);
+            blueLineMaterial = new Material(loadedMat);
+        }
+        else
+        {
+            Shader unlitShader = Shader.Find("Heist/FortniteTrajectory");
+            if (unlitShader == null) unlitShader = Shader.Find("Universal Render Pipeline/Unlit");
+            if (unlitShader == null) unlitShader = Shader.Find("Unlit/Color");
+
+            if (unlitShader != null)
+            {
+                blueLineMaterial = new Material(unlitShader);
+            }
+        }
+
+        if (blueLineMaterial != null)
+        {
+            Color blueColor = new Color(0.0f, 0.85f, 1.0f, 0.95f);
             if (blueLineMaterial.HasProperty("_BaseColor")) blueLineMaterial.SetColor("_BaseColor", blueColor);
             if (blueLineMaterial.HasProperty("_Color")) blueLineMaterial.SetColor("_Color", blueColor);
         }
@@ -55,8 +68,8 @@ public class MolotovItem : EquipableItem
             trajectoryLineRenderer.startWidth = 0.045f;
             trajectoryLineRenderer.endWidth = 0.035f;
             trajectoryLineRenderer.widthMultiplier = 1.0f;
-            trajectoryLineRenderer.startColor = new Color(0.2f, 0.75f, 1.0f, 0.95f);
-            trajectoryLineRenderer.endColor = new Color(0.15f, 0.55f, 1.0f, 0.85f);
+            trajectoryLineRenderer.startColor = new Color(0.0f, 0.85f, 1.0f, 0.95f);
+            trajectoryLineRenderer.endColor = new Color(0.0f, 0.65f, 1.0f, 0.85f);
             trajectoryLineRenderer.numCornerVertices = 4;
             trajectoryLineRenderer.numCapVertices = 4;
             trajectoryLineRenderer.alignment = LineAlignment.View;
@@ -79,8 +92,8 @@ public class MolotovItem : EquipableItem
         landingCircleRenderer.loop = true;
         landingCircleRenderer.startWidth = 0.055f;
         landingCircleRenderer.endWidth = 0.055f;
-        landingCircleRenderer.startColor = new Color(0.2f, 0.8f, 1.0f, 0.95f);
-        landingCircleRenderer.endColor = new Color(0.15f, 0.55f, 1.0f, 0.95f);
+        landingCircleRenderer.startColor = new Color(0.0f, 0.85f, 1.0f, 0.95f);
+        landingCircleRenderer.endColor = new Color(0.0f, 0.85f, 1.0f, 0.95f);
 
         if (blueLineMaterial != null)
         {
@@ -160,8 +173,8 @@ public class MolotovItem : EquipableItem
             trajectoryLineRenderer.startWidth = 0.045f;
             trajectoryLineRenderer.endWidth = 0.035f;
             trajectoryLineRenderer.widthMultiplier = 1.0f;
-            trajectoryLineRenderer.startColor = new Color(0.2f, 0.75f, 1.0f, 0.95f);
-            trajectoryLineRenderer.endColor = new Color(0.15f, 0.55f, 1.0f, 0.85f);
+            trajectoryLineRenderer.startColor = new Color(0.0f, 0.85f, 1.0f, 0.95f);
+            trajectoryLineRenderer.endColor = new Color(0.0f, 0.65f, 1.0f, 0.85f);
             trajectoryLineRenderer.numCornerVertices = 4;
             trajectoryLineRenderer.numCapVertices = 4;
             trajectoryLineRenderer.alignment = LineAlignment.View;
