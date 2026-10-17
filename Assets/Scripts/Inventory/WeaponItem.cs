@@ -32,6 +32,22 @@ public class WeaponItem : EquipableItem
     [Header("Audio (FMOD)")]
     public EventReference fireEvent;
     public EventReference reloadEvent;
+    public EventReference dryFireEvent;
+    public EventReference inspectEvent;
+
+    public enum FMODWeaponType
+    {
+        Revolver = 0,
+        Pistol = 1,
+        Shotgun_Lever = 2,
+        Shotgun_Double = 3,
+        SMG = 4,
+        Rifle = 5
+    }
+
+    [Header("FMOD Weapon Audio & Profile")]
+    public FMODWeaponType weaponProfile = FMODWeaponType.Revolver;
+    public bool autoDetectProfile = true;
 
     [Header("Input")]
     public InputReader inputReader;
@@ -47,6 +63,31 @@ public class WeaponItem : EquipableItem
         if (animator == null)
         {
             animator = GetComponentInParent<Animator>();
+        }
+
+        if (autoDetectProfile)
+        {
+            string idName = (itemData != null ? itemData.itemName : name).ToLower();
+            if (idName.Contains("colt"))
+            {
+                weaponProfile = FMODWeaponType.Pistol;
+            }
+            else if (idName.Contains("win") || idName.Contains("1887"))
+            {
+                weaponProfile = FMODWeaponType.Shotgun_Lever;
+            }
+            else if (idName.Contains("steven"))
+            {
+                weaponProfile = FMODWeaponType.Shotgun_Double;
+            }
+            else if (idName.Contains("tompson") || idName.Contains("thompson") || isAutomatic)
+            {
+                weaponProfile = FMODWeaponType.SMG;
+            }
+            else
+            {
+                weaponProfile = FMODWeaponType.Revolver;
+            }
         }
     }
 
@@ -76,6 +117,14 @@ public class WeaponItem : EquipableItem
         if (isReloading && Time.time >= reloadFinishTime)
         {
             FinishReload();
+        }
+
+        if (!isReloading && Keyboard.current != null)
+        {
+            if (Keyboard.current.iKey.wasPressedThisFrame || Keyboard.current.hKey.wasPressedThisFrame)
+            {
+                InspectWeapon();
+            }
         }
     }
 
@@ -168,12 +217,59 @@ public class WeaponItem : EquipableItem
 
         if (!infiniteAmmo && ammoInMagazine <= 0)
         {
-            StartReload();
+            PlayDryFire();
+            if (reserveAmmo > 0)
+            {
+                StartReload();
+            }
             return;
         }
 
         Fire();
         nextFireTime = Time.time + fireRate;
+    }
+
+    private void PlayDryFire()
+    {
+        Vector3 pos = muzzlePoint != null ? muzzlePoint.position : transform.position;
+        try
+        {
+            FMOD.Studio.EventInstance dryInst = !dryFireEvent.IsNull 
+                ? RuntimeManager.CreateInstance(dryFireEvent) 
+                : RuntimeManager.CreateInstance("event:/Weapons/Weapon_DryFire");
+            dryInst.setParameterByName("WeaponType", (float)weaponProfile);
+            dryInst.set3DAttributes(RuntimeUtils.To3DAttributes(pos));
+            dryInst.start();
+            dryInst.release();
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning($"[Weapon] PlayDryFire fallback error: {ex.Message}");
+        }
+        nextFireTime = Time.time + 0.25f;
+    }
+
+    public void InspectWeapon()
+    {
+        if (animator != null)
+        {
+            animator.SetTrigger("Inspect");
+        }
+
+        try
+        {
+            FMOD.Studio.EventInstance inspectInst = !inspectEvent.IsNull 
+                ? RuntimeManager.CreateInstance(inspectEvent) 
+                : RuntimeManager.CreateInstance("event:/Weapons/Weapon_Inspect");
+            inspectInst.setParameterByName("WeaponType", (float)weaponProfile);
+            inspectInst.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
+            inspectInst.start();
+            inspectInst.release();
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning($"[Weapon] Inspect fallback error: {ex.Message}");
+        }
     }
 
     private void Fire()
@@ -183,9 +279,20 @@ public class WeaponItem : EquipableItem
             ammoInMagazine--;
         }
 
-        if (!fireEvent.IsNull)
+        Vector3 soundPos = muzzlePoint != null ? muzzlePoint.position : transform.position;
+        try
         {
-            RuntimeManager.PlayOneShot(fireEvent, muzzlePoint != null ? muzzlePoint.position : transform.position);
+            FMOD.Studio.EventInstance fireInst = !fireEvent.IsNull 
+                ? RuntimeManager.CreateInstance(fireEvent) 
+                : RuntimeManager.CreateInstance("event:/Weapons/Weapon_Fire");
+            fireInst.setParameterByName("WeaponType", (float)weaponProfile);
+            fireInst.set3DAttributes(RuntimeUtils.To3DAttributes(soundPos));
+            fireInst.start();
+            fireInst.release();
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning($"[Weapon] Fire sound error: {ex.Message}");
         }
 
         if (muzzleFlash != null)
@@ -227,6 +334,8 @@ public class WeaponItem : EquipableItem
 
             if (Physics.Raycast(rayOrigin, shootDir, out RaycastHit hit, rayRange, hitLayers, QueryTriggerInteraction.Ignore))
             {
+                PlayBulletImpact(hit);
+
                 EnemyHealth enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>();
                 if (enemyHealth != null)
                 {
@@ -244,6 +353,56 @@ public class WeaponItem : EquipableItem
         }
     }
 
+    private void PlayBulletImpact(RaycastHit hit)
+    {
+        try
+        {
+            FMOD.Studio.EventInstance impactInst = RuntimeManager.CreateInstance("event:/Weapons/Bullet_Impact");
+            float surfaceType = 0f; // 0: Concrete, 1: Wood, 2: Metal, 3: Flesh
+
+            // 1. Проверяем врагов
+            if (hit.collider.GetComponentInParent<EnemyHealth>() != null)
+            {
+                surfaceType = 3f; // Flesh
+            }
+            else
+            {
+                // 2. Проверяем явный компонент SurfaceIdentifier
+                SurfaceIdentifier surf = hit.collider.GetComponentInParent<SurfaceIdentifier>();
+                if (surf != null)
+                {
+                    surfaceType = (float)surf.surfaceType;
+                }
+                else
+                {
+                    // 3. Проверяем PhysicMaterial, если назначен на коллайдере
+                    string matName = hit.collider.sharedMaterial != null ? hit.collider.sharedMaterial.name.ToLower() : "";
+                    string cName = hit.collider.name.ToLower();
+                    string parentName = hit.collider.transform.parent != null ? hit.collider.transform.parent.name.ToLower() : "";
+
+                    if (matName.Contains("wood") || cName.Contains("wood") || cName.Contains("table") || cName.Contains("door") || parentName.Contains("door") || parentName.Contains("table"))
+                    {
+                        surfaceType = 1f; // Wood
+                    }
+                    else if (matName.Contains("metal") || matName.Contains("iron") || cName.Contains("iron") || cName.Contains("safe") || cName.Contains("metal") || cName.Contains("steel") || parentName.Contains("safe") || parentName.Contains("metal"))
+                    {
+                        surfaceType = 2f; // Metal
+                    }
+                    else if (matName.Contains("flesh") || cName.Contains("body") || cName.Contains("enemy"))
+                    {
+                        surfaceType = 3f; // Flesh
+                    }
+                }
+            }
+
+            impactInst.setParameterByName("SurfaceType", surfaceType);
+            impactInst.set3DAttributes(RuntimeUtils.To3DAttributes(hit.point));
+            impactInst.start();
+            impactInst.release();
+        }
+        catch { }
+    }
+
     private void StartReload()
     {
         if (isReloading || infiniteAmmo || ammoInMagazine >= magazineSize || reserveAmmo <= 0)
@@ -254,9 +413,20 @@ public class WeaponItem : EquipableItem
         isReloading = true;
         reloadFinishTime = Time.time + reloadTime;
 
-        if (!reloadEvent.IsNull)
+        try
         {
-            RuntimeManager.PlayOneShot(reloadEvent, transform.position);
+            FMOD.Studio.EventInstance reloadInst = !reloadEvent.IsNull 
+                ? RuntimeManager.CreateInstance(reloadEvent) 
+                : RuntimeManager.CreateInstance("event:/Weapons/Weapon_Reload");
+            reloadInst.setParameterByName("WeaponType", (float)weaponProfile);
+            reloadInst.setParameterByName("ReloadPhase", 0f);
+            reloadInst.set3DAttributes(RuntimeUtils.To3DAttributes(transform.position));
+            reloadInst.start();
+            reloadInst.release();
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning($"[Weapon] Reload sound error: {ex.Message}");
         }
 
         if (animator != null)

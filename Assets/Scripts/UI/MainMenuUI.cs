@@ -40,9 +40,25 @@ public class MainMenuUI : MonoBehaviour
         if (settingsCloseButton != null) settingsCloseButton.onClick.AddListener(OnSettingsCloseButtonClicked);
         if (quitButton != null) quitButton.onClick.AddListener(OnQuitButtonClicked);
 
-        if (settingsPanel != null) settingsPanel.SetActive(false);
-
+        EnsureButtonDeselection();
         ShowMainMenu();
+    }
+
+    private void EnsureButtonDeselection()
+    {
+        Selectable[] selectables = GetComponentsInChildren<Selectable>(true);
+        foreach (var s in selectables)
+        {
+            if (s == null) continue;
+            Navigation nav = s.navigation;
+            nav.mode = Navigation.Mode.None;
+            s.navigation = nav;
+
+            if (s.GetComponent<ButtonAutoDeselect>() == null)
+            {
+                s.gameObject.AddComponent<ButtonAutoDeselect>();
+            }
+        }
     }
 
     private void Update()

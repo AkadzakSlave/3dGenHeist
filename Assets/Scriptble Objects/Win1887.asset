@@ -19,4 +19,4 @@ MonoBehaviour:
   baseWeight: 5
   dropPrefab: {fileID: 5288192269135368583, guid: 444b0851ab5f82c4e9be3c05d0bccff3, type: 3}
   dropPositionOffset: {x: 0, y: 0, z: 0}
-  dropRotationOffset: {x: 0, y: 0, z: 0}
+  dropRotationOffset: {x: 0, y: 90, z: 0}

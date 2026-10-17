@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
+[ExecuteAlways]
 public class HeistUI : MonoBehaviour
 {
     [Header("Old Debug HUD References")]
@@ -28,12 +29,13 @@ public class HeistUI : MonoBehaviour
     public Image reticleRing;
     public Color reticleIdleColor = new Color(1f, 1f, 1f, 0.75f);
     public Color reticleFocusColor = new Color(0.35f, 0.9f, 1f, 1f);
-    public float reticleIdleSize = 5f;
-    public float reticleFocusSize = 8.5f;
+    public float reticleIdleSize = 4f;
+    public float reticleFocusSize = 4.5f;
+    public float reticleRingSize = 26f;
     public float reticleSmoothSpeed = 16f;
 
     private bool isReticleFocused = false;
-    private float currentReticleSize = 5f;
+    private float currentReticleSize = 4f;
     private Color currentReticleColor = new Color(1f, 1f, 1f, 0.75f);
 
     [Header("UI Localization/Text")]
@@ -54,13 +56,28 @@ public class HeistUI : MonoBehaviour
     public bool isDebugHudActive = false;
 
     [Header("Revolver Drum Transform (Inspector Adjustable)")]
-    public Vector2 drumAnchoredPosition = new Vector2(165f, 165f);
+    [Tooltip("Позиция барабана от левого нижнего угла")]
+    public Vector2 drumAnchoredPosition = new Vector2(235f, 235f);
     [Tooltip("Общий размер барабана в пикселях холста (увеличьте для большего размера)")]
-    public float drumSize = 280f;
+    public float drumSize = 440f;
     [Tooltip("Расстояние от центра барабана до центра камор")]
-    public float chamberRadius = 55f;
+    public float chamberRadius = 90f;
     [Tooltip("Диаметр каморы барабана")]
-    public float chamberSize = 65f;
+    public float chamberSize = 106f;
+
+    [Header("Chamber Liquid Physics (Water / Honey Feel)")]
+    [Tooltip("Вязкость жидкости (выше = как густой мёд/желе, ниже = как подвижная вода)")]
+    [Range(2f, 25f)]
+    public float liquidViscosity = 7.5f;
+    [Tooltip("Упругость возврата мениска жидкости к горизонту")]
+    [Range(10f, 120f)]
+    public float liquidStiffness = 52f;
+    [Tooltip("Чувствительность наклона жидкости при повороте камеры/головы")]
+    [Range(0.2f, 5f)]
+    public float liquidLookSensitivity = 1.6f;
+    [Tooltip("Сила искажения/колебаний при спринте, прыжках и уроне")]
+    [Range(0.2f, 4f)]
+    public float liquidWobbleSensitivity = 1.3f;
 
     [Header("Revolver Drum HUD (Release)")]
     public Sprite drumSprite;
@@ -71,6 +88,18 @@ public class HeistUI : MonoBehaviour
     public Image staminaLiquidImage;
     public Image staminaBgImage;
     public TextMeshProUGUI releaseTimerText;
+
+    [Header("Hotbar Badges Transform (Inspector Adjustable)")]
+    [Tooltip("Позиция области подсказок относительно верха панели хотбара")]
+    public Vector2 hotbarHeaderPosition = new Vector2(0f, 12f);
+    [Tooltip("Размер бейджа подсказки взаимодействия ([E] Взять...)")]
+    public Vector2 interactionBadgeSize = new Vector2(380f, 36f);
+    public float interactionFontSize = 15f;
+    [Tooltip("Размер бейджа патронов / подсказки оружия")]
+    public Vector2 ammoBadgeSize = new Vector2(280f, 32f);
+    public float ammoFontSize = 14.5f;
+    [Tooltip("Расстояние между бейджами взаимодействия и патронов")]
+    public float badgesSpacing = 6f;
 
     [Header("Above Hotbar Badges (Release HUD)")]
     public GameObject hotbarHeaderArea;
@@ -95,11 +124,6 @@ public class HeistUI : MonoBehaviour
     public Color activeSlotColor = new Color(1.0f, 0.843f, 0.0f, 1f); // Золотой
     public Color inactiveSlotColor = new Color(0.22f, 0.23f, 0.27f, 0.75f);
 
-    [Header("Placeholders (Future)")]
-    public GameObject healthBarPlaceholder;
-    public GameObject inventoryPlaceholder;
-    public GameObject universalSlotPlaceholder;
-
     [Header("Transitions")]
     public GameObject loadingScreenPanel;
 
@@ -107,6 +131,22 @@ public class HeistUI : MonoBehaviour
     private int lastTimerSecond = -1;
     private int lastStaminaInt = -1;
     private Sprite cachedCircleSprite;
+
+    private float targetHpRatio = 1f;
+    private float currentHpRatio = 1f;
+    private float targetStaminaRatio = 1f;
+    private float currentStaminaRatio = 1f;
+    private float hpDamageFlashTimer = 0f;
+    private int lastHealthValue = 100;
+
+    // Физика жидкости (Spring-mass damped oscillator для наклона и искажения камор)
+    private float currentSloshAngle = 0f;
+    private float sloshVelocity = 0f;
+    private float currentWobble = 0f;
+    private float wobbleVelocity = 0f;
+    private float lastCamYaw = 0f;
+    private float lastCamPitch = 0f;
+    private bool wasPlayerGrounded = true;
 
     private void Awake()
     {
@@ -123,7 +163,6 @@ public class HeistUI : MonoBehaviour
             }
         }
 
-        // Автоматически находим старый PlayerInterfaceUi, если debugHudRoot не задан в инспекторе
         if (debugHudRoot == null)
         {
             Transform oldUi = transform.Find("PlayerInterfaceUi");
@@ -135,10 +174,21 @@ public class HeistUI : MonoBehaviour
 
         EnsureReticleCreated();
         EnsureReleaseHudCreated();
+        ApplyDrumLayout();
+        ApplyHotbarHeaderLayout();
     }
 
     private void Start()
     {
+        if (!Application.isPlaying)
+        {
+            EnsureReleaseHudCreated();
+            ApplyDrumLayout();
+            ApplyHotbarHeaderLayout();
+            SetupEditorPreview();
+            return;
+        }
+
         UpdateUI();
         UpdateMissionInfo();
 
@@ -170,9 +220,99 @@ public class HeistUI : MonoBehaviour
         }
     }
 
+    private void OnEnable()
+    {
+        EnsureReleaseHudCreated();
+        ApplyDrumLayout();
+        ApplyHotbarHeaderLayout();
+
+        if (!Application.isPlaying)
+        {
+            SetupEditorPreview();
+        }
+    }
+
     private void OnValidate()
     {
+        EnsureReleaseHudCreated();
         ApplyDrumLayout();
+        ApplyHotbarHeaderLayout();
+
+        if (!Application.isPlaying)
+        {
+            SetupEditorPreview();
+        }
+    }
+
+    [ContextMenu("Rebuild / Refresh Release HUD")]
+    public void ContextMenuRebuildReleaseHud()
+    {
+        EnsureReleaseHudCreated();
+        ApplyDrumLayout();
+        ApplyHotbarHeaderLayout();
+        SetupEditorPreview();
+    }
+
+    private void SetupEditorPreview()
+    {
+        if (Application.isPlaying) return;
+
+        if (releaseHudRoot != null)
+        {
+            releaseHudRoot.SetActive(!isDebugHudActive);
+        }
+
+        if (debugHudRoot != null)
+        {
+            debugHudRoot.SetActive(isDebugHudActive);
+        }
+
+        // Заполняем приятные превью-данные для визуальной настройки в редакторе
+        if (hpLiquidImage != null && hpLiquidImage.fillAmount == 0f)
+        {
+            hpLiquidImage.fillAmount = 1.0f;
+        }
+        if (hpText != null && (string.IsNullOrEmpty(hpText.text) || hpText.text == "100"))
+        {
+            hpText.text = "100";
+        }
+        if (staminaLiquidImage != null && staminaLiquidImage.fillAmount == 0f)
+        {
+            staminaLiquidImage.fillAmount = 0.85f;
+        }
+        if (releaseInteractionText != null && string.IsNullOrEmpty(releaseInteractionText.text))
+        {
+            releaseInteractionText.text = "[E] Подобрать Револьвер";
+        }
+        if (interactionBadge != null)
+        {
+            interactionBadge.SetActive(true);
+        }
+        if (releaseAmmoUsageText != null && string.IsNullOrEmpty(releaseAmmoUsageText.text))
+        {
+            releaseAmmoUsageText.text = "6 / 24";
+        }
+        if (ammoUsageBadge != null)
+        {
+            ammoUsageBadge.SetActive(true);
+        }
+
+        currentSloshAngle = 0f;
+        sloshVelocity = 0f;
+        currentWobble = 0f;
+        wobbleVelocity = 0f;
+        if (hpLiquidImage != null)
+        {
+            hpLiquidImage.rectTransform.localRotation = Quaternion.identity;
+            hpLiquidImage.rectTransform.localScale = Vector3.one;
+        }
+        if (staminaLiquidImage != null)
+        {
+            staminaLiquidImage.rectTransform.localRotation = Quaternion.identity;
+            staminaLiquidImage.rectTransform.localScale = Vector3.one;
+        }
+
+        UpdateHotbar();
     }
 
     private void OnDestroy()
@@ -196,6 +336,11 @@ public class HeistUI : MonoBehaviour
 
     private void Update()
     {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+
         // Переключение интерфейса по F3 (Исключительно через New Input System без вызова устаревшего UnityEngine.Input)
         bool f3Pressed = false;
         if (UnityEngine.InputSystem.Keyboard.current != null)
@@ -234,6 +379,9 @@ public class HeistUI : MonoBehaviour
         }
 
         UpdateReticle();
+
+        // Физическая симуляция камор (Вода / Вязкий мёд с реакцией на наклоны головы, спринт, прыжки и урон)
+        UpdateLiquidSimulation(Time.deltaTime);
 
         if (GameManager.Instance == null) return;
 
@@ -293,7 +441,10 @@ public class HeistUI : MonoBehaviour
             releaseHudRoot.SetActive(!debugActive);
         }
 
-        SetFMODOverlay(debugActive);
+        if (Application.isPlaying)
+        {
+            SetFMODOverlay(debugActive);
+        }
     }
 
     public static void SetFMODOverlay(bool enable)
@@ -396,10 +547,16 @@ public class HeistUI : MonoBehaviour
         }
 
         // 2. Новый Release HUD (Левая верхняя камора: Желтая "жидкость", при тратах бледно-желтый фон)
-        if (staminaLiquidImage != null)
+        float newRatio = Mathf.Clamp01(current / Mathf.Max(1f, max));
+        if (newRatio < targetStaminaRatio && Application.isPlaying)
         {
-            float ratio = Mathf.Clamp01(current / Mathf.Max(1f, max));
-            staminaLiquidImage.fillAmount = ratio;
+            wobbleVelocity += 0.05f * liquidWobbleSensitivity;
+        }
+        targetStaminaRatio = newRatio;
+
+        if (!Application.isPlaying && staminaLiquidImage != null)
+        {
+            staminaLiquidImage.fillAmount = targetStaminaRatio;
         }
     }
 
@@ -413,16 +570,143 @@ public class HeistUI : MonoBehaviour
         }
 
         // 2. Новый Release HUD (Верхняя камора: Зеленая "жидкость", при уроне красный фон)
-        if (hpLiquidImage != null)
+        if (current < lastHealthValue && Application.isPlaying)
         {
-            float ratio = Mathf.Clamp01((float)current / Mathf.Max(1, max));
-            hpLiquidImage.fillAmount = ratio;
+            hpDamageFlashTimer = 0.35f;
+            // Гидродинамический удар в камору ХП при получении урона: резкий всплеск и вибрация
+            sloshVelocity += UnityEngine.Random.Range(-38f, 38f) * liquidLookSensitivity;
+            wobbleVelocity += 0.52f * liquidWobbleSensitivity;
+        }
+        lastHealthValue = current;
+
+        targetHpRatio = Mathf.Clamp01((float)current / Mathf.Max(1, max));
+        if (!Application.isPlaying && hpLiquidImage != null)
+        {
+            hpLiquidImage.fillAmount = targetHpRatio;
         }
 
         if (hpText != null)
         {
             hpText.text = current.ToString();
             hpText.color = current <= 25 ? new Color(1f, 0.4f, 0.4f, 1f) : Color.white;
+        }
+    }
+
+    /// <summary>
+    /// Физическая симуляция камор (Вода / Вязкий мёд с реакцией на наклоны головы, спринт, прыжки и урон)
+    /// </summary>
+    private void UpdateLiquidSimulation(float dt)
+    {
+        if (dt <= 0f) return;
+        if (dt > 0.08f) dt = 0.08f; // Защита от резких лагов
+
+        float sloshTorque = 0f;
+        float wobbleForce = 0f;
+
+        // 1. Поворот головы / наклон камеры
+        Transform cam = Camera.main != null ? Camera.main.transform : null;
+        if (cam != null)
+        {
+            float curYaw = cam.eulerAngles.y;
+            float curPitch = cam.eulerAngles.x;
+
+            if (lastCamYaw != 0f || lastCamPitch != 0f)
+            {
+                float yawDelta = Mathf.DeltaAngle(lastCamYaw, curYaw);
+                float pitchDelta = Mathf.DeltaAngle(lastCamPitch, curPitch);
+
+                // Инерция: при повороте вправо поверхность жидкости отклоняется влево
+                sloshTorque += (-yawDelta * liquidLookSensitivity * 4.5f);
+                wobbleForce += (Mathf.Abs(pitchDelta) * liquidWobbleSensitivity * 0.45f);
+            }
+
+            lastCamYaw = curYaw;
+            lastCamPitch = curPitch;
+        }
+
+        // 2. Движение игрока, прыжки, приземление и спринт
+        var pm = PlayerMovement.Instance;
+        if (pm != null)
+        {
+            Vector3 vel = pm.Velocity;
+            Vector3 localVel = pm.transform.InverseTransformDirection(vel);
+            sloshTorque += (-localVel.x * liquidLookSensitivity * 1.6f);
+
+            bool isGrounded = pm.IsGrounded;
+            if (!wasPlayerGrounded && isGrounded)
+            {
+                // Приземление: резкое сжатие жидкости вниз и отскок (как желе/капля в невесомости)
+                wobbleVelocity -= 0.38f * liquidWobbleSensitivity;
+                sloshVelocity += UnityEngine.Random.Range(-14f, 14f) * liquidLookSensitivity;
+            }
+            else if (wasPlayerGrounded && !isGrounded && vel.y > 0.5f)
+            {
+                // Прыжок: подброс жидкости вверх
+                wobbleVelocity += 0.22f * liquidWobbleSensitivity;
+            }
+            wasPlayerGrounded = isGrounded;
+
+            // Спринт: ритмичная раскачка жидкости с каждым шагом
+            if (pm.IsSprinting && pm.IsMoving && isGrounded)
+            {
+                float sprintCadence = Time.time * 13.5f;
+                sloshTorque += Mathf.Sin(sprintCadence) * 16f * liquidWobbleSensitivity;
+                wobbleForce += Mathf.Abs(Mathf.Sin(sprintCadence)) * 4.5f * liquidWobbleSensitivity;
+            }
+            else if (pm.IsMoving && isGrounded)
+            {
+                float walkCadence = Time.time * 8.5f;
+                sloshTorque += Mathf.Sin(walkCadence) * 4.5f * liquidWobbleSensitivity;
+            }
+        }
+
+        // 3. Естественное микро-дыхание покоя (жидкость всегда живая, колышется)
+        float idleWave = Mathf.Sin(Time.time * 2.2f) * 1.5f;
+        float idleWobble = Mathf.Cos(Time.time * 1.7f) * 0.02f;
+
+        // 4. Пружинный маятник наклона жидкости (Slosh)
+        float sloshSpring = -liquidStiffness * (currentSloshAngle - idleWave) - (liquidViscosity * sloshVelocity);
+        sloshVelocity += (sloshSpring + sloshTorque) * dt;
+        currentSloshAngle += sloshVelocity * dt;
+        currentSloshAngle = Mathf.Clamp(currentSloshAngle, -45f, 45f);
+
+        // 5. Пружинный маятник деформации объема (Wobble: вязкое сжатие/растяжение)
+        float wobbleSpring = -liquidStiffness * (currentWobble - idleWobble) - ((liquidViscosity * 1.25f) * wobbleVelocity);
+        wobbleVelocity += (wobbleSpring + wobbleForce) * dt;
+        currentWobble += wobbleVelocity * dt;
+        currentWobble = Mathf.Clamp(currentWobble, -0.25f, 0.25f);
+
+        // 6. Применение физики к каморе HP
+        if (hpLiquidImage != null)
+        {
+            hpLiquidImage.rectTransform.localRotation = Quaternion.Euler(0f, 0f, currentSloshAngle);
+            hpLiquidImage.rectTransform.localScale = new Vector3(1f - currentWobble * 0.55f, 1f + currentWobble, 1f);
+
+            // Вязкое изменение уровня ХП (как густой мёд) с динамической волной поверхности
+            currentHpRatio = Mathf.Lerp(currentHpRatio, targetHpRatio, dt * 7f);
+            hpLiquidImage.fillAmount = Mathf.Clamp01(currentHpRatio + (currentWobble * 0.08f));
+        }
+
+        // 7. Применение физики к каморе Выносливости (более подвижная реакция)
+        if (staminaLiquidImage != null)
+        {
+            float stamSlosh = currentSloshAngle * 1.18f;
+            float stamWobble = currentWobble * 1.25f;
+            staminaLiquidImage.rectTransform.localRotation = Quaternion.Euler(0f, 0f, stamSlosh);
+            staminaLiquidImage.rectTransform.localScale = new Vector3(1f - stamWobble * 0.55f, 1f + stamWobble, 1f);
+
+            currentStaminaRatio = Mathf.Lerp(currentStaminaRatio, targetStaminaRatio, dt * 9f);
+            staminaLiquidImage.fillAmount = Mathf.Clamp01(currentStaminaRatio + (stamWobble * 0.07f));
+        }
+
+        // 8. Вспышка урона по каморе ХП
+        if (hpDamageFlashTimer > 0f)
+        {
+            hpDamageFlashTimer -= dt;
+            if (hpBgImage != null)
+            {
+                hpBgImage.color = Color.Lerp(new Color(0.28f, 0.08f, 0.08f, 0.9f), new Color(0.9f, 0.15f, 0.15f, 1f), hpDamageFlashTimer * 2.8f);
+            }
         }
     }
 
@@ -534,7 +818,11 @@ public class HeistUI : MonoBehaviour
 
     private void UpdateReticle()
     {
-        if (reticleDot == null) return;
+        if (reticleDot == null || reticleRing == null)
+        {
+            EnsureReticleCreated();
+            if (reticleDot == null) return;
+        }
 
         bool isMenuOpen = (MainMenuUI.Instance != null && MainMenuUI.Instance.IsMainMenuActive) ||
                           (PauseMenuUI.Instance != null && PauseMenuUI.Instance.IsPaused);
@@ -552,6 +840,7 @@ public class HeistUI : MonoBehaviour
             }
         }
 
+        // Center dot: remains a crisp, small dot (4px idle -> 4.5px focus)
         float targetSize = isReticleFocused ? reticleFocusSize : reticleIdleSize;
         Color targetColor = isReticleFocused ? reticleFocusColor : reticleIdleColor;
 
@@ -561,63 +850,107 @@ public class HeistUI : MonoBehaviour
         reticleDot.rectTransform.sizeDelta = new Vector2(currentReticleSize, currentReticleSize);
         reticleDot.color = currentReticleColor;
 
+        // Outer focus ring: expands around the dot and fades in when looking at an interactable
         if (reticleRing != null)
         {
-            float ringTargetAlpha = isReticleFocused ? 0.9f : 0f;
-            Color ringC = reticleRing.color;
-            ringC.a = Mathf.Lerp(ringC.a, ringTargetAlpha, Time.deltaTime * reticleSmoothSpeed);
+            if (reticleRing.sprite == null)
+            {
+                reticleRing.sprite = CreateRingSprite(64, 3);
+            }
+
+            reticleRing.rectTransform.sizeDelta = new Vector2(reticleRingSize, reticleRingSize);
+
+            float ringTargetAlpha = isReticleFocused ? 0.95f : 0f;
+            Color ringC = reticleFocusColor;
+            ringC.a = Mathf.Lerp(reticleRing.color.a, ringTargetAlpha, Time.deltaTime * reticleSmoothSpeed);
             reticleRing.color = ringC;
 
-            float ringTargetScale = isReticleFocused ? 1.0f : 0.6f;
+            float ringTargetScale = isReticleFocused ? 1.0f : 0.45f;
             reticleRing.rectTransform.localScale = Vector3.Lerp(reticleRing.rectTransform.localScale, Vector3.one * ringTargetScale, Time.deltaTime * reticleSmoothSpeed);
         }
     }
 
     private void EnsureReticleCreated()
     {
-        if (reticleRoot != null && reticleDot != null) return;
-
-        Transform existing = transform.Find("ReticleRoot");
-        if (existing != null)
+        if (reticleRoot == null)
         {
-            reticleRoot = existing.gameObject;
-            reticleDot = existing.Find("ReticleDot")?.GetComponent<Image>();
-            reticleRing = existing.Find("ReticleRing")?.GetComponent<Image>();
-            if (reticleDot != null) return;
+            Transform existing = transform.Find("ReticleRoot");
+            if (existing != null)
+            {
+                reticleRoot = existing.gameObject;
+            }
+            else
+            {
+                GameObject rRoot = new GameObject("ReticleRoot", typeof(RectTransform));
+                rRoot.transform.SetParent(transform, false);
+                RectTransform rRt = rRoot.GetComponent<RectTransform>();
+                rRt.anchorMin = rRt.anchorMax = rRt.pivot = new Vector2(0.5f, 0.5f);
+                rRt.anchoredPosition = Vector2.zero;
+                rRt.sizeDelta = new Vector2(48f, 48f);
+                reticleRoot = rRoot;
+            }
         }
 
-        GameObject rRoot = new GameObject("ReticleRoot", typeof(RectTransform));
-        rRoot.transform.SetParent(transform, false);
-        RectTransform rRt = rRoot.GetComponent<RectTransform>();
-        rRt.anchorMin = rRt.anchorMax = rRt.pivot = new Vector2(0.5f, 0.5f);
-        rRt.anchoredPosition = Vector2.zero;
-        rRt.sizeDelta = new Vector2(40f, 40f);
-        reticleRoot = rRoot;
+        // Ensure ReticleRing exists
+        if (reticleRing == null && reticleRoot != null)
+        {
+            Transform existingRing = reticleRoot.transform.Find("ReticleRing");
+            if (existingRing != null)
+            {
+                reticleRing = existingRing.GetComponent<Image>();
+            }
+            else
+            {
+                GameObject ringObj = new GameObject("ReticleRing", typeof(RectTransform), typeof(Image));
+                ringObj.transform.SetParent(reticleRoot.transform, false);
+                ringObj.transform.SetAsFirstSibling();
+                RectTransform ringRt = ringObj.GetComponent<RectTransform>();
+                ringRt.anchorMin = ringRt.anchorMax = ringRt.pivot = new Vector2(0.5f, 0.5f);
+                ringRt.anchoredPosition = Vector2.zero;
+                ringRt.sizeDelta = new Vector2(reticleRingSize, reticleRingSize);
+                reticleRing = ringObj.GetComponent<Image>();
+                reticleRing.sprite = CreateRingSprite(64, 3);
+                reticleRing.color = new Color(reticleFocusColor.r, reticleFocusColor.g, reticleFocusColor.b, 0f);
+                reticleRing.raycastTarget = false;
+            }
+        }
 
-        Sprite circleSprite = GetOrCreateCircleSprite();
-        Sprite ringSprite = CreateRingSprite(32, 2);
+        if (reticleRing != null)
+        {
+            if (reticleRing.sprite == null)
+            {
+                reticleRing.sprite = CreateRingSprite(64, 3);
+            }
+            reticleRing.rectTransform.sizeDelta = new Vector2(reticleRingSize, reticleRingSize);
+        }
 
-        GameObject ringObj = new GameObject("ReticleRing", typeof(RectTransform), typeof(Image));
-        ringObj.transform.SetParent(rRoot.transform, false);
-        RectTransform ringRt = ringObj.GetComponent<RectTransform>();
-        ringRt.anchorMin = ringRt.anchorMax = ringRt.pivot = new Vector2(0.5f, 0.5f);
-        ringRt.anchoredPosition = Vector2.zero;
-        ringRt.sizeDelta = new Vector2(10f, 10f);
-        reticleRing = ringObj.GetComponent<Image>();
-        reticleRing.sprite = ringSprite;
-        reticleRing.color = new Color(reticleFocusColor.r, reticleFocusColor.g, reticleFocusColor.b, 0f);
-        reticleRing.raycastTarget = false;
+        // Ensure ReticleDot exists
+        if (reticleDot == null && reticleRoot != null)
+        {
+            Transform existingDot = reticleRoot.transform.Find("ReticleDot");
+            if (existingDot != null)
+            {
+                reticleDot = existingDot.GetComponent<Image>();
+            }
+            else
+            {
+                GameObject dotObj = new GameObject("ReticleDot", typeof(RectTransform), typeof(Image));
+                dotObj.transform.SetParent(reticleRoot.transform, false);
+                RectTransform dotRt = dotObj.GetComponent<RectTransform>();
+                dotRt.anchorMin = dotRt.anchorMax = dotRt.pivot = new Vector2(0.5f, 0.5f);
+                dotRt.anchoredPosition = Vector2.zero;
+                dotRt.sizeDelta = new Vector2(reticleIdleSize, reticleIdleSize);
+                reticleDot = dotObj.GetComponent<Image>();
+                reticleDot.sprite = GetOrCreateCircleSprite();
+                reticleDot.color = reticleIdleColor;
+                reticleDot.raycastTarget = false;
+            }
+        }
 
-        GameObject dotObj = new GameObject("ReticleDot", typeof(RectTransform), typeof(Image));
-        dotObj.transform.SetParent(rRoot.transform, false);
-        RectTransform dotRt = dotObj.GetComponent<RectTransform>();
-        dotRt.anchorMin = dotRt.anchorMax = dotRt.pivot = new Vector2(0.5f, 0.5f);
-        dotRt.anchoredPosition = Vector2.zero;
-        dotRt.sizeDelta = new Vector2(5f, 5f);
-        reticleDot = dotObj.GetComponent<Image>();
-        reticleDot.sprite = circleSprite;
-        reticleDot.color = reticleIdleColor;
-        reticleDot.raycastTarget = false;
+        if (reticleDot != null && reticleDot.sprite == null)
+        {
+            reticleDot.sprite = GetOrCreateCircleSprite();
+        }
     }
 
     private Sprite GetOrCreateCircleSprite()
@@ -770,11 +1103,32 @@ public class HeistUI : MonoBehaviour
             lblLayRt.anchorMax = Vector2.one;
             lblLayRt.sizeDelta = Vector2.zero;
 
-            hpText = CreateChamberText(labelsLayer.transform, "HP_Text", posHp, "100", 14);
+            hpText = CreateChamberText(labelsLayer.transform, "HP_Text", posHp, "100", 22f);
         }
         else
         {
             drumRoot = existingDrum.gameObject;
+            Transform chLayer = drumRoot.transform.Find("ChambersLayer");
+            if (chLayer != null)
+            {
+                Transform hpSock = chLayer.Find("Socket_HP");
+                if (hpSock != null)
+                {
+                    hpBgImage = hpSock.Find("Bg")?.GetComponent<Image>();
+                    hpLiquidImage = hpSock.Find("Liquid")?.GetComponent<Image>();
+                }
+                Transform stamSock = chLayer.Find("Socket_Stamina");
+                if (stamSock != null)
+                {
+                    staminaBgImage = stamSock.Find("Bg")?.GetComponent<Image>();
+                    staminaLiquidImage = stamSock.Find("Liquid")?.GetComponent<Image>();
+                }
+            }
+            Transform lblLayer = drumRoot.transform.Find("LabelsLayer");
+            if (lblLayer != null)
+            {
+                hpText = lblLayer.Find("HP_Text")?.GetComponent<TextMeshProUGUI>();
+            }
             ApplyDrumLayout();
         }
 
@@ -799,8 +1153,8 @@ public class HeistUI : MonoBehaviour
             headerRt.anchorMin = new Vector2(0.5f, 1f);
             headerRt.anchorMax = new Vector2(0.5f, 1f);
             headerRt.pivot = new Vector2(0.5f, 0f);
-            headerRt.anchoredPosition = new Vector2(0f, 8f);
-            headerRt.sizeDelta = new Vector2(340f, 60f);
+            headerRt.anchoredPosition = hotbarHeaderPosition;
+            headerRt.sizeDelta = new Vector2(Mathf.Max(interactionBadgeSize.x, ammoBadgeSize.x), 74f);
             hotbarHeaderArea = headerObj;
 
             // 1. Бейдж подсказки взаимодействия ([E] Подобрать предмет)
@@ -810,13 +1164,12 @@ public class HeistUI : MonoBehaviour
             ibRt.anchorMin = new Vector2(0.5f, 0.5f);
             ibRt.anchorMax = new Vector2(0.5f, 0.5f);
             ibRt.pivot = new Vector2(0.5f, 0.5f);
-            ibRt.anchoredPosition = new Vector2(0f, 18f);
-            ibRt.sizeDelta = new Vector2(320f, 28f);
+            ibRt.sizeDelta = interactionBadgeSize;
 
             Image ibImg = interactBadgeObj.GetComponent<Image>();
-            ibImg.color = new Color(0.08f, 0.09f, 0.12f, 0.9f);
+            ibImg.color = new Color(0.08f, 0.09f, 0.12f, 0.92f);
             Outline ibOutline = interactBadgeObj.GetComponent<Outline>();
-            ibOutline.effectColor = new Color(0.35f, 0.85f, 1f, 0.45f);
+            ibOutline.effectColor = new Color(0.35f, 0.85f, 1f, 0.5f);
             ibOutline.effectDistance = new Vector2(1f, -1f);
             interactionBadge = interactBadgeObj;
 
@@ -829,9 +1182,9 @@ public class HeistUI : MonoBehaviour
 
             releaseInteractionText = ibTextObj.GetComponent<TextMeshProUGUI>();
             releaseInteractionText.alignment = TextAlignmentOptions.Center;
-            releaseInteractionText.fontSize = 13.5f;
+            releaseInteractionText.fontSize = interactionFontSize;
             releaseInteractionText.fontStyle = FontStyles.Bold;
-            releaseInteractionText.color = new Color(0.9f, 0.96f, 1f, 1f);
+            releaseInteractionText.color = new Color(0.92f, 0.97f, 1f, 1f);
             releaseInteractionText.text = "";
             interactionBadge.SetActive(false);
 
@@ -842,13 +1195,12 @@ public class HeistUI : MonoBehaviour
             abRt.anchorMin = new Vector2(0.5f, 0.5f);
             abRt.anchorMax = new Vector2(0.5f, 0.5f);
             abRt.pivot = new Vector2(0.5f, 0.5f);
-            abRt.anchoredPosition = new Vector2(0f, -10f);
-            abRt.sizeDelta = new Vector2(260f, 26f);
+            abRt.sizeDelta = ammoBadgeSize;
 
             Image abImg = ammoBadgeObj.GetComponent<Image>();
-            abImg.color = new Color(0.08f, 0.08f, 0.1f, 0.88f);
+            abImg.color = new Color(0.08f, 0.08f, 0.1f, 0.9f);
             Outline abOutline = ammoBadgeObj.GetComponent<Outline>();
-            abOutline.effectColor = new Color(1.0f, 0.843f, 0f, 0.4f);
+            abOutline.effectColor = new Color(1.0f, 0.843f, 0f, 0.45f);
             abOutline.effectDistance = new Vector2(1f, -1f);
             ammoUsageBadge = ammoBadgeObj;
 
@@ -861,7 +1213,7 @@ public class HeistUI : MonoBehaviour
 
             releaseAmmoUsageText = abTextObj.GetComponent<TextMeshProUGUI>();
             releaseAmmoUsageText.alignment = TextAlignmentOptions.Center;
-            releaseAmmoUsageText.fontSize = 13f;
+            releaseAmmoUsageText.fontSize = ammoFontSize;
             releaseAmmoUsageText.fontStyle = FontStyles.Bold;
             releaseAmmoUsageText.color = Color.white;
             releaseAmmoUsageText.text = "";
@@ -921,6 +1273,27 @@ public class HeistUI : MonoBehaviour
                 keyTmp.color = Color.white;
                 hotbarSlots[i].keyNumberText = keyTmp;
             }
+
+            ApplyHotbarHeaderLayout();
+        }
+        else
+        {
+            hotbarRoot = existingHb.gameObject;
+            hotbarHeaderArea = existingHb.Find("HotbarHeaderArea")?.gameObject;
+            if (hotbarHeaderArea != null)
+            {
+                interactionBadge = hotbarHeaderArea.transform.Find("InteractionBadge")?.gameObject;
+                if (interactionBadge != null)
+                {
+                    releaseInteractionText = interactionBadge.transform.Find("Text")?.GetComponent<TextMeshProUGUI>();
+                }
+                ammoUsageBadge = hotbarHeaderArea.transform.Find("AmmoUsageBadge")?.gameObject;
+                if (ammoUsageBadge != null)
+                {
+                    releaseAmmoUsageText = ammoUsageBadge.transform.Find("Text")?.GetComponent<TextMeshProUGUI>();
+                }
+            }
+            ApplyHotbarHeaderLayout();
         }
 
         // ==================== 3. ТАЙМЕР ЗАБЕГА (Появляется ТОЛЬКО во время забега) ====================
@@ -988,7 +1361,62 @@ public class HeistUI : MonoBehaviour
             {
                 RectTransform rt = hpTxtT.GetComponent<RectTransform>();
                 rt.anchoredPosition = new Vector2(0f, chamberRadius);
-                rt.sizeDelta = new Vector2(chamberSize * 0.9f, chamberSize * 0.5f);
+                rt.sizeDelta = new Vector2(chamberSize * 0.95f, chamberSize * 0.55f);
+
+                TextMeshProUGUI tmp = hpTxtT.GetComponent<TextMeshProUGUI>();
+                if (tmp != null)
+                {
+                    tmp.fontSizeMin = 10;
+                    tmp.fontSizeMax = 24f;
+                    tmp.fontStyle = FontStyles.Bold;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Динамически применяет размеры и положение бейджей над инвентарем
+    /// </summary>
+    public void ApplyHotbarHeaderLayout()
+    {
+        if (hotbarHeaderArea != null)
+        {
+            RectTransform headerRt = hotbarHeaderArea.GetComponent<RectTransform>();
+            if (headerRt != null)
+            {
+                headerRt.anchoredPosition = hotbarHeaderPosition;
+                float totalHeight = interactionBadgeSize.y + ammoBadgeSize.y + badgesSpacing + 8f;
+                float maxWidth = Mathf.Max(interactionBadgeSize.x, ammoBadgeSize.x);
+                headerRt.sizeDelta = new Vector2(maxWidth, totalHeight);
+            }
+        }
+
+        if (interactionBadge != null)
+        {
+            RectTransform ibRt = interactionBadge.GetComponent<RectTransform>();
+            if (ibRt != null)
+            {
+                float yPos = (ammoBadgeSize.y * 0.5f) + badgesSpacing + (interactionBadgeSize.y * 0.5f);
+                ibRt.anchoredPosition = new Vector2(0f, yPos);
+                ibRt.sizeDelta = interactionBadgeSize;
+            }
+            if (releaseInteractionText != null)
+            {
+                releaseInteractionText.fontSize = interactionFontSize;
+            }
+        }
+
+        if (ammoUsageBadge != null)
+        {
+            RectTransform abRt = ammoUsageBadge.GetComponent<RectTransform>();
+            if (abRt != null)
+            {
+                abRt.anchoredPosition = new Vector2(0f, 0f);
+                abRt.sizeDelta = ammoBadgeSize;
+            }
+            if (releaseAmmoUsageText != null)
+            {
+                releaseAmmoUsageText.fontSize = ammoFontSize;
             }
         }
     }
@@ -1058,13 +1486,13 @@ public class HeistUI : MonoBehaviour
         RectTransform rt = txtObj.GetComponent<RectTransform>();
         rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
         rt.anchoredPosition = pos;
-        rt.sizeDelta = new Vector2(50f, 26f);
+        rt.sizeDelta = new Vector2(70f, 34f);
 
         TextMeshProUGUI tmp = txtObj.GetComponent<TextMeshProUGUI>();
         tmp.text = defaultText;
         tmp.alignment = TextAlignmentOptions.Center;
         tmp.enableAutoSizing = true;
-        tmp.fontSizeMin = 8;
+        tmp.fontSizeMin = 10;
         tmp.fontSizeMax = fontSize;
         tmp.fontStyle = FontStyles.Bold;
         tmp.color = Color.white;
@@ -1075,10 +1503,14 @@ public class HeistUI : MonoBehaviour
     public void UpdateHotbar()
     {
         if (hotbarSlots == null || hotbarSlots.Length == 0) return;
-        if (PlayerInventory.Instance == null) return;
 
-        int activeIdx = PlayerInventory.Instance.activeSlotIndex;
-        var invSlots = PlayerInventory.Instance.slots;
+        int activeIdx = 0;
+        EquipableItem[] invSlots = null;
+        if (PlayerInventory.Instance != null)
+        {
+            activeIdx = PlayerInventory.Instance.activeSlotIndex;
+            invSlots = PlayerInventory.Instance.slots;
+        }
 
         for (int i = 0; i < hotbarSlots.Length; i++)
         {
@@ -1111,7 +1543,10 @@ public class HeistUI : MonoBehaviour
                 }
                 else
                 {
-                    slotUI.iconImage.gameObject.SetActive(false);
+                    if (PlayerInventory.Instance != null)
+                    {
+                        slotUI.iconImage.gameObject.SetActive(false);
+                    }
                 }
             }
         }

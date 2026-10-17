@@ -168,10 +168,47 @@ public class PlayerInventory : MonoBehaviour
         {
             EnsureItemActive(slots[activeSlotIndex]);
             slots[activeSlotIndex].Equip();
+            PlaySwitchSound(slots[activeSlotIndex]);
         }
 
         onInventoryChanged?.Invoke();
         UpdateWeaponText();
+    }
+
+    private void PlaySwitchSound(EquipableItem item)
+    {
+        if (item == null || item.itemData == null) return;
+
+        string eventPath = null;
+        switch (item.itemData.itemType)
+        {
+            case ItemType.Weapon:
+                eventPath = "event:/Weapons/Weapon_SwitchPickUp";
+                break;
+            case ItemType.Tool:
+                eventPath = "event:/Environment/Items/Main/Main_SwitchPickUp";
+                break;
+            case ItemType.Utility:
+                eventPath = "event:/Environment/Items/Secondary/Secondary_SwitchPickUp";
+                break;
+        }
+
+        if (!string.IsNullOrEmpty(eventPath))
+        {
+            try
+            {
+                EventInstance switchInst = RuntimeManager.CreateInstance(eventPath);
+                if (item.itemData.itemType == ItemType.Tool)
+                {
+                    switchInst.setParameterByName("MainType", (float)item.itemData.fmodMainType);
+                }
+                switchInst.setParameterByName("ActiveItem", 1f);
+                RuntimeManager.AttachInstanceToGameObject(switchInst, gameObject);
+                switchInst.start();
+                switchInst.release();
+            }
+            catch { }
+        }
     }
 
     public bool PickupItem(ItemData data)
@@ -253,28 +290,29 @@ public class PlayerInventory : MonoBehaviour
             customRotOffset = itemToDrop.itemData.dropRotationOffset;
         }
 
-        // CS2-style forward spawn: directly along camera forward vector, slightly below eye center
-        float targetDistance = 0.55f;
-        Vector3 eyePos = cam.position;
+        // Natural hand-level drop origin: lower-right from camera, where character holds weapons
+        Vector3 handOffset = cam.right * 0.14f - cam.up * 0.22f;
+        float targetDistance = 0.45f;
+        Vector3 originPos = cam.position + handOffset;
         Vector3 forwardDir = cam.forward;
 
         // Wall safety check: don't spawn inside or through walls if player is right against a wall
         Vector3 targetDropPos;
         LayerMask wallCheckMask = ~0;
-        if (Physics.SphereCast(eyePos, 0.12f, forwardDir, out RaycastHit wallHit, targetDistance, wallCheckMask, QueryTriggerInteraction.Ignore))
+        if (Physics.SphereCast(originPos, 0.12f, forwardDir, out RaycastHit wallHit, targetDistance, wallCheckMask, QueryTriggerInteraction.Ignore))
         {
             if (!wallHit.collider.transform.IsChildOf(transform))
             {
-                targetDropPos = eyePos + forwardDir * Mathf.Max(0.15f, wallHit.distance - 0.08f);
+                targetDropPos = originPos + forwardDir * Mathf.Max(0.15f, wallHit.distance - 0.08f);
             }
             else
             {
-                targetDropPos = eyePos + forwardDir * targetDistance - cam.up * 0.08f;
+                targetDropPos = originPos + forwardDir * targetDistance;
             }
         }
         else
         {
-            targetDropPos = eyePos + forwardDir * targetDistance - cam.up * 0.08f;
+            targetDropPos = originPos + forwardDir * targetDistance;
         }
 
         // Apply optional extra offset if specified

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -114,7 +114,7 @@ namespace FMODUnity
             base.InitializeProperties();
 
             PropertyAccessors.LiveUpdate.Set(this, TriStateBool.Enabled);
-            PropertyAccessors.Overlay.Set(this, TriStateBool.Enabled);
+            PropertyAccessors.Overlay.Set(this, TriStateBool.Disabled);
             PropertyAccessors.SampleRate.Set(this, 48000);
             PropertyAccessors.RealChannelCount.Set(this, 256);
             PropertyAccessors.VirtualChannelCount.Set(this, 1024);

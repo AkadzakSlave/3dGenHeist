@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -689,18 +690,7 @@ public class GameManager : MonoBehaviour
 
     public void ReturnToMainMenu()
     {
-        StartCoroutine(ReturnToMainMenuRoutine());
-    }
-
-    private IEnumerator ReturnToMainMenuRoutine()
-    {
         Time.timeScale = 1f;
-
-        if (heistUI != null) heistUI.ShowLoadingScreen();
-
-        isHeistActive = false;
-        isInLobby = true;
-        isProcessingPlayerWipe = false;
 
         // Reset session money & operation run
         sessionMoney = 0;
@@ -709,44 +699,12 @@ public class GameManager : MonoBehaviour
         currentDay = 1;
         activeOperationPreset = null;
         selectedDossier = null;
-        onMoneyChanged?.Invoke();
+        isHeistActive = false;
+        isInLobby = true;
+        isProcessingPlayerWipe = false;
 
-        // Clear player inventory and held items
-        if (PlayerInventory.Instance != null)
-        {
-            PlayerInventory.Instance.ClearInventory();
-        }
-
-        // Clear procedural level if active
-        if (levelGenerator != null)
-        {
-            levelGenerator.ClearLevel();
-        }
-
-        // Reset enemies
-        if (EnemyManager.Instance != null)
-        {
-            EnemyManager.Instance.ResetForNewHeist();
-        }
-
-        // Revive players with full controls restored
-        ReviveAllPlayers();
-
-        // Teleport player back to initial lobby spawn point
-        if (lobbySpawnPoint != null)
-        {
-            yield return StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));
-        }
-
-        yield return new WaitForSecondsRealtime(0.2f);
-
-        // Show Main Menu UI
-        if (MainMenuUI.Instance != null)
-        {
-            MainMenuUI.Instance.ShowMainMenu();
-        }
-
-        if (heistUI != null) heistUI.HideLoadingScreen();
+        // Cleanly reload the scene to reset all game state, entities, and rooms
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
     private IEnumerator TeleportPlayer(Vector3 pos, Quaternion rot)

@@ -106,6 +106,24 @@ public class PlayerMovement : MonoBehaviour
         jumpRequested = true;
     }
 
+    public static PlayerMovement Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+    }
+
     void Start()
     {
         controller = GetComponent<CharacterController>();
@@ -361,18 +379,34 @@ public class PlayerMovement : MonoBehaviour
 
         // 1. Проверяем наличие сумки (слот 0)
         float hasBag = 0f;
-        if (PlayerInventory.Instance != null && PlayerInventory.Instance.slots[0] != null)
+        if (PlayerInventory.Instance != null && PlayerInventory.Instance.slots != null && PlayerInventory.Instance.slots.Length > 0 && PlayerInventory.Instance.slots[0] != null)
         {
-            if (PlayerInventory.Instance.slots[0].itemData.fmodMainType == MainEquipmentType.Bag)
+            if (PlayerInventory.Instance.slots[0].itemData != null && PlayerInventory.Instance.slots[0].itemData.fmodMainType == MainEquipmentType.Bag)
             {
                 hasBag = 1f;
             }
         }
         footsteps.setParameterByName("HasBag", hasBag);
 
-        // 2. Передаем общий вес игрока
+        // 2. Вес и стадия перегруза для FMOD WeightStage (0: Легкий, 1: Средний, 2: Тяжелый/Перегруз)
         float playerWeight = GameManager.Instance != null ? GameManager.Instance.currentWeight : 0f;
         footsteps.setParameterByName("PlayerWeight", playerWeight);
+
+        float weightStage = 0f;
+        if (playerWeight > 35f || (GameManager.Instance != null && GameManager.Instance.currentWeight > GameManager.Instance.maxWeight))
+        {
+            weightStage = 2f;
+        }
+        else if (playerWeight > 15f)
+        {
+            weightStage = 1f;
+        }
+        footsteps.setParameterByName("WeightStage", weightStage);
+
+        // 3. Параметры спринта и активного предмета в руках
+        footsteps.setParameterByName("IsSprinting", isSprinting ? 1f : 0f);
+        float hasActiveItem = (PlayerInventory.Instance != null && PlayerInventory.Instance.GetActiveItem() != null) ? 1f : 0f;
+        footsteps.setParameterByName("ActiveItem", hasActiveItem);
 
         RuntimeManager.AttachInstanceToGameObject(footsteps, gameObject);
         footsteps.start();

@@ -6,8 +6,12 @@ public class PauseMenuUI : MonoBehaviour
     public static PauseMenuUI Instance { get; private set; }
 
     [Header("Panels")]
+    [Tooltip("Главная панель меню паузы с кнопками")]
     public GameObject pauseMenuPanel;
+    [Tooltip("Панель настроек")]
     public GameObject settingsPanel;
+    [Tooltip("Статический тёмный фон паузы на сцене, помещенный ниже всех элементов")]
+    public GameObject darkBackgroundPanel;
 
     [Header("Buttons")]
     public Button resumeButton;
@@ -43,8 +47,34 @@ public class PauseMenuUI : MonoBehaviour
         if (surrenderButton != null) surrenderButton.onClick.AddListener(OnSurrenderButtonClicked);
         if (exitToMainMenuButton != null) exitToMainMenuButton.onClick.AddListener(OnExitToMainMenuButtonClicked);
 
+        SetupButtonDeselection();
+
+        if (darkBackgroundPanel != null) darkBackgroundPanel.SetActive(false);
         if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
         if (settingsPanel != null) settingsPanel.SetActive(false);
+    }
+
+    private void SetupButtonDeselection()
+    {
+        Selectable[] selectables = GetComponentsInChildren<Selectable>(true);
+        foreach (var s in selectables)
+        {
+            if (s == null) continue;
+            Navigation nav = s.navigation;
+            nav.mode = Navigation.Mode.None;
+            s.navigation = nav;
+
+            if (s is Button btn)
+            {
+                btn.onClick.AddListener(() =>
+                {
+                    if (UnityEngine.EventSystems.EventSystem.current != null)
+                    {
+                        UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
+                    }
+                });
+            }
+        }
     }
 
     private float lastToggleTime = -1f;
@@ -123,6 +153,7 @@ public class PauseMenuUI : MonoBehaviour
         isPaused = true;
         Time.timeScale = 0f;
 
+        if (darkBackgroundPanel != null) darkBackgroundPanel.SetActive(true);
         if (pauseMenuPanel != null) pauseMenuPanel.SetActive(true);
         if (settingsPanel != null) settingsPanel.SetActive(false);
 
@@ -144,6 +175,7 @@ public class PauseMenuUI : MonoBehaviour
         isPaused = false;
         Time.timeScale = 1f;
 
+        if (darkBackgroundPanel != null) darkBackgroundPanel.SetActive(false);
         if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
         if (settingsPanel != null) settingsPanel.SetActive(false);
 
@@ -155,12 +187,14 @@ public class PauseMenuUI : MonoBehaviour
 
     public void OnSettingsButtonClicked()
     {
+        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);
         if (settingsPanel != null) settingsPanel.SetActive(true);
     }
 
     public void OnSettingsCloseButtonClicked()
     {
         if (settingsPanel != null) settingsPanel.SetActive(false);
+        if (pauseMenuPanel != null) pauseMenuPanel.SetActive(true);
     }
 
     public void OnSurrenderButtonClicked()
