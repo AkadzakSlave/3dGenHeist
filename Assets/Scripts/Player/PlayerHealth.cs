@@ -12,6 +12,7 @@ public class PlayerHealth : MonoBehaviour
     public UnityEvent onDamaged;
     public UnityEvent onDeath;
     public UnityEvent onRevived;
+    public UnityEvent onHealed;
 
     private CharacterController characterController;
     private PlayerMovement playerMovement;
@@ -52,6 +53,28 @@ public class PlayerHealth : MonoBehaviour
         {
             GameManager.Instance.UnregisterPlayerHealth(this);
         }
+    }
+
+    public bool Heal(int amount)
+    {
+        if (isDead || currentHealth >= maxHealth || amount <= 0)
+        {
+            return false;
+        }
+
+        int prevHp = currentHealth;
+        currentHealth = Mathf.Min(maxHealth, currentHealth + amount);
+        int healed = currentHealth - prevHp;
+        onHealed?.Invoke();
+        UpdateHealthUI();
+
+        if (HeistUI.Instance != null && healed > 0)
+        {
+            HeistUI.Instance.ShowNotification($"+{healed} HP", new Color(0.2f, 1.0f, 0.55f, 1f));
+        }
+
+        Debug.Log($"[PlayerHealth] Healed +{healed} HP. Current HP: {currentHealth}/{maxHealth}");
+        return true;
     }
 
     public void TakeDamage(int damage)

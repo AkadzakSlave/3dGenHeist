@@ -56,14 +56,36 @@ public class HeistUI : MonoBehaviour
     public bool isDebugHudActive = false;
 
     [Header("Revolver Drum Transform (Inspector Adjustable)")]
+    [Tooltip("Автоматически считывать позицию и размер барабана, если вы двигаете объект RevolverDrum в Scene View мышкой (чтобы позиция не сбрасывалась при старте!)")]
+    public bool autoSyncFromSceneDrum = true;
     [Tooltip("Позиция барабана от левого нижнего угла")]
     public Vector2 drumAnchoredPosition = new Vector2(175f, 175f);
     [Tooltip("Общий размер барабана в пикселях холста (увеличьте для большего размера)")]
     public float drumSize = 410f;
     [Tooltip("Расстояние от центра барабана до центра камор")]
     public float chamberRadius = 85f;
-    [Tooltip("Диаметр каморы барабана")]
+    [Tooltip("Диаметр каморы барабана (круга фона)")]
     public float chamberSize = 72f;
+
+    [Header("Chamber Liquid Customization")]
+    [Tooltip("Ширина жидкости в каморе (множитель Scale X, чтобы жидкость не сжималась в шарик)")]
+    [Range(0.8f, 2.0f)]
+    public float liquidScaleX = 1.18f;
+    [Tooltip("Высота жидкости в каморе (множитель Scale Y)")]
+    [Range(0.8f, 2.0f)]
+    public float liquidScaleY = 1.0f;
+    [Tooltip("Дополнительное смещение каморы здоровья (HP)")]
+    public Vector2 hpChamberOffset = Vector2.zero;
+    [Tooltip("Дополнительное смещение каморы выносливости (Stamina)")]
+    public Vector2 staminaChamberOffset = Vector2.zero;
+    [Tooltip("Минимальная видимая часть жидкости при низком ХП (чтобы мениск не исчезал совсем)")]
+    [Range(0.0f, 0.2f)]
+    public float liquidFillMin = 0.06f;
+
+    [Header("Chamber Liquid Colors")]
+    public Color liquidColorHealthy = new Color(0.18f, 0.90f, 0.45f, 1f); // > 40%
+    public Color liquidColorWarning = new Color(0.96f, 0.80f, 0.12f, 1f); // 20% - 40%
+    public Color liquidColorCritical = new Color(0.85f, 0.15f, 0.15f, 1f); // < 20%
 
     public static HeistUI Instance { get; private set; }
     private float reticleHitmarkerTimer = 0f;
@@ -92,6 +114,43 @@ public class HeistUI : MonoBehaviour
     public Image staminaLiquidImage;
     public Image staminaBgImage;
     public TextMeshProUGUI releaseTimerText;
+
+    [Header("Drum Notifications (Floating Above Drum)")]
+    public GameObject drumNotificationRoot;
+    [Tooltip("Смещение контейнера уведомлений относительно верхнего края барабана")]
+    public Vector2 notificationOffset = new Vector2(0f, 16f);
+    [Tooltip("Высота плашки уведомления")]
+    public float notificationBadgeHeight = 34f;
+    [Tooltip("Минимальная ширина плашки уведомления")]
+    public float notificationMinWidth = 120f;
+    [Tooltip("Горизонтальный внутренний отступ текста")]
+    public float notificationHorizontalPadding = 34f;
+    [Tooltip("Размер шрифта текста уведомления")]
+    public float notificationFontSize = 17f;
+    [Tooltip("Расстояние между несколькими всплывшими уведомлениями")]
+    public float notificationStackSpacing = 38f;
+    [Tooltip("Длительность фазы выезда снизу (сек)")]
+    public float notificationEnterDuration = 0.22f;
+    [Tooltip("Длительность фазы показа текста (сек)")]
+    public float notificationHoldDuration = 1.35f;
+    [Tooltip("Длительность фазы уезда вверх и растворения (сек)")]
+    public float notificationExitDuration = 0.38f;
+    [Tooltip("Дистанция выезда снизу из-под барабана (пикс)")]
+    public float notificationEnterSlideDistance = 26f;
+    [Tooltip("Дистанция уезда вверх при растворении (пикс)")]
+    public float notificationExitSlideDistance = 36f;
+
+    private class ActiveNotification
+    {
+        public GameObject root;
+        public RectTransform rect;
+        public CanvasGroup canvasGroup;
+        public float targetBaseY;
+        public float currentBaseY;
+    }
+
+    private readonly System.Collections.Generic.List<ActiveNotification> activeNotifications = new System.Collections.Generic.List<ActiveNotification>();
+    private static Sprite cachedCapsuleSprite;
 
     [Header("Hotbar Badges Transform (Inspector Adjustable)")]
     [Tooltip("Позиция области подсказок относительно верха панели хотбара")]
@@ -710,8 +769,7 @@ public class HeistUI : MonoBehaviour
         if (hpLiquidImage != null)
         {
             hpLiquidImage.rectTransform.localRotation = Quaternion.Euler(0f, 0f, currentSloshAngle);
-            // Фиксированная увеличенная ширина (1.18x), чтобы жидкость не сжималась в шарик по бокам
-            Vector3 scale = new Vector3(1.18f, 1f + currentWobble * 0.75f, 1f);
+            Vector3 scale = new Vector3(liquidScaleX, liquidScaleY + currentWobble * 0.75f, 1f);
             if (heartBeat > 0f)
             {
                 scale *= (1f + heartBeat * 0.14f);
@@ -720,26 +778,20 @@ public class HeistUI : MonoBehaviour
 
             // Вязкое изменение уровня ХП (как густой мёд) с динамической волной поверхности
             currentHpRatio = Mathf.Lerp(currentHpRatio, targetHpRatio, dt * 7f);
-            float visualHpRatio = currentHpRatio > 0.001f ? Mathf.Lerp(0.06f, 1.0f, currentHpRatio) : 0f;
+            float visualHpRatio = currentHpRatio > 0.001f ? Mathf.Lerp(liquidFillMin, 1.0f, currentHpRatio) : 0f;
             hpLiquidImage.fillAmount = Mathf.Clamp01(visualHpRatio + (currentWobble * 0.08f));
 
-            // Цветовая градация по заданным порогам:
-            // > 40%: Сочный изумрудно-зеленый оттенок
-            // 20% – 40%: Предупреждающий янтарно-желтый цвет
-            // < 20%: Кроваво-алый пульсирующий цвет
-            Color normalLiquidColor = new Color(0.18f, 0.90f, 0.45f, 1f);
-            Color midLiquidColor = new Color(0.96f, 0.80f, 0.12f, 1f);
-            Color critLiquidColor = Color.Lerp(new Color(0.85f, 0.15f, 0.15f, 1f), new Color(1.0f, 0.35f, 0.35f, 1f), heartBeat);
+            Color critLiquidColor = Color.Lerp(liquidColorCritical, new Color(1.0f, 0.35f, 0.35f, 1f), heartBeat);
 
             if (currentHpRatio > 0.40f)
             {
                 float tGreen = Mathf.Clamp01((currentHpRatio - 0.40f) / 0.60f);
-                hpLiquidImage.color = Color.Lerp(midLiquidColor, normalLiquidColor, tGreen);
+                hpLiquidImage.color = Color.Lerp(liquidColorWarning, liquidColorHealthy, tGreen);
             }
             else if (currentHpRatio >= 0.20f)
             {
                 float tYellow = Mathf.Clamp01((currentHpRatio - 0.20f) / 0.20f);
-                hpLiquidImage.color = Color.Lerp(critLiquidColor, midLiquidColor, tYellow);
+                hpLiquidImage.color = Color.Lerp(critLiquidColor, liquidColorWarning, tYellow);
             }
             else
             {
@@ -785,10 +837,10 @@ public class HeistUI : MonoBehaviour
             float stamSlosh = currentSloshAngle * 1.18f;
             float stamWobble = currentWobble * 1.25f;
             staminaLiquidImage.rectTransform.localRotation = Quaternion.Euler(0f, 0f, stamSlosh);
-            staminaLiquidImage.rectTransform.localScale = new Vector3(1.18f, 1f + stamWobble * 0.75f, 1f);
+            staminaLiquidImage.rectTransform.localScale = new Vector3(liquidScaleX, liquidScaleY + stamWobble * 0.75f, 1f);
 
             currentStaminaRatio = Mathf.Lerp(currentStaminaRatio, targetStaminaRatio, dt * 9f);
-            float visualStamRatio = currentStaminaRatio > 0.001f ? Mathf.Lerp(0.05f, 1.0f, currentStaminaRatio) : 0f;
+            float visualStamRatio = currentStaminaRatio > 0.001f ? Mathf.Lerp(liquidFillMin, 1.0f, currentStaminaRatio) : 0f;
             staminaLiquidImage.fillAmount = Mathf.Clamp01(visualStamRatio + (stamWobble * 0.07f));
 
             // Если выносливость на исходе (< 20%) — тревожная янтарная пульсация
@@ -1456,7 +1508,31 @@ public class HeistUI : MonoBehaviour
         {
             releaseTimerText = existingTimer.GetComponent<TextMeshProUGUI>();
         }
+
+        // ==================== 4. ПЛАВАЮЩИЕ УВЕДОМЛЕНИЯ НАД БАРАБАНОМ ====================
+        Transform existingNotif = releaseHudRoot.transform.Find("DrumNotificationRoot");
+        if (existingNotif == null)
+        {
+            GameObject notifObj = new GameObject("DrumNotificationRoot", typeof(RectTransform));
+            notifObj.transform.SetParent(releaseHudRoot.transform, false);
+            RectTransform nRt = notifObj.GetComponent<RectTransform>();
+            nRt.anchorMin = new Vector2(0f, 0f);
+            nRt.anchorMax = new Vector2(0f, 0f);
+            nRt.pivot = new Vector2(0.5f, 0f);
+            nRt.anchoredPosition = new Vector2(drumAnchoredPosition.x + notificationOffset.x, drumAnchoredPosition.y + drumSize * 0.5f + notificationOffset.y);
+            nRt.sizeDelta = new Vector2(300f, 260f);
+            drumNotificationRoot = notifObj;
+        }
+        else
+        {
+            drumNotificationRoot = existingNotif.gameObject;
+        }
     }
+
+    private Vector2 lastInspectorDrumPos;
+    private float lastInspectorDrumSize;
+    private Vector2 lastSceneDrumPos;
+    private float lastSceneDrumSize;
 
     /// <summary>
     /// Динамически применяет размеры и положение барабана при изменении полей в Инспекторе
@@ -1468,20 +1544,64 @@ public class HeistUI : MonoBehaviour
         RectTransform drumRt = drumRoot.GetComponent<RectTransform>();
         if (drumRt != null)
         {
-            drumRt.anchoredPosition = drumAnchoredPosition;
-            drumRt.sizeDelta = new Vector2(drumSize, drumSize);
+            if (autoSyncFromSceneDrum && !Application.isPlaying)
+            {
+                bool inspectorChanged = (drumAnchoredPosition != lastInspectorDrumPos) || (Mathf.Abs(drumSize - lastInspectorDrumSize) > 0.1f);
+                bool sceneChanged = (drumRt.anchoredPosition != lastSceneDrumPos) || (Mathf.Abs(drumRt.sizeDelta.x - lastSceneDrumSize) > 0.1f);
+
+                if (inspectorChanged)
+                {
+                    // Пользователь изменил поля в Инспекторе HeistUI -> применяем к объекту в сцене
+                    drumRt.anchoredPosition = drumAnchoredPosition;
+                    drumRt.sizeDelta = new Vector2(drumSize, drumSize);
+                    lastInspectorDrumPos = drumAnchoredPosition;
+                    lastInspectorDrumSize = drumSize;
+                    lastSceneDrumPos = drumRt.anchoredPosition;
+                    lastSceneDrumSize = drumRt.sizeDelta.x;
+                }
+                else if (sceneChanged && drumRt.sizeDelta.x > 10f)
+                {
+                    // Пользователь передвинул или смасштабировал RevolverDrum в окне Scene View мышкой ->
+                    // считываем в поля HeistUI, чтобы при старте игры ничего не сбрасывалось!
+                    drumAnchoredPosition = drumRt.anchoredPosition;
+                    drumSize = drumRt.sizeDelta.x;
+                    lastInspectorDrumPos = drumAnchoredPosition;
+                    lastInspectorDrumSize = drumSize;
+                    lastSceneDrumPos = drumRt.anchoredPosition;
+                    lastSceneDrumSize = drumRt.sizeDelta.x;
+                }
+                else
+                {
+                    drumRt.anchoredPosition = drumAnchoredPosition;
+                    drumRt.sizeDelta = new Vector2(drumSize, drumSize);
+                }
+            }
+            else
+            {
+                drumRt.anchoredPosition = drumAnchoredPosition;
+                drumRt.sizeDelta = new Vector2(drumSize, drumSize);
+            }
+        }
+
+        if (drumNotificationRoot != null)
+        {
+            RectTransform nRt = drumNotificationRoot.GetComponent<RectTransform>();
+            if (nRt != null)
+            {
+                nRt.anchoredPosition = new Vector2(drumAnchoredPosition.x + notificationOffset.x, drumAnchoredPosition.y + drumSize * 0.5f + notificationOffset.y);
+            }
         }
 
         Transform chLayer = drumRoot.transform.Find("ChambersLayer");
         if (chLayer != null)
         {
             float S = drumSize / 813f;
-            Vector2 posHp = new Vector2(8.1f * S, 167.3f * S);
+            Vector2 posHp = new Vector2(8.1f * S, 167.3f * S) + hpChamberOffset;
             Vector2 posAmmo = new Vector2(165.3f * S, 79.0f * S);
             Vector2 posBR = new Vector2(165.6f * S, -100.9f * S);
             Vector2 posB = new Vector2(8.2f * S, -194.7f * S);
             Vector2 posBL = new Vector2(-150.0f * S, -101.0f * S);
-            Vector2 posStamina = new Vector2(-149.5f * S, 78.8f * S);
+            Vector2 posStamina = new Vector2(-149.5f * S, 78.8f * S) + staminaChamberOffset;
 
             UpdateSocketTransform(chLayer.Find("Socket_HP"), posHp, chamberSize);
             UpdateSocketTransform(chLayer.Find("Socket_Ammo"), posAmmo, chamberSize);
@@ -1498,7 +1618,7 @@ public class HeistUI : MonoBehaviour
             if (hpTxtT != null)
             {
                 float S = drumSize / 813f;
-                Vector2 posHp = new Vector2(8.1f * S, 167.3f * S);
+                Vector2 posHp = new Vector2(8.1f * S, 167.3f * S) + hpChamberOffset;
                 RectTransform rt = hpTxtT.GetComponent<RectTransform>();
                 rt.anchoredPosition = posHp;
                 rt.sizeDelta = new Vector2(chamberSize * 0.95f, chamberSize * 0.55f);
@@ -1718,5 +1838,233 @@ public class HeistUI : MonoBehaviour
                 }
             }
         }
+    }
+
+    private static Sprite GetOrCreateCapsuleSprite()
+    {
+        if (cachedCapsuleSprite != null) return cachedCapsuleSprite;
+        int w = 64;
+        int h = 32;
+        Texture2D tex = new Texture2D(w, h, TextureFormat.RGBA32, false);
+        tex.filterMode = FilterMode.Bilinear;
+        Color[] cols = new Color[w * h];
+        float radius = 15f;
+        Vector2 cLeft = new Vector2(15.5f, 15.5f);
+        Vector2 cRight = new Vector2(47.5f, 15.5f);
+
+        for (int y = 0; y < h; y++)
+        {
+            for (int x = 0; x < w; x++)
+            {
+                float d = 0f;
+                if (x < cLeft.x) d = Vector2.Distance(new Vector2(x, y), cLeft);
+                else if (x > cRight.x) d = Vector2.Distance(new Vector2(x, y), cRight);
+                else d = Mathf.Abs(y - 15.5f);
+
+                float alpha = Mathf.Clamp01((radius - d) + 0.5f);
+                cols[y * w + x] = new Color(1f, 1f, 1f, alpha);
+            }
+        }
+        tex.SetPixels(cols);
+        tex.Apply();
+        cachedCapsuleSprite = Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(0.5f, 0.5f), 100f, 0, SpriteMeshType.FullRect, new Vector4(16, 15, 16, 15));
+        return cachedCapsuleSprite;
+    }
+
+    /// <summary>
+    /// Выводит анимированное всплывающее уведомление над барабаном револьвера:
+    /// выезд снизу из-под экрана -> мягкая фиксация над барабаном -> плавный уезд вверх и растворение.
+    /// </summary>
+    public void ShowNotification(string message, Color textColor)
+    {
+        if (string.IsNullOrEmpty(message)) return;
+
+        if (drumNotificationRoot == null)
+        {
+            EnsureReleaseHudCreated();
+            if (drumNotificationRoot == null) return;
+        }
+
+        // 1. Создаем плашку уведомления
+        GameObject itemObj = new GameObject("Notif_" + message, typeof(RectTransform), typeof(CanvasGroup));
+        itemObj.transform.SetParent(drumNotificationRoot.transform, false);
+
+        RectTransform itemRt = itemObj.GetComponent<RectTransform>();
+        itemRt.anchorMin = itemRt.anchorMax = itemRt.pivot = new Vector2(0.5f, 0f);
+        itemRt.sizeDelta = new Vector2(notificationMinWidth, notificationBadgeHeight);
+        itemRt.anchoredPosition = new Vector2(0f, -notificationEnterSlideDistance);
+        itemRt.localScale = Vector3.one * 0.85f;
+
+        CanvasGroup cg = itemObj.GetComponent<CanvasGroup>();
+        cg.alpha = 0f;
+        cg.blocksRaycasts = false;
+        cg.interactable = false;
+
+        // Фон-капсула (темно-графитовый полупрозрачный со стильным свечением)
+        GameObject bgObj = new GameObject("Bg", typeof(RectTransform), typeof(Image), typeof(Outline));
+        bgObj.transform.SetParent(itemObj.transform, false);
+        RectTransform bgRt = bgObj.GetComponent<RectTransform>();
+        bgRt.anchorMin = Vector2.zero;
+        bgRt.anchorMax = Vector2.one;
+        bgRt.sizeDelta = Vector2.zero;
+
+        Image bgImg = bgObj.GetComponent<Image>();
+        bgImg.sprite = GetOrCreateCapsuleSprite();
+        bgImg.type = Image.Type.Sliced;
+        bgImg.color = new Color(0.06f, 0.07f, 0.10f, 0.88f);
+        bgImg.raycastTarget = false;
+
+        Outline outline = bgObj.GetComponent<Outline>();
+        outline.effectColor = new Color(textColor.r * 0.85f, textColor.g * 0.85f, textColor.b * 0.85f, 0.45f);
+        outline.effectDistance = new Vector2(1.2f, -1.2f);
+        outline.useGraphicAlpha = false;
+
+        // Текст уведомления
+        GameObject txtObj = new GameObject("Text", typeof(RectTransform), typeof(TextMeshProUGUI));
+        txtObj.transform.SetParent(itemObj.transform, false);
+        RectTransform txtRt = txtObj.GetComponent<RectTransform>();
+        txtRt.anchorMin = Vector2.zero;
+        txtRt.anchorMax = Vector2.one;
+        txtRt.sizeDelta = Vector2.zero;
+
+        TextMeshProUGUI tmp = txtObj.GetComponent<TextMeshProUGUI>();
+        tmp.text = message;
+        tmp.fontSize = notificationFontSize;
+        tmp.fontStyle = FontStyles.Bold;
+        tmp.alignment = TextAlignmentOptions.Center;
+        tmp.color = textColor;
+        tmp.raycastTarget = false;
+
+        // Авто-ширина под текст + настраиваемые отступы
+        float prefWidth = tmp.preferredWidth;
+        itemRt.sizeDelta = new Vector2(Mathf.Max(notificationMinWidth, prefWidth + notificationHorizontalPadding), notificationBadgeHeight);
+
+        // Сдвигаем все уже висящие уведомления вверх, освобождая место новому снизу
+        for (int i = 0; i < activeNotifications.Count; i++)
+        {
+            if (activeNotifications[i] != null)
+            {
+                activeNotifications[i].targetBaseY += notificationStackSpacing;
+            }
+        }
+
+        ActiveNotification activeItem = new ActiveNotification
+        {
+            root = itemObj,
+            rect = itemRt,
+            canvasGroup = cg,
+            targetBaseY = 0f,
+            currentBaseY = -notificationEnterSlideDistance
+        };
+        activeNotifications.Add(activeItem);
+
+        if (Application.isPlaying)
+        {
+            StartCoroutine(AnimateNotificationRoutine(activeItem));
+        }
+        else
+        {
+            cg.alpha = 1f;
+            itemRt.anchoredPosition = Vector2.zero;
+            itemRt.localScale = Vector3.one;
+        }
+    }
+
+    private System.Collections.IEnumerator AnimateNotificationRoutine(ActiveNotification item)
+    {
+        float enterDuration = notificationEnterDuration;
+        float holdDuration = notificationHoldDuration;
+        float exitDuration = notificationExitDuration;
+
+        float timer = 0f;
+
+        // 1. ФАЗА ВЪЕЗДА СНИЗУ (Выезд из-под барабана, появление из прозрачности с сочным попом)
+        while (timer < enterDuration)
+        {
+            if (item == null || item.root == null) yield break;
+            timer += Time.deltaTime;
+            float t = Mathf.Clamp01(timer / enterDuration);
+            float ease = 1f - Mathf.Pow(1f - t, 3f);
+
+            item.canvasGroup.alpha = ease;
+            float popScale = Mathf.LerpUnclamped(0.85f, 1.05f, ease);
+            item.rect.localScale = Vector3.one * (t < 0.8f ? popScale : Mathf.Lerp(1.05f, 1.0f, (t - 0.8f) / 0.2f));
+
+            item.currentBaseY = Mathf.Lerp(item.currentBaseY, item.targetBaseY, Time.deltaTime * 16f);
+            float animOffset = (1f - ease) * -notificationEnterSlideDistance;
+            item.rect.anchoredPosition = new Vector2(0f, item.currentBaseY + animOffset);
+
+            yield return null;
+        }
+
+        if (item != null && item.rect != null)
+        {
+            item.rect.localScale = Vector3.one;
+            item.canvasGroup.alpha = 1f;
+        }
+
+        // 2. ФАЗА УДЕРЖАНИЯ (Игрок спокойно видит информацию, плашки мягко плывут вверх при новых поступлениях)
+        timer = 0f;
+        while (timer < holdDuration)
+        {
+            if (item == null || item.root == null) yield break;
+            timer += Time.deltaTime;
+
+            item.currentBaseY = Mathf.Lerp(item.currentBaseY, item.targetBaseY, Time.deltaTime * 14f);
+            item.rect.anchoredPosition = new Vector2(0f, item.currentBaseY);
+
+            yield return null;
+        }
+
+        // 3. ФАЗА УЕЗДА ВВЕРХ И РАСТВОРЕНИЯ (Уезжает вверх и растворяется)
+        timer = 0f;
+        while (timer < exitDuration)
+        {
+            if (item == null || item.root == null) yield break;
+            timer += Time.deltaTime;
+            float t = Mathf.Clamp01(timer / exitDuration);
+            float ease = t * t;
+
+            item.canvasGroup.alpha = 1f - ease;
+            item.rect.localScale = Vector3.one * Mathf.Lerp(1f, 0.92f, ease);
+
+            item.currentBaseY = Mathf.Lerp(item.currentBaseY, item.targetBaseY, Time.deltaTime * 14f);
+            float exitOffset = ease * notificationExitSlideDistance;
+            item.rect.anchoredPosition = new Vector2(0f, item.currentBaseY + exitOffset);
+
+            yield return null;
+        }
+
+        // Завершение
+        activeNotifications.Remove(item);
+        if (item != null && item.root != null)
+        {
+            Destroy(item.root);
+        }
+    }
+
+    // ==================== ТЕСТОВЫЕ КНОПКИ В ИНСПЕКТОРЕ ДЛЯ БЫСТРОЙ ПРОВЕРКИ ====================
+    [ContextMenu("🔔 Тест: Патроны (+15% Патронов)")]
+    public void TestAmmoNotification()
+    {
+        ShowNotification("+15% Патронов", new Color(1f, 0.88f, 0.35f, 1f));
+    }
+
+    [ContextMenu("💚 Тест: Лечение (+40 HP)")]
+    public void TestHealNotification()
+    {
+        ShowNotification("+40 HP", new Color(0.2f, 1f, 0.55f, 1f));
+    }
+
+    [ContextMenu("💰 Тест: Деньги (+$500)")]
+    public void TestMoneyNotification()
+    {
+        ShowNotification("+$500", new Color(0.35f, 0.95f, 0.45f, 1f));
+    }
+
+    [ContextMenu("🔥 Тест: Ожог!")]
+    public void TestBurnNotification()
+    {
+        ShowNotification("Ожог!", new Color(1f, 0.38f, 0.15f, 1f));
     }
 }

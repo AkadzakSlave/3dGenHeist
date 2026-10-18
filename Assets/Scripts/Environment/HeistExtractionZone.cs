@@ -24,10 +24,11 @@ public class HeistExtractionZone : MonoBehaviour
     {
         if (GameManager.Instance == null) return;
 
-        Debug.Log($"<color=green>[Extraction] Сумка попала в зону! Выгружено: ${bagOnFloor.storedMoney}</color>");
+        int moneyExtracted = bagOnFloor.storedMoney;
+        Debug.Log($"<color=green>[Extraction] Сумка попала в зону! Выгружено: ${moneyExtracted}</color>");
         
         // Добавляем деньги к общему счету миссии
-        GameManager.Instance.depositedMoney += bagOnFloor.storedMoney;
+        GameManager.Instance.depositedMoney += moneyExtracted;
         
         // Обнуляем данные в объекте на полу (чтобы нельзя было забрать дважды)
         bagOnFloor.storedMoney = 0;
@@ -35,6 +36,11 @@ public class HeistExtractionZone : MonoBehaviour
 
         // Вызываем событие обновления UI
         GameManager.Instance.onMoneyChanged?.Invoke();
+
+        if (HeistUI.Instance != null && moneyExtracted > 0)
+        {
+            HeistUI.Instance.ShowNotification($"+${moneyExtracted}", new Color(0.35f, 0.95f, 0.45f, 1f));
+        }
     }
 
     private void OnDrawGizmos()

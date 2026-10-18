@@ -15,11 +15,30 @@ public class WeaponItem : EquipableItem
     public int pelletsPerShot = 1;
     public float spreadAngle = 0f;
 
-    [Header("Ammo")]
+    [Header("Ammo & Category")]
+    public AmmoType ammoType = AmmoType.Light;
+    public bool autoDetectAmmoType = true;
     public bool infiniteAmmo = false;
     public int magazineSize = 6;
     public int ammoInMagazine = 6;
-    public int reserveAmmo = 24;
+    [SerializeField]
+    private int fallbackReserveAmmo = 24;
+
+    public int reserveAmmo
+    {
+        get => PlayerInventory.Instance != null ? PlayerInventory.Instance.GetAmmo(ammoType) : fallbackReserveAmmo;
+        set
+        {
+            if (PlayerInventory.Instance != null)
+            {
+                PlayerInventory.Instance.SetAmmo(ammoType, value);
+            }
+            else
+            {
+                fallbackReserveAmmo = value;
+            }
+        }
+    }
     public float reloadTime = 1.5f;
 
     [Header("Visuals & Animation")]
@@ -121,6 +140,23 @@ public class WeaponItem : EquipableItem
                 weaponProfile = FMODWeaponType.Revolver;
                 recoilVertical = 1.5f;
                 recoilHorizontal = 0.35f;
+            }
+        }
+
+        if (autoDetectAmmoType)
+        {
+            string idName = (itemData != null ? itemData.itemName : name).ToLower();
+            if (idName.Contains("win") || idName.Contains("1887") || idName.Contains("steven") || idName.Contains("shotgun") || weaponProfile == FMODWeaponType.Shotgun_Lever || weaponProfile == FMODWeaponType.Shotgun_Double)
+            {
+                ammoType = AmmoType.Shotgun;
+            }
+            else if (idName.Contains("tompson") || idName.Contains("thompson") || idName.Contains("smg") || idName.Contains("rifle") || isAutomatic || weaponProfile == FMODWeaponType.SMG || weaponProfile == FMODWeaponType.Rifle)
+            {
+                ammoType = AmmoType.Medium;
+            }
+            else
+            {
+                ammoType = AmmoType.Light;
             }
         }
     }
@@ -506,7 +542,7 @@ public class WeaponItem : EquipableItem
             float surfaceType = 0f; // 0: Concrete, 1: Wood, 2: Metal, 3: Flesh
 
             // 1. Приоритет: Проверка врагов / живых целей -> Flesh (3)
-            if (hit.collider.GetComponentInParent<EnemyHealth>() != null || hit.collider.CompareTag("Enemy"))
+            if (hit.collider.GetComponentInParent<EnemyHealth>() != null || hit.collider.GetComponentInParent<EnemyController>() != null)
             {
                 surfaceType = 3f; // Flesh
             }
@@ -615,8 +651,20 @@ public class WeaponItem : EquipableItem
 
             if (activeReloadInstance.isValid())
             {
-                activeReloadInstance.setParameterByName("WeaponType", (float)weaponProfile);
+                float reloadParamType = (float)weaponProfile;
+                float reloadPitch = 1.0f;
+
+                // В FMOD банке для SMG (4) звуковик ещё не выделил отдельную дорожку.
+                // Для Томпсона используем сочную магазинную перезарядку (Pistol = 1) с чуть ускоренным темпом
+                if (weaponProfile == FMODWeaponType.SMG)
+                {
+                    reloadParamType = 1.0f;
+                    reloadPitch = 1.12f;
+                }
+
+                activeReloadInstance.setParameterByName("WeaponType", reloadParamType);
                 activeReloadInstance.setParameterByName("ReloadPhase", 0f);
+                activeReloadInstance.setPitch(reloadPitch);
                 RuntimeManager.AttachInstanceToGameObject(activeReloadInstance, gameObject);
                 activeReloadInstance.start();
             }
@@ -638,10 +686,16 @@ public class WeaponItem : EquipableItem
     private void FinishReload()
     {
         int missingAmmo = magazineSize - ammoInMagazine;
-        int ammoToLoad = Mathf.Min(missingAmmo, reserveAmmo);
+        int ammoToLoad = PlayerInventory.Instance != null 
+            ? PlayerInventory.Instance.ConsumeAmmo(ammoType, missingAmmo) 
+            : Mathf.Min(missingAmmo, fallbackReserveAmmo);
+
+        if (PlayerInventory.Instance == null)
+        {
+            fallbackReserveAmmo -= ammoToLoad;
+        }
 
         ammoInMagazine += ammoToLoad;
-        reserveAmmo -= ammoToLoad;
         isReloading = false;
 
         if (activeReloadInstance.isValid())

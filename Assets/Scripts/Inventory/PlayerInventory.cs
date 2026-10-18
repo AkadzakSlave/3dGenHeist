@@ -21,6 +21,121 @@ public class PlayerInventory : MonoBehaviour
     public int activeSlotIndex = 0;
     public string emptyWeaponText = "Нет оружия";
 
+    [Header("Ammo Pools (Categories)")]
+    [Header("Light Ammo (Pistols, Revolver) - Max 180, Start 60")]
+    public int lightAmmo = 60;
+    public int maxLightAmmo = 180;
+
+    [Header("Medium Ammo (Thompson, Auto) - Max 450, Start 150")]
+    public int mediumAmmo = 150;
+    public int maxMediumAmmo = 450;
+
+    [Header("Shotgun Ammo (Stevens, Win1887) - Max 120, Start 40")]
+    public int shotgunAmmo = 40;
+    public int maxShotgunAmmo = 120;
+
+    public UnityEvent onAmmoChanged;
+
+    public int GetAmmo(AmmoType type)
+    {
+        switch (type)
+        {
+            case AmmoType.Light: return lightAmmo;
+            case AmmoType.Medium: return mediumAmmo;
+            case AmmoType.Shotgun: return shotgunAmmo;
+            default: return lightAmmo;
+        }
+    }
+
+    public int GetMaxAmmo(AmmoType type)
+    {
+        switch (type)
+        {
+            case AmmoType.Light: return maxLightAmmo;
+            case AmmoType.Medium: return maxMediumAmmo;
+            case AmmoType.Shotgun: return maxShotgunAmmo;
+            default: return maxLightAmmo;
+        }
+    }
+
+    public void SetAmmo(AmmoType type, int value)
+    {
+        switch (type)
+        {
+            case AmmoType.Light:
+                lightAmmo = Mathf.Clamp(value, 0, maxLightAmmo);
+                break;
+            case AmmoType.Medium:
+                mediumAmmo = Mathf.Clamp(value, 0, maxMediumAmmo);
+                break;
+            case AmmoType.Shotgun:
+                shotgunAmmo = Mathf.Clamp(value, 0, maxShotgunAmmo);
+                break;
+        }
+        onAmmoChanged?.Invoke();
+        onInventoryChanged?.Invoke();
+        UpdateWeaponText();
+    }
+
+    public int ConsumeAmmo(AmmoType type, int requestedAmount)
+    {
+        if (requestedAmount <= 0) return 0;
+        int current = GetAmmo(type);
+        int taken = Mathf.Min(requestedAmount, current);
+        if (taken > 0)
+        {
+            SetAmmo(type, current - taken);
+        }
+        return taken;
+    }
+
+    public bool AddAmmo(AmmoType type, int amount)
+    {
+        if (amount <= 0) return false;
+        int current = GetAmmo(type);
+        int max = GetMaxAmmo(type);
+        if (current >= max) return false;
+        SetAmmo(type, current + amount);
+        return true;
+    }
+
+    public bool IsAmmoFull()
+    {
+        return lightAmmo >= maxLightAmmo && mediumAmmo >= maxMediumAmmo && shotgunAmmo >= maxShotgunAmmo;
+    }
+
+    public bool AddAmmoBox(float percent = 0.15f)
+    {
+        int addLight = Mathf.RoundToInt(maxLightAmmo * percent);     // 27
+        int addMedium = Mathf.RoundToInt(maxMediumAmmo * percent);   // 68
+        int addShotgun = Mathf.RoundToInt(maxShotgunAmmo * percent); // 18
+
+        bool canAddLight = lightAmmo < maxLightAmmo;
+        bool canAddMedium = mediumAmmo < maxMediumAmmo;
+        bool canAddShotgun = shotgunAmmo < maxShotgunAmmo;
+
+        if (!canAddLight && !canAddMedium && !canAddShotgun)
+        {
+            return false; // Все типы патронов уже заполнены
+        }
+
+        if (canAddLight) lightAmmo = Mathf.Min(maxLightAmmo, lightAmmo + addLight);
+        if (canAddMedium) mediumAmmo = Mathf.Min(maxMediumAmmo, mediumAmmo + addMedium);
+        if (canAddShotgun) shotgunAmmo = Mathf.Min(maxShotgunAmmo, shotgunAmmo + addShotgun);
+
+        onAmmoChanged?.Invoke();
+        onInventoryChanged?.Invoke();
+        UpdateWeaponText();
+
+        if (HeistUI.Instance != null)
+        {
+            HeistUI.Instance.ShowNotification("+15% Патронов", new Color(1f, 0.88f, 0.35f, 1f));
+        }
+
+        Debug.Log($"[PlayerInventory] Ящик с патронами подобран (+15%). Лёгкие: {lightAmmo}/{maxLightAmmo}, Средние: {mediumAmmo}/{maxMediumAmmo}, Дробовик: {shotgunAmmo}/{maxShotgunAmmo}");
+        return true;
+    }
+
     [Header("Physical Toss Settings (CS2-Style)")]
     public float dropThrowForce = 4.2f;
     public float dropUpwardForce = 1.0f;

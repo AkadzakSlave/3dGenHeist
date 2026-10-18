@@ -4,8 +4,11 @@ using FMODUnity;
 public class AmmoPickup : MonoBehaviour, IInteractable
 {
     [Header("Ammo Settings")]
-    [Tooltip("Количество добавляемых патронов")]
-    public int ammoAmount = 30;
+    [Tooltip("Процент пополнения боезапаса от максимума для каждого вида оружия (15% = 0.15)")]
+    public float ammoPercent = 0.15f;
+
+    [Tooltip("Разрешить автоматический подбор при касании/наступании на коробку")]
+    public bool allowTouchPickup = true;
 
     [Header("Audio (FMOD)")]
     [Tooltip("Звук подбора патронов")]
@@ -13,60 +16,88 @@ public class AmmoPickup : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        if (PlayerInventory.Instance == null)
-        {
-            Debug.LogError("[AmmoPickup] PlayerInventory.Instance не найден!");
-            return;
-        }
-
-        bool added = false;
-        
-        // 1. Пытаемся добавить патроны к оружию во втором слоте (слот 1)
-        if (PlayerInventory.Instance.slots != null && PlayerInventory.Instance.slots.Length > 1)
-        {
-            WeaponItem weapon = PlayerInventory.Instance.slots[1] as WeaponItem;
-            if (weapon != null)
-            {
-                weapon.reserveAmmo += ammoAmount;
-                weapon.RefreshWeaponUI();
-                added = true;
-                Debug.Log($"[AmmoPickup] Добавлено {ammoAmount} патронов для {weapon.itemData.itemName}. Всего в запасе: {weapon.reserveAmmo}");
-            }
-        }
-
-        // 2. Если в слоте нет оружия, ищем в списке всех возможных предметов игрока
-        if (!added && PlayerInventory.Instance.allPossibleItems != null)
-        {
-            foreach (var item in PlayerInventory.Instance.allPossibleItems)
-            {
-                if (item is WeaponItem weapon)
-                {
-                    weapon.reserveAmmo += ammoAmount;
-                    added = true;
-                    Debug.Log($"[AmmoPickup] Добавлено {ammoAmount} патронов для {weapon.itemData.itemName} в резерв. Всего: {weapon.reserveAmmo}");
-                    break;
-                }
-            }
-        }
-
-        if (added)
-        {
-            // Воспроизводим звук подбора
-            if (!pickupSound.IsNull)
-            {
-                RuntimeManager.PlayOneShot(pickupSound, transform.position);
-            }
-
-            Destroy(gameObject);
-        }
-        else
-        {
-            Debug.LogWarning("[AmmoPickup] Не удалось найти подходящее оружие у игрока, чтобы добавить патроны.");
-        }
+        TryPickupAmmo(GetTargetPlayerInventory());
     }
 
     public string GetInteractText()
     {
-        return $"Pick up Ammo (+{ammoAmount})";
+        PlayerInventory inv = GetTargetPlayerInventory();
+        if (inv != null && inv.IsAmmoFull())
+        {
+            return "Патроны полны";
+        }
+        int percentDisplay = Mathf.RoundToInt(ammoPercent * 100f);
+        return $"Подобрать патроны (+{percentDisplay}%)";
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!allowTouchPickup) return;
+        PlayerInventory inv = other.GetComponentInParent<PlayerInventory>();
+        if (inv == null) inv = other.GetComponent<PlayerInventory>();
+        if (inv != null) TryPickupAmmo(inv);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (!allowTouchPickup) return;
+        PlayerInventory inv = collision.gameObject.GetComponentInParent<PlayerInventory>();
+        if (inv == null) inv = collision.gameObject.GetComponent<PlayerInventory>();
+        if (inv != null) TryPickupAmmo(inv);
+    }
+
+    private bool TryPickupAmmo(PlayerInventory inv)
+    {
+        if (inv == null)
+        {
+            return false;
+        }
+
+        if (inv.AddAmmoBox(ammoPercent))
+        {
+            PlayPickupSound();
+            Destroy(gameObject);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void PlayPickupSound()
+    {
+        if (!pickupSound.IsNull)
+        {
+            RuntimeManager.PlayOneShot(pickupSound, transform.position);
+        }
+        else
+        {
+            try
+            {
+                RuntimeManager.PlayOneShot("event:/Environment/Items/Secondary/Secondary_SwitchPickUp", transform.position);
+            }
+            catch { }
+        }
+    }
+
+    private PlayerInventory GetTargetPlayerInventory()
+    {
+        if (PlayerInventory.Instance != null) return PlayerInventory.Instance;
+        return Object.FindAnyObjectByType<PlayerInventory>();
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = new Color(1f, 0.85f, 0.2f, 0.55f);
+        Collider col = GetComponent<Collider>();
+        if (col is BoxCollider box)
+        {
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawWireCube(box.center, box.size);
+        }
+        else if (col is SphereCollider sphere)
+        {
+            Gizmos.matrix = transform.localToWorldMatrix;
+            Gizmos.DrawWireSphere(sphere.center, sphere.radius);
+        }
     }
 }

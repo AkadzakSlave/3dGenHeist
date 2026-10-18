@@ -25,6 +25,7 @@ public class MolotovFireZone : MonoBehaviour
     private Vector3 targetScale;
     private float currentRadius;
     private float baseLightIntensity = 2.2f;
+    private static float lastBurnNotificationTime = -10f;
 
     private void Start()
     {
@@ -155,6 +156,13 @@ public class MolotovFireZone : MonoBehaviour
                 {
                     int playerTickDmg = Mathf.Max(1, Mathf.RoundToInt(playerDamagePerSec * damageInterval));
                     player.TakeDamage(playerTickDmg);
+
+                    if (HeistUI.Instance != null && Time.time - lastBurnNotificationTime > 1.8f)
+                    {
+                        lastBurnNotificationTime = Time.time;
+                        HeistUI.Instance.ShowNotification("Ожог!", new Color(1f, 0.38f, 0.15f, 1f));
+                    }
+
                     Debug.Log($"[Molotov] 🔥 Fire burned Player '{player.name}' for {playerTickDmg} DMG.");
                 }
             }

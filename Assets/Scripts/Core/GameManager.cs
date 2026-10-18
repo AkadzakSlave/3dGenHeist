@@ -676,7 +676,8 @@ public class GameManager : MonoBehaviour
         BagTool bag = GetHeldBag();
         if (bag == null || bag.storedMoney <= 0) return;
 
-        depositedMoney += bag.storedMoney;
+        int added = bag.storedMoney;
+        depositedMoney += added;
         bag.storedMoney = 0;
         bag.storedWeight = 0;
         
@@ -686,6 +687,11 @@ public class GameManager : MonoBehaviour
         }
 
         onMoneyChanged?.Invoke();
+
+        if (HeistUI.Instance != null && added > 0)
+        {
+            HeistUI.Instance.ShowNotification($"+${added}", new Color(0.35f, 0.95f, 0.45f, 1f));
+        }
     }
 
     public void ReturnToMainMenu()

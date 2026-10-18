@@ -10,8 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 255e8612309ed9c4e931687918b51698, type: 3}
-  m_Name: Corridor
+  m_Name: B7_CrossRoad
   m_EditorClassIdentifier: Assembly-CSharp::RoomTemplate
-  prefab: {fileID: 3627145871583954411, guid: af2b7388869ebb1409b99cff51ae66cf, type: 3}
+  prefab: {fileID: 155286199148962951, guid: 1a8d885a98dceb34aa2f565c634a5efd, type: 3}
   category: 0
-  weight: 10
+  weight: 30
