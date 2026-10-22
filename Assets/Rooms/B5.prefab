@@ -1285,9 +1285,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1894133741030755571}
-  - component: {fileID: 4569180212087587777}
   - component: {fileID: 344819258948747965}
   - component: {fileID: -259154400092925876}
+  - component: {fileID: 893808324211023524}
   m_Layer: 6
   m_Name: B5
   m_TagString: Untagged
@@ -1318,27 +1318,6 @@ Transform:
   - {fileID: 4628048878415152238}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4569180212087587777
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6636598832252159969}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa034bf8404475e4bb70b6c1e1716479, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LootSpawner
-  lootPrefabs:
-  - {fileID: 3101191389420430174, guid: 9ea9f899e776df045a1afaa9c79eef52, type: 3}
-  - {fileID: 8453512800796366143, guid: c6e7160a1c65de94eb662f7e73f78fc1, type: 3}
-  spawnChance: 0.7
-  spawnPoints:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!65 &344819258948747965
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1392,6 +1371,21 @@ MonoBehaviour:
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: 73b3344c553bb8e4c98c9fd0416276c0, type: 2}
   m_BuildHeightMesh: 0
+--- !u!114 &893808324211023524
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6636598832252159969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21696b9c90624894582f0f619947524a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoomLootManager
+  lootDB: {fileID: 11400000, guid: 9ad89e344dc3c1b42898b47d3427a4e0, type: 2}
+  spawnOnStart: 0
+  randomRotationJitter: 20
 --- !u!1 &7802353009071629212
 GameObject:
   m_ObjectHideFlags: 0

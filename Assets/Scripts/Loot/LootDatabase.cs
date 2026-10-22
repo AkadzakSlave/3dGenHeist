@@ -35,13 +35,35 @@ public class LootDatabase : ScriptableObject
             var highVal = targetList.FindAll(x => x != null && (x.minValue >= 400 || x.lootType == LootType.Gold || x.lootType == LootType.Case || x.lootType == LootType.Brilliant));
             if (highVal.Count > 0)
             {
-                return highVal[Random.Range(0, highVal.Count)];
+                return SelectWeighted(highVal);
             }
         }
 
         var valid = targetList.FindAll(x => x != null);
         if (valid.Count == 0) return null;
-        return valid[Random.Range(0, valid.Count)];
+        return SelectWeighted(valid);
+    }
+
+    private LootData SelectWeighted(List<LootData> items)
+    {
+        if (items == null || items.Count == 0) return null;
+        if (items.Count == 1) return items[0];
+
+        int totalWeight = 0;
+        foreach (var it in items)
+        {
+            totalWeight += Mathf.Max(1, it.dropWeight);
+        }
+
+        int roll = Random.Range(0, totalWeight);
+        int current = 0;
+        foreach (var it in items)
+        {
+            current += Mathf.Max(1, it.dropWeight);
+            if (roll < current) return it;
+        }
+
+        return items[items.Count - 1];
     }
 
     public int GetAverageItemValue()

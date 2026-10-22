@@ -17,4 +17,5 @@ MonoBehaviour:
   minValue: 10
   maxValue: 200
   weight: 1
+  dropWeight: 60
   prefab: {fileID: 6435782346074615943, guid: 56d592912d3c21546971bc81b36339b3, type: 3}

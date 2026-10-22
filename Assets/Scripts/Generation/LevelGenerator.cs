@@ -155,8 +155,9 @@ public class LevelGenerator : MonoBehaviour
 
     private void SpawnAllRoomsLoot()
     {
-        if (spawnedRooms == null) return;
-        int roomsWithLoot = 0;
+        if (spawnedRooms == null || spawnedRooms.Count == 0) return;
+
+        List<RoomLootManager> managers = new List<RoomLootManager>();
         foreach (var room in spawnedRooms)
         {
             if (room != null)
@@ -165,11 +166,91 @@ public class LevelGenerator : MonoBehaviour
                 if (lootManager != null)
                 {
                     lootManager.SpawnLoot();
-                    roomsWithLoot++;
+                    managers.Add(lootManager);
                 }
             }
         }
-        Debug.Log($"<color=cyan>[Gen] Лут успешно заспавнен в {roomsWithLoot} комнатах.</color>");
+
+        // Гарантированный бюджет карты (Anti-Softlock)
+        EnforceAntiSoftlockBudget(managers);
+    }
+
+    private void EnforceAntiSoftlockBudget(List<RoomLootManager> managers)
+    {
+        if (managers == null || managers.Count == 0) return;
+
+        // 1. Рассчитываем необходимый порог выручки с учетом квоты дня и запаса (1.6x)
+        int minBudget = 2200; // Базовый минимум для тестов
+
+        if (GameManager.Instance != null)
+        {
+            int targetQuota = GameManager.Instance.operationTargetQuota;
+            int alreadySaved = GameManager.Instance.accumulatedOperationMoney + GameManager.Instance.depositedMoney;
+            int neededToPass = Mathf.Max(0, targetQuota - alreadySaved);
+            int daysLeft = Mathf.Clamp(4 - GameManager.Instance.currentDay, 1, 3);
+            int dailyNeed = Mathf.CeilToInt((float)neededToPass / daysLeft);
+
+            // Запас 1.6x: игрок может не найти все углы или не унести из-за перегруза
+            minBudget = Mathf.Max(1800, Mathf.RoundToInt(dailyNeed * 1.6f));
+        }
+
+        // 2. Считаем текущую стоимость заспавненного лута
+        int currentTotal = 0;
+        foreach (var m in managers)
+        {
+            if (m != null) currentTotal += m.GetTotalSpawnedValue();
+        }
+
+        // 3. Если лута меньше безопасного порога — добираем в свободных точках
+        if (currentTotal < minBudget)
+        {
+            Debug.Log($"<color=orange>[AntiSoftlock] Начальный лут: ${currentTotal}. Требуется гарантированный минимум: ${minBudget}. Докидываем лут...</color>");
+
+            int safetyIterations = 40;
+            while (currentTotal < minBudget && safetyIterations > 0)
+            {
+                safetyIterations--;
+                bool pointFound = false;
+
+                // Сначала ищем точки в сейфе / богатых комнатах
+                foreach (var m in managers)
+                {
+                    if (m != null && m.gameObject.name.ToLower().Contains("safe"))
+                    {
+                        if (m.TrySpawnInUnoccupiedPoint(forceHighValue: true))
+                        {
+                            pointFound = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Затем в любых других комнатах
+                if (!pointFound)
+                {
+                    foreach (var m in managers)
+                    {
+                        if (m != null && m.TrySpawnInUnoccupiedPoint(forceHighValue: false))
+                        {
+                            pointFound = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Пересчитываем сумму
+                currentTotal = 0;
+                foreach (var m in managers)
+                {
+                    if (m != null) currentTotal += m.GetTotalSpawnedValue();
+                }
+
+                // Если все точки на всей карте уже заняты — выходим
+                if (!pointFound) break;
+            }
+        }
+
+        Debug.Log($"<color=yellow>[AntiSoftlock] Итоговый бюджет банка: ${currentTotal} (Порог квоты: ${minBudget}). Софтлок исключен!</color>");
     }
 
     IEnumerator GenerateLevelWithRetries()
@@ -546,28 +627,184 @@ public class LevelGenerator : MonoBehaviour
 
     // --- ПРОВЕРКИ КОЛЛИЗИЙ И ГРАНИЦ ---
 
+    private bool GetRoomFootprint(GameObject room, out Vector3 worldCenter, out Vector3 worldSize, out Quaternion worldRotation)
+    {
+        // 1. Ищем лучший активный BoxCollider комнаты (размером от 3м до 26м)
+        BoxCollider[] boxes = room.GetComponentsInChildren<BoxCollider>(true);
+        BoxCollider bestBox = null;
+        float maxArea = 0f;
+
+        foreach (var b in boxes)
+        {
+            if (b == null || !b.enabled) continue;
+            // Пропускаем отключенные в префабе дочерние объекты (например, декоративные плейны пола/крыши)
+            if (!b.gameObject.activeSelf && b.gameObject != room) continue;
+
+            Vector3 scale = b.transform.lossyScale;
+            float sx = Mathf.Abs(b.size.x * scale.x);
+            float sz = Mathf.Abs(b.size.z * scale.z);
+
+            // Реальные размеры комнат в банке от 3м до 26м. Все, что больше 26м — технические плейны
+            if (sx > 26f || sz > 26f || sx < 3f || sz < 3f) continue;
+
+            float area = sx * sz;
+            if (area > maxArea)
+            {
+                maxArea = area;
+                bestBox = b;
+            }
+        }
+
+        if (bestBox != null)
+        {
+            worldCenter = bestBox.transform.TransformPoint(bestBox.center);
+            worldSize = Vector3.Scale(bestBox.size, bestBox.transform.lossyScale);
+            worldRotation = bestBox.transform.rotation;
+            return true;
+        }
+
+        // 2. Фолбек: по границам активных Renderer в префабе комнаты
+        Renderer[] rends = room.GetComponentsInChildren<Renderer>(false);
+        if (rends == null || rends.Length == 0) rends = room.GetComponentsInChildren<Renderer>(true);
+
+        if (rends != null && rends.Length > 0)
+        {
+            Bounds b = rends[0].bounds;
+            for (int i = 1; i < rends.Length; i++)
+            {
+                if (rends[i] != null && (rends[i].gameObject.activeSelf || rends[i].gameObject == room))
+                {
+                    b.Encapsulate(rends[i].bounds);
+                }
+            }
+            worldCenter = b.center;
+            worldSize = b.size;
+            worldRotation = room.transform.rotation;
+            return true;
+        }
+
+        worldCenter = room.transform.position;
+        worldSize = new Vector3(12f, 3f, 12f);
+        worldRotation = room.transform.rotation;
+        return false;
+    }
+
+    private struct OBB2D
+    {
+        public Vector2[] corners;
+        public Vector2[] axes;
+    }
+
+    private OBB2D CreateOBB2D(Vector3 center, Vector3 size, Quaternion rotation, float margin)
+    {
+        float hx = Mathf.Max(0.2f, Mathf.Abs(size.x) * 0.5f - margin);
+        float hz = Mathf.Max(0.2f, Mathf.Abs(size.z) * 0.5f - margin);
+
+        Vector3 right = rotation * Vector3.right;
+        Vector3 forward = rotation * Vector3.forward;
+
+        Vector2 c = new Vector2(center.x, center.z);
+        Vector2 r = new Vector2(right.x, right.z).normalized * hx;
+        Vector2 f = new Vector2(forward.x, forward.z).normalized * hz;
+
+        return new OBB2D
+        {
+            corners = new Vector2[4]
+            {
+                c + r + f,
+                c - r + f,
+                c - r - f,
+                c + r - f
+            },
+            axes = new Vector2[2]
+            {
+                new Vector2(right.x, right.z).normalized,
+                new Vector2(forward.x, forward.z).normalized
+            }
+        };
+    }
+
+    private bool Overlaps2D(OBB2D a, OBB2D b)
+    {
+        Vector2[] testAxes = new Vector2[4] { a.axes[0], a.axes[1], b.axes[0], b.axes[1] };
+
+        foreach (var axis in testAxes)
+        {
+            if (axis.sqrMagnitude < 0.001f) continue;
+
+            float minA = float.MaxValue, maxA = float.MinValue;
+            for (int i = 0; i < 4; i++)
+            {
+                float proj = Vector2.Dot(a.corners[i], axis);
+                if (proj < minA) minA = proj;
+                if (proj > maxA) maxA = proj;
+            }
+
+            float minB = float.MaxValue, maxB = float.MinValue;
+            for (int i = 0; i < 4; i++)
+            {
+                float proj = Vector2.Dot(b.corners[i], axis);
+                if (proj < minB) minB = proj;
+                if (proj > maxB) maxB = proj;
+            }
+
+            if (maxA <= minB || maxB <= minA)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private bool IsWithinBounds(GameObject room)
     {
-        BoxCollider box = room.GetComponent<BoxCollider>();
-        if (box == null) return true;
+        if (buildingBounds.size == Vector3.zero)
+        {
+            buildingBounds = new Bounds(boundsCenter, boundsSize);
+        }
 
-        Vector3 center = room.transform.TransformPoint(box.center);
-        Vector3 extents = Vector3.Scale(box.size, room.transform.lossyScale) / 2f;
+        if (GetRoomFootprint(room, out Vector3 center, out Vector3 size, out Quaternion _))
+        {
+            float halfX = Mathf.Abs(size.x) * 0.45f;
+            float halfZ = Mathf.Abs(size.z) * 0.45f;
 
-        Bounds roomBounds = new Bounds(center, extents * 2f);
-        return buildingBounds.Contains(roomBounds.min) && buildingBounds.Contains(roomBounds.max);
+            Vector3 min = center - new Vector3(halfX, 0f, halfZ);
+            Vector3 max = center + new Vector3(halfX, 0f, halfZ);
+
+            // Проверка по горизонтали с запасом 8м
+            bool xIn = min.x >= (buildingBounds.min.x - 8f) && max.x <= (buildingBounds.max.x + 8f);
+            bool zIn = min.z >= (buildingBounds.min.z - 8f) && max.z <= (buildingBounds.max.z + 8f);
+            return xIn && zIn;
+        }
+        return true;
     }
 
     private bool CanPlaceRoom(GameObject room)
     {
-        BoxCollider box = room.GetComponent<BoxCollider>();
-        if (box == null) return true;
+        if (!GetRoomFootprint(room, out Vector3 center, out Vector3 size, out Quaternion rotation))
+        {
+            return true;
+        }
 
-        Vector3 center = room.transform.TransformPoint(box.center);
-        Vector3 halfExtents = Vector3.Scale(box.size, room.transform.lossyScale) * 0.48f;
-        Quaternion orientation = room.transform.rotation;
+        // Отступ 0.65м дает запас для соприкасающихся стен и дверных сокетов (до 1.3м на стык)
+        OBB2D candidateOBB = CreateOBB2D(center, size, rotation, margin: 0.65f);
 
-        return !Physics.CheckBox(center, halfExtents, orientation, roomLayerMask);
+        // 1. Точная 2D OBB проверка со всеми уже размещенными комнатами
+        foreach (var existingRoom in spawnedRooms)
+        {
+            if (existingRoom == null || existingRoom == room) continue;
+
+            if (GetRoomFootprint(existingRoom, out Vector3 exCenter, out Vector3 exSize, out Quaternion exRot))
+            {
+                OBB2D existingOBB = CreateOBB2D(exCenter, exSize, exRot, margin: 0.65f);
+                if (Overlaps2D(candidateOBB, existingOBB))
+                {
+                    return false; // Настоящее наложение комнат заблокировано
+                }
+            }
+        }
+
+        return true;
     }
 
     // --- УТИЛИТЫ ---

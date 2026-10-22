@@ -614,7 +614,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RoomLootManager
   lootDB: {fileID: 11400000, guid: 9ad89e344dc3c1b42898b47d3427a4e0, type: 2}
-  spawnOnStart: 1
+  spawnOnStart: 0
   randomRotationJitter: 20
 --- !u!65 &2981827415316579638
 BoxCollider:
@@ -1856,13 +1856,67 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4941045587309417086, guid: 2df7157586a29df45b52eee7231729b4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2741563919191309028}
+    - targetCorrespondingSourceObject: {fileID: 5080584550464617104, guid: 2df7157586a29df45b52eee7231729b4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3022817094502163571}
   m_SourcePrefab: {fileID: 100100000, guid: 2df7157586a29df45b52eee7231729b4, type: 3}
 --- !u!4 &335939050802502875 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1183721428352655722, guid: 2df7157586a29df45b52eee7231729b4, type: 3}
   m_PrefabInstance: {fileID: 1496341418035756465}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &5788827973564985295 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4941045587309417086, guid: 2df7157586a29df45b52eee7231729b4, type: 3}
+  m_PrefabInstance: {fileID: 1496341418035756465}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2741563919191309028
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5788827973564985295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 1
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
+--- !u!1 &5928371174915327777 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5080584550464617104, guid: 2df7157586a29df45b52eee7231729b4, type: 3}
+  m_PrefabInstance: {fileID: 1496341418035756465}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3022817094502163571
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5928371174915327777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 1
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1001 &5105508418509990747
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2013,6 +2067,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootPoint
   capacityUnits: 1
+  sizeFilter: 0
+  isHighValue: 0
   spawnChance: 80
   verticalOffset: 0.05
   spawnPositions:
@@ -2089,6 +2145,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootPoint
   capacityUnits: 1
+  sizeFilter: 0
+  isHighValue: 0
   spawnChance: 80
   verticalOffset: 0.05
   spawnPositions:
@@ -2134,6 +2192,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootPoint
   capacityUnits: 1
+  sizeFilter: 0
+  isHighValue: 0
   spawnChance: 80
   verticalOffset: 0.05
   spawnPositions:
@@ -2179,6 +2239,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootPoint
   capacityUnits: 1
+  sizeFilter: 0
+  isHighValue: 0
   spawnChance: 80
   verticalOffset: 0.05
   spawnPositions:

@@ -50,14 +50,15 @@ public class LootPoint : MonoBehaviour
         }
 
         Gizmos.color = gizmoColor;
-        Vector3 center = transform.position + Vector3.up * verticalOffset;
-        
         Vector3 boxSize = new Vector3(0.25f, 0.08f, 0.25f);
-        if (sizeFilter == LootPointSizeFilter.LargeOnly || capacityUnits >= 4) boxSize = new Vector3(0.5f, 0.2f, 0.4f);
-        else if (sizeFilter == LootPointSizeFilter.MediumOnly || capacityUnits >= 2) boxSize = new Vector3(0.35f, 0.12f, 0.35f);
+        if (sizeFilter == LootPointSizeFilter.LargeOnly || capacityUnits >= 4) boxSize = new Vector3(0.5f, 0.25f, 0.4f);
+        else if (sizeFilter == LootPointSizeFilter.MediumOnly || capacityUnits >= 2) boxSize = new Vector3(0.35f, 0.15f, 0.35f);
+
+        // Центр куба на половине высоты, чтобы его дно касалось поверхности
+        Vector3 center = transform.position + Vector3.up * (verticalOffset + boxSize.y * 0.5f);
 
         Gizmos.DrawWireCube(center, boxSize);
-        Gizmos.DrawRay(transform.position, Vector3.up * (verticalOffset + 0.1f));
+        Gizmos.DrawRay(transform.position, Vector3.up * (verticalOffset + boxSize.y));
         
         if (spawnPositions != null && spawnPositions.Count > 0)
         {

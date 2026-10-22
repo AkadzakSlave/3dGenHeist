@@ -330,6 +330,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1810727765435554638}
+  - component: {fileID: 5900904399480454970}
   m_Layer: 0
   m_Name: SpawnLoot
   m_TagString: Untagged
@@ -352,6 +353,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2372253502921632291}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5900904399480454970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2975094090126876114}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1 &3234051385383172288
 GameObject:
   m_ObjectHideFlags: 0
@@ -361,9 +381,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2372253502921632291}
-  - component: {fileID: -889297293479346090}
   - component: {fileID: 6905478380357573250}
   - component: {fileID: 3866067173212516256}
+  - component: {fileID: 4464517331008026138}
   m_Layer: 6
   m_Name: S5
   m_TagString: Untagged
@@ -405,30 +425,6 @@ Transform:
   - {fileID: 4429476301261977312}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &-889297293479346090
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3234051385383172288}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa034bf8404475e4bb70b6c1e1716479, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LootSpawner
-  lootPrefabs:
-  - {fileID: 1214243730013476256, guid: 1e939d136b87d214993fe5a77a2db770, type: 3}
-  - {fileID: 3101191389420430174, guid: 9ea9f899e776df045a1afaa9c79eef52, type: 3}
-  - {fileID: 8453512800796366143, guid: c6e7160a1c65de94eb662f7e73f78fc1, type: 3}
-  spawnChance: 0.8
-  spawnPoints:
-  - {fileID: 1810727765435554638}
-  - {fileID: 3732805372388404880}
-  - {fileID: 945424887476775262}
-  - {fileID: 2474014669154188393}
-  - {fileID: 4648729240683765712}
-  - {fileID: 6414390784291416385}
 --- !u!65 &6905478380357573250
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -482,6 +478,21 @@ MonoBehaviour:
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: d91857c7215872247ae4d8a85d0d6083, type: 2}
   m_BuildHeightMesh: 0
+--- !u!114 &4464517331008026138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3234051385383172288}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21696b9c90624894582f0f619947524a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoomLootManager
+  lootDB: {fileID: 11400000, guid: 9ad89e344dc3c1b42898b47d3427a4e0, type: 2}
+  spawnOnStart: 0
+  randomRotationJitter: 20
 --- !u!1 &3678627713444339949
 GameObject:
   m_ObjectHideFlags: 0
@@ -583,6 +594,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 945424887476775262}
+  - component: {fileID: 2583621298049129743}
   m_Layer: 0
   m_Name: SpawnLoot (2)
   m_TagString: Untagged
@@ -605,6 +617,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2372253502921632291}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2583621298049129743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4640118552135486095}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1 &5382159202895004137
 GameObject:
   m_ObjectHideFlags: 0
@@ -877,6 +908,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4648729240683765712}
+  - component: {fileID: 884785285771928933}
   m_Layer: 0
   m_Name: SpawnLoot (4)
   m_TagString: Untagged
@@ -899,6 +931,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2372253502921632291}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &884785285771928933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5899033032046067749}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1 &5902696313793942061
 GameObject:
   m_ObjectHideFlags: 0
@@ -908,6 +959,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2474014669154188393}
+  - component: {fileID: 1022752713035189379}
   m_Layer: 0
   m_Name: SpawnLoot (3)
   m_TagString: Untagged
@@ -930,6 +982,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2372253502921632291}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1022752713035189379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5902696313793942061}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1 &7733546686405260158
 GameObject:
   m_ObjectHideFlags: 0
@@ -1163,6 +1234,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3732805372388404880}
+  - component: {fileID: 7837755446139324585}
   m_Layer: 0
   m_Name: SpawnLoot (1)
   m_TagString: Untagged
@@ -1185,6 +1257,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2372253502921632291}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7837755446139324585
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7954964913089553994}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1 &8175563047015255714
 GameObject:
   m_ObjectHideFlags: 0
@@ -1577,6 +1668,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6414390784291416385}
+  - component: {fileID: 1603012328915828456}
   m_Layer: 0
   m_Name: SpawnLoot (5)
   m_TagString: Untagged
@@ -1599,6 +1691,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2372253502921632291}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1603012328915828456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8797724418384026416}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1 &8810334077914376973
 GameObject:
   m_ObjectHideFlags: 0

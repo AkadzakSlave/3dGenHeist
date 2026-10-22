@@ -19,10 +19,8 @@ public class LootSetupTool : EditorWindow
     }
 
     private int selectedTab = 0;
-    private readonly string[] tabNames = new string[] { "📊 Дашборд комнат", "🎯 Расстановка в сцене (Click-to-Place)", "⚙️ Пакетная миграция" };
+    private readonly string[] tabNames = new string[] { "📊 Дашборд комнат", "🎯 Быстрая расстановка лута", "⚙️ Пакетная миграция" };
 
-    // Placement Mode Settings
-    private bool placementMode = false;
     private PlacementPreset currentPreset = PlacementPreset.Small_Loot;
     private float customVerticalOffset = 0.05f;
     private float customSpawnChance = 80f;
@@ -39,13 +37,11 @@ public class LootSetupTool : EditorWindow
 
     private void OnEnable()
     {
-        SceneView.duringSceneGui += OnSceneGUI;
         FindLootDatabase();
     }
 
     private void OnDisable()
     {
-        SceneView.duringSceneGui -= OnSceneGUI;
     }
 
     private void FindLootDatabase()
@@ -172,75 +168,178 @@ public class LootSetupTool : EditorWindow
 
     #endregion
 
-    #region Tab 2: Click-to-Place Mode
+    #region Tab 2: Placement Mode
 
     private void DrawPlacementTab()
     {
-        GUILayout.Label("Интерактивная расстановка точек (Scene View)", EditorStyles.boldLabel);
-        EditorGUILayout.HelpBox("1. Откройте нужный префаб комнаты (или сцену).\n2. Включите режим клика ниже.\n3. Кликайте по столам, полкам или полу в окне Scene View — точка лута создастся автоматически!", MessageType.Info);
-
-        EditorGUILayout.Space(6);
-
-        GUI.backgroundColor = placementMode ? new Color(0.3f, 1f, 0.4f) : new Color(1f, 0.5f, 0.5f);
-        if (GUILayout.Button(placementMode ? "🟢 РЕЖИМ РАССТАНОВКИ ВКЛЮЧЕН (Кликните в Scene View)" : "⚪ ВКЛЮЧИТЬ РЕЖИМ РАССТАНОВКИ", GUILayout.Height(38)))
-        {
-            placementMode = !placementMode;
-            SceneView.RepaintAll();
-        }
-        GUI.backgroundColor = Color.white;
+        GUILayout.Label("Расстановка точек лута на мебель", EditorStyles.boldLabel);
+        EditorGUILayout.HelpBox("1. Откройте нужный префаб комнаты.\n2. Выделите в SceneView или в Hierarchy мебель (стол, полку, тумбу, комод).\n3. Нажмите кнопку нужного размера лута — точка встанет ровно на верхнюю поверхность!\n(Можно выделять сразу несколько объектов через Ctrl/Shift).", MessageType.Info);
 
         EditorGUILayout.Space(10);
-        GUILayout.Label("── Пресет создаваемой точки ──", EditorStyles.boldLabel);
-        currentPreset = (PlacementPreset)EditorGUILayout.EnumPopup("Тип лута", currentPreset);
-
         customSpawnChance = EditorGUILayout.Slider("Шанс спавна (%)", customSpawnChance, 10f, 100f);
         customVerticalOffset = EditorGUILayout.FloatField("Смещение вверх (Y Offset)", customVerticalOffset);
 
-        EditorGUILayout.Space(8);
-        EditorGUILayout.HelpBox(GetPresetDescription(currentPreset), MessageType.None);
-    }
+        EditorGUILayout.Space(14);
+        GUILayout.Label("── 🎯 Поставить точку на ВЫДЕЛЕННЫЕ объекты ──", EditorStyles.boldLabel);
 
-    private string GetPresetDescription(PlacementPreset preset)
-    {
-        switch (preset)
+        EditorGUILayout.BeginHorizontal();
+        GUI.backgroundColor = new Color(0.4f, 1f, 0.4f);
+        if (GUILayout.Button("🟢 Поставить Small\n(Полки, узкие тумбы)", GUILayout.Height(44)))
         {
-            case PlacementPreset.Small_Loot:
-                return "🟢 Small: Пачки денег, сигары, мелкие драгоценности (Capacity = 1). Идеально для столов и полок.";
-            case PlacementPreset.Medium_Loot:
-                return "🔵 Medium: Золотые слитки, статуэтки, дорогие часы (Capacity = 2). Для кабинетов и тумб.";
-            case PlacementPreset.Large_Loot:
-                return "🟣 Large: Кейсы с деньгами, чемоданы (Capacity = 4). Для пола, сейфов и багажных полок.";
-            case PlacementPreset.Vault_Special:
-                return "⭐ Vault: Высокая стоимость (High Value)! Спавнит самые дорогие предметы с бонусом к цене.";
-            default:
-                return "";
+            PlaceOnSelectedObjects(PlacementPreset.Small_Loot);
+        }
+
+        GUI.backgroundColor = new Color(0.4f, 0.8f, 1f);
+        if (GUILayout.Button("🔵 Поставить Medium\n(Столы, комоды)", GUILayout.Height(44)))
+        {
+            PlaceOnSelectedObjects(PlacementPreset.Medium_Loot);
+        }
+        EditorGUILayout.EndHorizontal();
+
+        EditorGUILayout.BeginHorizontal();
+        GUI.backgroundColor = new Color(0.9f, 0.4f, 1f);
+        if (GUILayout.Button("🟣 Поставить Large\n(Широкие столы, пол, комод)", GUILayout.Height(40)))
+        {
+            PlaceOnSelectedObjects(PlacementPreset.Large_Loot);
+        }
+
+        GUI.backgroundColor = new Color(1f, 0.85f, 0.2f);
+        if (GUILayout.Button("⭐ Поставить Vault\n(Сейф / Золото)", GUILayout.Height(40)))
+        {
+            PlaceOnSelectedObjects(PlacementPreset.Vault_Special);
+        }
+        EditorGUILayout.EndHorizontal();
+        GUI.backgroundColor = Color.white;
+
+        EditorGUILayout.Space(10);
+        EditorGUILayout.HelpBox("💡 Адаптивный спавн: на Large точке могут случайно появиться 1 большой кейс, 1-2 слитка золота или 2-3 пачки денег рядом! На Medium — 1 слиток или 1-2 пачки денег.", MessageType.None);
+
+        EditorGUILayout.Space(14);
+        GUILayout.Label("── 🔍 Авто-детект по именам моделей (Blender / Unity) ──", EditorStyles.boldLabel);
+        if (GUILayout.Button("🔍 Найти мебель (Стеллажи, столы, шкафы) и расставить лут", GUILayout.Height(32)))
+        {
+            AutoDetectFurnitureInCurrentRoom();
         }
     }
 
-    private void OnSceneGUI(SceneView sceneView)
+    private void PlaceOnSelectedObjects(PlacementPreset preset)
     {
-        if (!placementMode) return;
+        currentPreset = preset;
+        PlaceOnSelectedObjects();
+    }
 
-        Event e = Event.current;
-        Ray ray = HandleUtility.GUIPointToWorldRay(e.mousePosition);
-
-        if (Physics.Raycast(ray, out RaycastHit hit, 200f))
+    private void PlaceOnSelectedObjects()
+    {
+        if (Selection.gameObjects == null || Selection.gameObjects.Length == 0)
         {
-            // Рисуем маркер под курсором
-            Color markerColor = GetPresetColor(currentPreset);
-            Handles.color = markerColor;
-            Handles.DrawWireDisc(hit.point + hit.normal * 0.02f, hit.normal, 0.25f);
-            Handles.DrawDottedLine(hit.point, hit.point + Vector3.up * customVerticalOffset, 3f);
+            EditorUtility.DisplayDialog("Внимание", "Выделите в Hierarchy или в SceneView хотя бы один объект (стол, полку, тумбу)!", "OK");
+            return;
+        }
 
-            // Обработка клика мыши
-            if (e.type == EventType.MouseDown && e.button == 0 && !e.alt)
+        int count = 0;
+        foreach (var go in Selection.gameObjects)
+        {
+            if (go == null) continue;
+            Renderer rend = go.GetComponent<Renderer>();
+            Vector3 pos;
+            if (rend != null)
             {
-                CreateLootPointAt(hit.point, hit.normal);
-                e.Use();
+                pos = new Vector3(rend.bounds.center.x, rend.bounds.max.y, rend.bounds.center.z);
             }
+            else
+            {
+                pos = go.transform.position;
+            }
+
+            CreateLootPointAt(pos, Vector3.up);
+            count++;
         }
 
-        sceneView.Repaint();
+        Debug.Log($"<color=green>[LootPlacer] Создано точек на выделенных объектах: {count}</color>");
+    }
+
+    private void AutoDetectFurnitureInCurrentRoom()
+    {
+        Transform rootRoom = null;
+        var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
+        if (prefabStage != null)
+        {
+            rootRoom = prefabStage.prefabContentsRoot.transform;
+        }
+        else if (Selection.activeTransform != null)
+        {
+            rootRoom = Selection.activeTransform.root;
+        }
+
+        if (rootRoom == null)
+        {
+            EditorUtility.DisplayDialog("Внимание", "Откройте префаб комнаты в Prefab Mode или выделите комнату на сцене!", "OK");
+            return;
+        }
+
+        // Поддержка русских названий из Blender (стелаж, стол, полка, шкаф и т.д.)
+        string[] keywords = new string[] {
+            "стелаж", "стеллаж", "стол", "тумба", "шкаф", "полка", "комод", "сейф", "стойка",
+            "table", "desk", "shelf", "counter", "cabinet", "stand", "cupboard", "commode", "safe"
+        };
+        Renderer[] allRenderers = rootRoom.GetComponentsInChildren<Renderer>(true);
+
+        int created = 0;
+        foreach (var rend in allRenderers)
+        {
+            if (rend == null) continue;
+            string nameLower = rend.gameObject.name.ToLower();
+
+            bool matched = false;
+            foreach (var kw in keywords)
+            {
+                if (nameLower.Contains(kw))
+                {
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched) continue;
+
+            // Проверяем, нет ли уже рядом точки лута
+            Vector3 topCenter = new Vector3(rend.bounds.center.x, rend.bounds.max.y, rend.bounds.center.z);
+            LootPoint[] existing = rootRoom.GetComponentsInChildren<LootPoint>(true);
+            bool alreadyHasPoint = false;
+            foreach (var ep in existing)
+            {
+                if (ep != null && Vector3.Distance(ep.transform.position, topCenter) < 0.4f)
+                {
+                    alreadyHasPoint = true;
+                    break;
+                }
+            }
+
+            if (alreadyHasPoint) continue;
+
+            // Определяем тип точки по имени/размеру
+            if (nameLower.Contains("safe") || nameLower.Contains("сейф"))
+            {
+                currentPreset = PlacementPreset.Vault_Special;
+            }
+            else if (nameLower.Contains("shelf") || nameLower.Contains("стелаж") || nameLower.Contains("полка") || rend.bounds.size.x < 0.6f || rend.bounds.size.z < 0.6f)
+            {
+                currentPreset = PlacementPreset.Small_Loot;
+            }
+            else if (rend.bounds.size.x >= 1.2f || rend.bounds.size.z >= 1.2f)
+            {
+                currentPreset = PlacementPreset.Large_Loot;
+            }
+            else
+            {
+                currentPreset = PlacementPreset.Medium_Loot;
+            }
+
+            CreateLootPointAt(topCenter, Vector3.up);
+            created++;
+        }
+
+        EditorUtility.DisplayDialog("Авто-детект завершен", $"Найдено мебели и создано точек: {created}", "OK");
     }
 
     private Color GetPresetColor(PlacementPreset preset)
@@ -305,17 +404,17 @@ public class LootSetupTool : EditorWindow
                 break;
             case PlacementPreset.Medium_Loot:
                 lp.capacityUnits = 2;
-                lp.sizeFilter = LootPointSizeFilter.MediumOnly;
+                lp.sizeFilter = LootPointSizeFilter.Any; // 1 средний или 1-2 малых со смещением
                 lp.isHighValue = false;
                 break;
             case PlacementPreset.Large_Loot:
                 lp.capacityUnits = 4;
-                lp.sizeFilter = LootPointSizeFilter.LargeOnly;
+                lp.sizeFilter = LootPointSizeFilter.Any; // 1 крупный, 1-2 средних или 2-3 малых
                 lp.isHighValue = false;
                 break;
             case PlacementPreset.Vault_Special:
                 lp.capacityUnits = 4;
-                lp.sizeFilter = LootPointSizeFilter.LargeOnly;
+                lp.sizeFilter = LootPointSizeFilter.Any; // Богатый лут сейфа
                 lp.isHighValue = true;
                 break;
         }

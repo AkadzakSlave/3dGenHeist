@@ -100,14 +100,18 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
         }
-        else
+        else if (Instance != this)
         {
             Destroy(gameObject);
+            return;
         }
     }
 
     private void Start()
     {
+        // Guard against duplicate instances running Start before Unity finishes Destroy
+        if (Instance != null && Instance != this) return;
+
         // Register all players present in scene
         PlayerHealth[] players = FindObjectsByType<PlayerHealth>(FindObjectsInactive.Include);
         foreach (var p in players)
@@ -118,7 +122,7 @@ public class GameManager : MonoBehaviour
         onGlobalBalanceChanged?.Invoke();
         onMoneyChanged?.Invoke();
 
-        if (isInLobby && lobbySpawnPoint != null && playerController != null)
+        if (isInLobby && lobbySpawnPoint != null)
         {
             StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));
         }
@@ -715,19 +719,54 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator TeleportPlayer(Vector3 pos, Quaternion rot)
     {
+        if (Instance != null && Instance != this) yield break;
+
+        if (playerTransform == null && playerController != null)
+        {
+            playerTransform = playerController.transform;
+        }
+
+        if (playerController == null && playerTransform != null)
+        {
+            playerController = playerTransform.GetComponent<CharacterController>();
+        }
+
+        if (playerController == null)
+        {
+            playerController = FindAnyObjectByType<CharacterController>();
+            if (playerController != null && playerTransform == null)
+            {
+                playerTransform = playerController.transform;
+            }
+        }
+
         if (playerController != null)
         {
             playerController.enabled = false;
-            playerTransform.position = pos;
-            playerTransform.rotation = rot;
-            yield return new WaitForEndOfFrame();
-            playerController.enabled = true;
         }
-        else if (playerTransform != null)
+
+        if (playerTransform != null)
         {
             playerTransform.position = pos;
             playerTransform.rotation = rot;
-            yield return new WaitForEndOfFrame();
+        }
+
+        yield return new WaitForEndOfFrame();
+
+        // Check if playerController is still valid after the frame (in case a duplicate GameObject was destroyed)
+        if (playerController != null)
+        {
+            playerController.enabled = true;
+        }
+        else
+        {
+            CharacterController cc = FindAnyObjectByType<CharacterController>();
+            if (cc != null)
+            {
+                cc.enabled = true;
+                playerController = cc;
+                playerTransform = cc.transform;
+            }
         }
 
         PlayerMovement pm = FindAnyObjectByType<PlayerMovement>();

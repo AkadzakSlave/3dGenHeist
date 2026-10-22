@@ -9,6 +9,10 @@ public class LootData : ScriptableObject
     public int maxValue = 200;
     public int weight = 5;
     
+    [Header("Rarity Settings")]
+    [Tooltip("Вес выпадения в процентах/долях (больше = чаще выпадает)")]
+    [Range(1, 100)] public int dropWeight = 50;
+
     [Header("Visuals")]
     public GameObject prefab; // Визуал предмета
 }

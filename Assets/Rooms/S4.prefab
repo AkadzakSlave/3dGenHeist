@@ -101,6 +101,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2021775889026058216}
+  - component: {fileID: 1221406594698980116}
   m_Layer: 0
   m_Name: SpawnLoot (2)
   m_TagString: Untagged
@@ -123,6 +124,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4239066406221034543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1221406594698980116
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 268342401311283796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1 &638919578930995108
 GameObject:
   m_ObjectHideFlags: 0
@@ -132,9 +152,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4239066406221034543}
-  - component: {fileID: 3156193250628141813}
   - component: {fileID: 4435333912743236827}
   - component: {fileID: 7779939993621979140}
+  - component: {fileID: 1513623514007165138}
   m_Layer: 6
   m_Name: S4
   m_TagString: Untagged
@@ -181,32 +201,6 @@ Transform:
   - {fileID: 8815640851201682259}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3156193250628141813
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 638919578930995108}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa034bf8404475e4bb70b6c1e1716479, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LootSpawner
-  lootPrefabs:
-  - {fileID: 1214243730013476256, guid: 1e939d136b87d214993fe5a77a2db770, type: 3}
-  - {fileID: 3101191389420430174, guid: 9ea9f899e776df045a1afaa9c79eef52, type: 3}
-  - {fileID: 8453512800796366143, guid: c6e7160a1c65de94eb662f7e73f78fc1, type: 3}
-  spawnChance: 0.8
-  spawnPoints:
-  - {fileID: 839169735212183673}
-  - {fileID: 5111463380414533965}
-  - {fileID: 2021775889026058216}
-  - {fileID: 1949535094011105560}
-  - {fileID: 5742154545935967065}
-  - {fileID: 2127756065382925468}
-  - {fileID: 1181954053387789191}
-  - {fileID: 5473611638243668266}
 --- !u!65 &4435333912743236827
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -260,6 +254,21 @@ MonoBehaviour:
   m_MinRegionArea: 2
   m_NavMeshData: {fileID: 23800000, guid: c00d45f9f58380d44b43ba34e927ea64, type: 2}
   m_BuildHeightMesh: 0
+--- !u!114 &1513623514007165138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 638919578930995108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21696b9c90624894582f0f619947524a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RoomLootManager
+  lootDB: {fileID: 11400000, guid: 9ad89e344dc3c1b42898b47d3427a4e0, type: 2}
+  spawnOnStart: 0
+  randomRotationJitter: 20
 --- !u!1 &697962872810874156
 GameObject:
   m_ObjectHideFlags: 0
@@ -540,6 +549,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 839169735212183673}
+  - component: {fileID: 5504609242491823516}
   m_Layer: 0
   m_Name: SpawnLoot
   m_TagString: Untagged
@@ -562,6 +572,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4239066406221034543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5504609242491823516
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1405209499307474740}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1 &1603851563919748569
 GameObject:
   m_ObjectHideFlags: 0
@@ -1258,6 +1287,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2127756065382925468}
+  - component: {fileID: 2160391185364328520}
   m_Layer: 0
   m_Name: SpawnLoot (5)
   m_TagString: Untagged
@@ -1280,6 +1310,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4239066406221034543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2160391185364328520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4173714125746079411}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1 &4510909882694575148
 GameObject:
   m_ObjectHideFlags: 0
@@ -1551,6 +1600,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1949535094011105560}
+  - component: {fileID: 6321641194939965577}
   m_Layer: 0
   m_Name: SpawnLoot (3)
   m_TagString: Untagged
@@ -1573,6 +1623,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4239066406221034543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6321641194939965577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6455545760027579126}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1 &6843598601875086532
 GameObject:
   m_ObjectHideFlags: 0
@@ -1582,6 +1651,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5473611638243668266}
+  - component: {fileID: 8279249248444196775}
   m_Layer: 0
   m_Name: SpawnLoot (7)
   m_TagString: Untagged
@@ -1604,6 +1674,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4239066406221034543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8279249248444196775
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6843598601875086532}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1 &7239513131791248757
 GameObject:
   m_ObjectHideFlags: 0
@@ -1613,6 +1702,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1181954053387789191}
+  - component: {fileID: 7908662409342730846}
   m_Layer: 0
   m_Name: SpawnLoot (6)
   m_TagString: Untagged
@@ -1635,6 +1725,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4239066406221034543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7908662409342730846
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7239513131791248757}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1 &7530728664855809970
 GameObject:
   m_ObjectHideFlags: 0
@@ -1801,6 +1910,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5742154545935967065}
+  - component: {fileID: 6327619287973931858}
   m_Layer: 0
   m_Name: SpawnLoot (4)
   m_TagString: Untagged
@@ -1823,6 +1933,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4239066406221034543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6327619287973931858
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8540385535054114249}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1 &8634223778809328507
 GameObject:
   m_ObjectHideFlags: 0
@@ -1832,6 +1961,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5111463380414533965}
+  - component: {fileID: 6977640687665581628}
   m_Layer: 0
   m_Name: SpawnLoot (1)
   m_TagString: Untagged
@@ -1854,6 +1984,25 @@ Transform:
   m_Children: []
   m_Father: {fileID: 4239066406221034543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6977640687665581628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8634223778809328507}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 2
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!1001 &501381701954511215
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2628,8 +2777,62 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4941045587309417086, guid: 2df7157586a29df45b52eee7231729b4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1765010745593752456}
+    - targetCorrespondingSourceObject: {fileID: 5080584550464617104, guid: 2df7157586a29df45b52eee7231729b4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3390981776672093996}
   m_SourcePrefab: {fileID: 100100000, guid: 2df7157586a29df45b52eee7231729b4, type: 3}
+--- !u!1 &3232300520423103590 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4941045587309417086, guid: 2df7157586a29df45b52eee7231729b4, type: 3}
+  m_PrefabInstance: {fileID: 7514659476716637720}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1765010745593752456
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3232300520423103590}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 1
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
+--- !u!1 &3371140316692231304 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5080584550464617104, guid: 2df7157586a29df45b52eee7231729b4, type: 3}
+  m_PrefabInstance: {fileID: 7514659476716637720}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3390981776672093996
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3371140316692231304}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46fc292f4a8d91c4b8767da2073d77e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootPoint
+  capacityUnits: 1
+  sizeFilter: 0
+  isHighValue: 0
+  spawnChance: 80
+  verticalOffset: 0.05
+  spawnPositions: []
+  isOccupied: 0
 --- !u!4 &8657047290806906738 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1183721428352655722, guid: 2df7157586a29df45b52eee7231729b4, type: 3}
