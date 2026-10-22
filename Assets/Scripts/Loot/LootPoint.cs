@@ -3,11 +3,19 @@ using System.Collections.Generic;
 
 // LootPointSize перенесен в LootDatabase.cs для глобальной видимости
 
+public enum LootPointSizeFilter { Any, SmallOnly, MediumOnly, LargeOnly }
+
 public class LootPoint : MonoBehaviour
 {
     [Header("Capacity Settings")]
     [Tooltip("Сколько 'единиц объема' вмещает точка. Малый предмет = 1, Средний = 2, Крупный = 4")]
     public int capacityUnits = 1;
+
+    [Tooltip("Ограничение по размеру предмета (Any = авто по вместимости)")]
+    public LootPointSizeFilter sizeFilter = LootPointSizeFilter.Any;
+
+    [Tooltip("Особая точка (для сейфа/хранилища): спавнит дорогой лут (золото, кейсы, драгоценности, пачки денег с бонусом к цене)")]
+    public bool isHighValue = false;
     
     [Range(0, 100)] public float spawnChance = 80f;
 
@@ -23,15 +31,43 @@ public class LootPoint : MonoBehaviour
 
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.cyan;
+        Color gizmoColor;
+        if (isHighValue)
+        {
+            gizmoColor = new Color(1f, 0.85f, 0.1f, 0.9f); // Gold for safe/high value
+        }
+        else if (sizeFilter == LootPointSizeFilter.LargeOnly || capacityUnits >= 4)
+        {
+            gizmoColor = new Color(0.85f, 0.2f, 1f, 0.9f); // Magenta for Large
+        }
+        else if (sizeFilter == LootPointSizeFilter.MediumOnly || capacityUnits >= 2)
+        {
+            gizmoColor = new Color(0.2f, 0.7f, 1f, 0.9f); // Cyan for Medium
+        }
+        else
+        {
+            gizmoColor = new Color(0.2f, 1f, 0.4f, 0.9f); // Green for Small
+        }
+
+        Gizmos.color = gizmoColor;
         Vector3 center = transform.position + Vector3.up * verticalOffset;
-        Gizmos.DrawWireCube(center, new Vector3(0.3f, 0.05f, 0.3f));
         
-        if (spawnPositions.Count > 0)
+        Vector3 boxSize = new Vector3(0.25f, 0.08f, 0.25f);
+        if (sizeFilter == LootPointSizeFilter.LargeOnly || capacityUnits >= 4) boxSize = new Vector3(0.5f, 0.2f, 0.4f);
+        else if (sizeFilter == LootPointSizeFilter.MediumOnly || capacityUnits >= 2) boxSize = new Vector3(0.35f, 0.12f, 0.35f);
+
+        Gizmos.DrawWireCube(center, boxSize);
+        Gizmos.DrawRay(transform.position, Vector3.up * (verticalOffset + 0.1f));
+        
+        if (spawnPositions != null && spawnPositions.Count > 0)
         {
             foreach (var p in spawnPositions)
             {
-                if (p != null) Gizmos.DrawRay(p.position, Vector3.up * 0.1f);
+                if (p != null)
+                {
+                    Gizmos.color = gizmoColor * 0.8f;
+                    Gizmos.DrawRay(p.position, Vector3.up * 0.15f);
+                }
             }
         }
     }

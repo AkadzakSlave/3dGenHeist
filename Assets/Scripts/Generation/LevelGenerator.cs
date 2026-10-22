@@ -40,6 +40,7 @@ public class LevelGenerator : MonoBehaviour
     private Stack<SocketData> openSockets = new Stack<SocketData>();
     private List<GameObject> spawnedRooms = new List<GameObject>();
     private List<GameObject> spawnedWalls = new List<GameObject>();
+    private int connectedLoopsCount = 0;
 
     [HideInInspector]
     public Transform vanSpawnPoint;
@@ -87,6 +88,7 @@ public class LevelGenerator : MonoBehaviour
         openSockets.Clear();
         
         generatedRoomsCount = 0;
+        connectedLoopsCount = 0;
         vaultSpawned = false;
         securitySpawned = false;
         vipSpawned = false;
@@ -145,7 +147,29 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
+        // 4. Centralized loot spawn for all generated rooms (runs after NavMesh is baked)
+        SpawnAllRoomsLoot();
+
         onComplete?.Invoke();
+    }
+
+    private void SpawnAllRoomsLoot()
+    {
+        if (spawnedRooms == null) return;
+        int roomsWithLoot = 0;
+        foreach (var room in spawnedRooms)
+        {
+            if (room != null)
+            {
+                RoomLootManager lootManager = room.GetComponent<RoomLootManager>();
+                if (lootManager != null)
+                {
+                    lootManager.SpawnLoot();
+                    roomsWithLoot++;
+                }
+            }
+        }
+        Debug.Log($"<color=cyan>[Gen] Лут успешно заспавнен в {roomsWithLoot} комнатах.</color>");
     }
 
     IEnumerator GenerateLevelWithRetries()
@@ -175,6 +199,7 @@ public class LevelGenerator : MonoBehaviour
             if (generatedRoomsCount >= minR)
             {
                 generationSuccess = true;
+                ConnectLoops();
                 SealDeadEnds();
                 PrintGenerationReport(currentAttempt + 1);
             }
@@ -192,6 +217,7 @@ public class LevelGenerator : MonoBehaviour
                 minR = GameManager.Instance.selectedDossier.minRooms;
             
             Debug.LogError($"<color=red>[Gen] ФАТАЛЬНАЯ ОШИБКА: Не удалось достичь minRooms ({minR}) за {maxRetries} попыток! Оставляем последний результат.</color>");
+            ConnectLoops();
             SealDeadEnds();
         }
     }
@@ -288,6 +314,76 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
+    private void ConnectLoops()
+    {
+        connectedLoopsCount = 0;
+        List<RoomSocket> openSocketsList = new List<RoomSocket>();
+
+        foreach (GameObject room in spawnedRooms)
+        {
+            if (room == null) continue;
+            RoomSocket[] sockets = room.GetComponentsInChildren<RoomSocket>();
+            foreach (var s in sockets)
+            {
+                if (!s.isConnected)
+                {
+                    openSocketsList.Add(s);
+                }
+            }
+        }
+
+        for (int i = 0; i < openSocketsList.Count; i++)
+        {
+            RoomSocket socketA = openSocketsList[i];
+            if (socketA == null || socketA.isConnected) continue;
+
+            for (int j = i + 1; j < openSocketsList.Count; j++)
+            {
+                RoomSocket socketB = openSocketsList[j];
+                if (socketB == null || socketB.isConnected) continue;
+
+                // Не соединяем сокеты одной и той же комнаты
+                if (GetRoomRoot(socketA.gameObject) == GetRoomRoot(socketB.gameObject)) continue;
+
+                // Проверяем расстояние между сокетами (в пределах 1.8м по горизонтали, 0.6м по вертикали)
+                Vector3 delta = socketA.transform.position - socketB.transform.position;
+                if (Mathf.Abs(delta.y) > 0.6f) continue;
+                delta.y = 0;
+                if (delta.magnitude > 1.8f) continue;
+
+                // Проверяем, что сокеты направлены навстречу друг другу
+                float dot = Vector3.Dot(socketA.transform.forward, -socketB.transform.forward);
+                if (dot < 0.8f) continue;
+
+                // Соединяем сокеты
+                socketA.isConnected = true;
+                socketB.isConnected = true;
+
+                // Ставим разрушаемую стену посередине
+                if (destructibleWallPrefab != null)
+                {
+                    Vector3 midPos = (socketA.transform.position + socketB.transform.position) * 0.5f;
+                    GameObject wall = Instantiate(destructibleWallPrefab, midPos, socketA.transform.rotation, transform);
+                    spawnedWalls.Add(wall);
+                }
+
+                connectedLoopsCount++;
+                Debug.Log($"<color=cyan>[Gen/Loop] Создан обходной путь (петля) между комнатами {GetRoomRoot(socketA.gameObject).name} и {GetRoomRoot(socketB.gameObject).name}!</color>");
+                break;
+            }
+        }
+    }
+
+    private GameObject GetRoomRoot(GameObject obj)
+    {
+        Transform cur = obj.transform;
+        while (cur.parent != null && cur.parent != transform)
+        {
+            cur = cur.parent;
+        }
+        return cur.gameObject;
+    }
+
     private void SealDeadEnds()
     {
         int sealedCount = 0;
@@ -325,6 +421,7 @@ public class LevelGenerator : MonoBehaviour
         report += $"   - Хранилище (Vault): {(vaultSpawned ? "<color=green>Да</color>" : "<color=red>Нет</color>")}\n";
         report += $"   - Охранная (Security): {(securitySpawned ? "<color=green>Да</color>" : "<color=red>Нет</color>")}\n";
         report += $"   - VIP: {(vipSpawned ? "<color=green>Да</color>" : "<color=red>Нет</color>")}\n";
+        report += $"▪ Создано закольцованных путей (петель): <b>{connectedLoopsCount}</b>\n";
         report += $"▪ Запечатано тупиков стенками: <b>{spawnedWalls.Count}</b>\n";
         report += "<color=#00FF00><b>================================</b></color>";
         
@@ -372,6 +469,18 @@ public class LevelGenerator : MonoBehaviour
         // Vault depth requirement scales with bank size (depth >= 2 for small banks, >= 3 for normal/large)
         int minVaultDepth = Mathf.Clamp(minR / 3, 2, 4);
         bool forceVault = !vaultSpawned && (generatedRoomsCount >= maxR - 3 || depth >= minVaultDepth);
+
+        // Если близки к лимиту комнат, а хранилище еще не заспавнилось — принудительно отдаем Vault
+        if (!vaultSpawned && (generatedRoomsCount >= maxR - 2))
+        {
+            var vaultTemplate = activePreset.availableRooms.FirstOrDefault(t => t.category == RoomCategory.Vault);
+            if (vaultTemplate != null)
+            {
+                valid.Clear();
+                valid.Add(vaultTemplate);
+                return valid;
+            }
+        }
 
         foreach (var t in activePreset.availableRooms)
         {

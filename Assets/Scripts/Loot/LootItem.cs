@@ -23,10 +23,26 @@ public class LootItem : MonoBehaviour, IInteractable
 
     public void Initialize()
     {
+        Initialize(false);
+    }
+
+    public void Initialize(bool isHighValue)
+    {
         if (data == null) return;
         
-        // Рандомим стоимость из диапазона в LootData
-        value = Random.Range(data.minValue, data.maxValue + 1);
+        if (isHighValue)
+        {
+            // Для богатых точек (сейф) генерируем верхний диапазон или бонус к цене
+            int highMin = Mathf.RoundToInt(Mathf.Lerp(data.minValue, data.maxValue, 0.5f));
+            int highMax = Mathf.RoundToInt(data.maxValue * 1.4f);
+            value = Random.Range(highMin, highMax + 1);
+        }
+        else
+        {
+            // Рандомим стоимость из диапазона в LootData
+            value = Random.Range(data.minValue, data.maxValue + 1);
+        }
+        
         weight = data.weight;
     }
 

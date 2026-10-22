@@ -63,6 +63,10 @@ public class PlayerCamera : MonoBehaviour
         currentRecoil.y += horizontalKick;
     }
 
+    [Header("Visual Atmosphere (Noir Comic & Dust)")]
+    public bool enableNoirComicEffect = false;
+    public bool enableDustParticles = true;
+
     void Start()
     {
         initialLocalPos = transform.localPosition;
@@ -70,6 +74,21 @@ public class PlayerCamera : MonoBehaviour
         if (playerMovement == null)
         {
             playerMovement = GetComponentInParent<PlayerMovement>();
+        }
+
+        // Автоматически подключаем полноэкранный нуар/комикс эффект к камере
+        if (enableNoirComicEffect && GetComponent<NoirPostProcessEffect>() == null)
+        {
+            gameObject.AddComponent<NoirPostProcessEffect>();
+        }
+
+        // Автоматически подключаем парящие пылинки по всей игре
+        if (enableDustParticles && GetComponentInChildren<AtmosphericDust>() == null)
+        {
+            GameObject dustObj = new GameObject("AtmosphericDust");
+            dustObj.transform.SetParent(transform, false);
+            var dust = dustObj.AddComponent<AtmosphericDust>();
+            dust.followTarget = transform;
         }
 
         if (MainMenuUI.Instance != null && MainMenuUI.Instance.IsMainMenuActive)

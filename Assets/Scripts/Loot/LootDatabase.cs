@@ -10,7 +10,7 @@ public class LootDatabase : ScriptableObject
     public List<LootData> mediumLoot = new List<LootData>();
     public List<LootData> largeLoot = new List<LootData>();
 
-    public LootData GetRandomLoot(LootPointSize size)
+    public LootData GetRandomLoot(LootPointSize size, bool highValueOnly = false)
     {
         List<LootData> targetList = null;
         switch (size)
@@ -20,8 +20,28 @@ public class LootDatabase : ScriptableObject
             case LootPointSize.Large: targetList = largeLoot; break;
         }
 
-        if (targetList == null || targetList.Count == 0) return null;
-        return targetList[Random.Range(0, targetList.Count)];
+        // Если запрошенный список пуст, ищем в смежных категориях
+        if (targetList == null || targetList.Count == 0)
+        {
+            if (size == LootPointSize.Large && mediumLoot.Count > 0) targetList = mediumLoot;
+            else if (size == LootPointSize.Medium && smallLoot.Count > 0) targetList = smallLoot;
+            else if (smallLoot.Count > 0) targetList = smallLoot;
+            else return null;
+        }
+
+        if (highValueOnly)
+        {
+            // Фильтруем предметы повышенной ценности (золото, кейсы, драгоценности или от $400)
+            var highVal = targetList.FindAll(x => x != null && (x.minValue >= 400 || x.lootType == LootType.Gold || x.lootType == LootType.Case || x.lootType == LootType.Brilliant));
+            if (highVal.Count > 0)
+            {
+                return highVal[Random.Range(0, highVal.Count)];
+            }
+        }
+
+        var valid = targetList.FindAll(x => x != null);
+        if (valid.Count == 0) return null;
+        return valid[Random.Range(0, valid.Count)];
     }
 
     public int GetAverageItemValue()

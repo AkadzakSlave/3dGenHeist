@@ -14,4 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RoomTemplate
   prefab: {fileID: 155286199148962951, guid: 1a8d885a98dceb34aa2f565c634a5efd, type: 3}
   category: 0
-  weight: 30
+  weight: 40
