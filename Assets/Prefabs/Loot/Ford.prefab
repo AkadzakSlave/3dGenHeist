@@ -14,15 +14,15 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 129c4444a5332d74ca9c044226bc7b64, type: 2}
     - target: {fileID: -8679921383154817045, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
       propertyPath: m_LocalScale.x
-      value: 30
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
       propertyPath: m_LocalScale.y
-      value: 30
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
       propertyPath: m_LocalScale.z
-      value: 30
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
       propertyPath: m_LocalPosition.x
@@ -66,7 +66,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
       propertyPath: m_ConstrainProportionsScale
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
@@ -137,7 +137,7 @@ PrefabInstance:
       addedObject: {fileID: 304100605269821251}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4118209345569991890}
+      addedObject: {fileID: 3495840429100338214}
   m_SourcePrefab: {fileID: 100100000, guid: 3e72d525daaff1f4e8dbf7d3ce8d4011, type: 3}
 --- !u!1 &6091717216496605067 stripped
 GameObject:
@@ -166,7 +166,7 @@ MonoBehaviour:
       Data3: -1576399740
       Data4: 642664294
     Path: event:/Environment/Items/Loot/Loot_PickUp
---- !u!65 &4118209345569991890
+--- !u!65 &3495840429100338214
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

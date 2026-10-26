@@ -578,7 +578,53 @@ public class HeistUI : MonoBehaviour
             }
         }
 
+        // Индикатор статуса ограбления (Стелс / Тревога / Штурм)
+        if (timerText != null)
+        {
+            if (GameManager.Instance.isInLobby)
+            {
+                timerText.text = "<color=#AAAAAA>ЛОББИ</color>";
+            }
+            else if (!GameManager.Instance.isHeistActive)
+            {
+                timerText.text = "<color=#55FF55>● СТЕЛС</color>";
+            }
+            else if (GameManager.Instance.heistTimer > 0)
+            {
+                int min = Mathf.FloorToInt(GameManager.Instance.heistTimer / 60);
+                int sec = Mathf.FloorToInt(GameManager.Instance.heistTimer % 60);
+                timerText.text = $"<color=#FF4444>▲ ТРЕВОГА {min:00}:{sec:00}</color>";
+            }
+            else
+            {
+                timerText.text = "<color=#FF0000>⚠ ШТУРМ: ПОДКРЕПЛЕНИЕ</color>";
+            }
+        }
+
+        UpdateMissionInfo();
         UpdateHotbar();
+    }
+
+    public void SetInteractionProgress(float progress, string actionName)
+    {
+        if (reticleRing != null)
+        {
+            reticleRing.gameObject.SetActive(true);
+            reticleRing.type = Image.Type.Filled;
+            reticleRing.fillMethod = Image.FillMethod.Radial360;
+            reticleRing.fillAmount = Mathf.Clamp01(progress);
+            reticleRing.color = Color.Lerp(Color.white, new Color(0.2f, 1f, 0.4f, 1f), progress);
+        }
+        SetInteractionText($"{actionName} [{Mathf.RoundToInt(progress * 100)}%]");
+    }
+
+    public void HideInteractionProgress()
+    {
+        if (reticleRing != null)
+        {
+            reticleRing.fillAmount = 0f;
+            reticleRing.color = reticleIdleColor;
+        }
     }
 
     public void UpdateMapLootInfo(int totalMapLoot, int count)
@@ -905,19 +951,25 @@ public class HeistUI : MonoBehaviour
     private void UpdateMissionInfo()
     {
         var gm = GameManager.Instance;
-        if (gm == null || gm.activeOperationPreset == null) return;
+        if (gm == null) return;
 
-        int dayIndex = Mathf.Clamp(gm.currentDay - 1, 0, gm.activeOperationPreset.cities.Count - 1);
-        string currentCity = gm.activeOperationPreset.cities[dayIndex].cityName;
-        if (cityNameText != null) cityNameText.text = $"{gm.activeOperationPreset.levelName}: {currentCity}";
+        if (gm.activeOperationPreset != null && gm.activeOperationPreset.cities != null && gm.activeOperationPreset.cities.Count > 0)
+        {
+            int dayIndex = Mathf.Clamp(gm.currentDay - 1, 0, gm.activeOperationPreset.cities.Count - 1);
+            string currentCity = gm.activeOperationPreset.cities[dayIndex].cityName;
+            if (cityNameText != null) cityNameText.text = $"{gm.activeOperationPreset.levelName}: {currentCity}";
+        }
 
+        int currentTotal = gm.accumulatedOperationMoney + gm.depositedMoney;
         if (quotaProgressSlider != null)
         {
-            quotaProgressSlider.maxValue = gm.operationTargetQuota;
-            quotaProgressSlider.value = gm.accumulatedOperationMoney + gm.depositedMoney;
+            quotaProgressSlider.maxValue = Mathf.Max(1, gm.operationTargetQuota);
+            quotaProgressSlider.value = currentTotal;
         }
         if (quotaText != null) 
-            quotaText.text = $"${gm.accumulatedOperationMoney + gm.depositedMoney} / ${gm.operationTargetQuota}";
+        {
+            quotaText.text = $"${currentTotal} / ${gm.operationTargetQuota}";
+        }
 
         int difficulty = 1;
         if (gm.selectedDossier != null) difficulty = gm.selectedDossier.difficultyLevel;

@@ -49,6 +49,7 @@ public class LevelGenerator : MonoBehaviour
     private bool vaultSpawned = false;
     private bool securitySpawned = false;
     private bool vipSpawned = false;
+    private Dictionary<GameObject, RoomTemplate> roomTemplatesMap = new Dictionary<GameObject, RoomTemplate>();
 
     private Bounds buildingBounds;
 
@@ -86,6 +87,7 @@ public class LevelGenerator : MonoBehaviour
         spawnedRooms.Clear();
         spawnedWalls.Clear();
         openSockets.Clear();
+        roomTemplatesMap.Clear();
         
         generatedRoomsCount = 0;
         connectedLoopsCount = 0;
@@ -124,12 +126,16 @@ public class LevelGenerator : MonoBehaviour
         {
             Debug.Log("<color=cyan>[Gen] Перезапекание NavMesh для всего процедурного уровня с мебелью...</color>");
             
+            // Настраиваем мебель: убираем синие островки навмеша со столов/стульев, сохраняя их как препятствия
+            ConfigureNavMeshModifiersForRooms();
+
             // Force the use of Physics Colliders for modular rooms with furniture
             surface.useGeometry = UnityEngine.AI.NavMeshCollectGeometry.PhysicsColliders;
             surface.overrideTileSize = true;
             surface.tileSize = 256;
             surface.overrideVoxelSize = true;
             surface.voxelSize = 0.08f; // High precision for furniture navigation
+            surface.minRegionArea = 3.0f; // Discard tiny isolated islands on tables/props
             
             surface.BuildNavMesh();
         }
@@ -315,6 +321,7 @@ public class LevelGenerator : MonoBehaviour
         GameObject startObj = Instantiate(activePreset.startRoom.prefab, Vector3.zero, Quaternion.identity, transform);
         generatedRoomsCount++;
         spawnedRooms.Add(startObj);
+        roomTemplatesMap[startObj] = activePreset.startRoom;
         Debug.Log($"<color=cyan>[Gen] Заспавнена стартовая комната: {startObj.name} (Локация: {activePreset.levelName})</color>");
 
         // 2. Фургон
@@ -342,7 +349,15 @@ public class LevelGenerator : MonoBehaviour
 
             if (targetSocket.isConnected) continue;
             
-            List<RoomTemplate> validTemplates = GetValidTemplates(currentDepth);
+            // Находим комнату, которой принадлежит целевой сокет, чтобы не спавнить 2 одинаковые комнаты подряд
+            GameObject parentRoom = GetRoomRoot(targetSocket.gameObject);
+            RoomTemplate parentTemplate = null;
+            if (parentRoom != null && roomTemplatesMap.TryGetValue(parentRoom, out var pTemp))
+            {
+                parentTemplate = pTemp;
+            }
+
+            List<RoomTemplate> validTemplates = GetValidTemplates(currentDepth, parentTemplate);
 
             while (validTemplates.Count > 0)
             {
@@ -370,6 +385,7 @@ public class LevelGenerator : MonoBehaviour
                         
                         generatedRoomsCount++;
                         spawnedRooms.Add(newRoom);
+                        roomTemplatesMap[newRoom] = selectedTemplate;
                         RegisterUniqueSpawn(selectedTemplate.category);
                         Debug.Log($"[Gen] УСПЕШНО установлена комната #{generatedRoomsCount} (Тип: {selectedTemplate.category}) на глубине {currentDepth}");
 
@@ -535,7 +551,7 @@ public class LevelGenerator : MonoBehaviour
 
     // --- ЛОГИКА ОГРАНИЧЕНИЙ И ВЕСОВ ---
 
-    private List<RoomTemplate> GetValidTemplates(int depth)
+    private List<RoomTemplate> GetValidTemplates(int depth, RoomTemplate excludedTemplate = null)
     {
         List<RoomTemplate> valid = new List<RoomTemplate>();
         
@@ -584,6 +600,12 @@ public class LevelGenerator : MonoBehaviour
             valid.Add(t);
         }
 
+        // Запрещаем стыковку одинаковых комнат подряд (комната не должна спавнить саму себя на своем сокете)
+        if (excludedTemplate != null && valid.Count > 1)
+        {
+            valid.RemoveAll(t => t == excludedTemplate || (t.prefab != null && excludedTemplate.prefab != null && t.prefab == excludedTemplate.prefab));
+        }
+
         // Fallback to Normal rooms if list is empty
         if (valid.Count == 0)
         {
@@ -594,9 +616,52 @@ public class LevelGenerator : MonoBehaviour
                     valid.Add(t);
                 }
             }
+            if (excludedTemplate != null && valid.Count > 1)
+            {
+                valid.RemoveAll(t => t == excludedTemplate || (t.prefab != null && excludedTemplate.prefab != null && t.prefab == excludedTemplate.prefab));
+            }
         }
 
         return valid;
+    }
+
+    private void ConfigureNavMeshModifiersForRooms()
+    {
+        if (spawnedRooms == null) return;
+
+        foreach (var room in spawnedRooms)
+        {
+            if (room == null) continue;
+
+            Collider[] colliders = room.GetComponentsInChildren<Collider>(true);
+            foreach (var col in colliders)
+            {
+                if (col.isTrigger) continue;
+
+                string colName = col.gameObject.name.ToLower();
+
+                // Пропускаем несущие элементы ходьбы: пол, лестницы, ступени, пандусы, балконы
+                if (colName.Contains("floor") || colName.Contains("stair") || colName.Contains("ramp") || 
+                    colName.Contains("step") || colName.Contains("balcony") || colName.Contains("ground"))
+                {
+                    continue;
+                }
+
+                // Столы, стулья, стойки, полки: помечаем Not Walkable, чтобы на них не рисовалась сетка NavMesh
+                if (col is BoxCollider box)
+                {
+                    Vector3 size = box.size;
+                    // Мебель обычно компактная (< 5м по сторонам и высота от 0.25м до 2.2м)
+                    if (size.x < 5f && size.z < 5f && size.y >= 0.25f && size.y <= 2.2f)
+                    {
+                        var mod = col.GetComponent<Unity.AI.Navigation.NavMeshModifier>();
+                        if (mod == null) mod = col.gameObject.AddComponent<Unity.AI.Navigation.NavMeshModifier>();
+                        mod.overrideArea = true;
+                        mod.area = 1; // 1 = Not Walkable
+                    }
+                }
+            }
+        }
     }
 
     private RoomTemplate GetRandomWeightedTemplate(List<RoomTemplate> templates)

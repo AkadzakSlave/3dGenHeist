@@ -9,6 +9,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 97cc4b29169ad914291aa0bded4f4dc0, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 85
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 97cc4b29169ad914291aa0bded4f4dc0, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 85
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 97cc4b29169ad914291aa0bded4f4dc0, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 85
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 97cc4b29169ad914291aa0bded4f4dc0, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -48,6 +60,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 97cc4b29169ad914291aa0bded4f4dc0, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -7511558181221131132, guid: 97cc4b29169ad914291aa0bded4f4dc0, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
@@ -65,7 +81,7 @@ PrefabInstance:
       addedObject: {fileID: 5128496393873929846}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 97cc4b29169ad914291aa0bded4f4dc0, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 770887554803178982}
+      addedObject: {fileID: 2239982849774173541}
   m_SourcePrefab: {fileID: 100100000, guid: 97cc4b29169ad914291aa0bded4f4dc0, type: 3}
 --- !u!1 &7953836805146211083 stripped
 GameObject:
@@ -94,7 +110,7 @@ MonoBehaviour:
       Data3: -1576399740
       Data4: 642664294
     Path: event:/Environment/Items/Loot/Loot_PickUp
---- !u!65 &770887554803178982
+--- !u!65 &2239982849774173541
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -113,5 +129,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.0061254767, y: 0.009802425, z: 0.0025541307}
-  m_Center: {x: -0.000049346825, y: 6.984918e-10, z: 0}
+  m_Size: {x: 0.0061254776, y: 0.009802431, z: 0.0025541321}
+  m_Center: {x: -0.000049346832, y: 6.9849215e-10, z: 0}

@@ -137,6 +137,9 @@ public class PlayerMovement : MonoBehaviour
         if (controller != null)
         {
             standingHeight = controller.height;
+            // Устанавливаем высоту шага 0.5м для легкого преодоления любых ступеней
+            controller.stepOffset = 0.5f;
+            controller.slopeLimit = 55f;
         }
     }
 
@@ -148,7 +151,8 @@ public class PlayerMovement : MonoBehaviour
         
         if (isGrounded && velocity.y < 0)
         {
-            velocity.y = -2f;
+            // Фиксируем игрока на ступенях при спуске вниз, предотвращая отрыв от лестницы
+            velocity.y = -6f;
         }
 
         float x = 0f;
@@ -338,9 +342,11 @@ public class PlayerMovement : MonoBehaviour
         // Применяем гравитацию
         velocity.y += gravity * Time.deltaTime;
 
-        // Движение с плавной инерцией
-        Vector3 finalVelocity = currentHorizontalVelocity + velocity;
-        controller.Move(finalVelocity * Time.deltaTime);
+        // Разделяем горизонтальное и вертикальное перемещение:
+        // В Unity CharacterController требует горизонтального вектора без прижимания вниз,
+        // чтобы stepOffset мог беспрепятственно поднимать капсулу на ступени лестниц без застреваний и прыжков.
+        controller.Move(currentHorizontalVelocity * Time.deltaTime);
+        controller.Move(velocity * Time.deltaTime);
 
         // --- ПРИЗЕМЛЕНИЕ ---
         if (isGrounded && !wasGrounded)

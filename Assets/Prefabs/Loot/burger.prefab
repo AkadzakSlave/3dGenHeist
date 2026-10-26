@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: c2f25961dbc65554fb49ff449248106d, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.7
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c2f25961dbc65554fb49ff449248106d, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.7
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c2f25961dbc65554fb49ff449248106d, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.7
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: c2f25961dbc65554fb49ff449248106d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -77,7 +77,7 @@ PrefabInstance:
       addedObject: {fileID: 2594590901606407996}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: c2f25961dbc65554fb49ff449248106d, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -4737309978646037319}
+      addedObject: {fileID: 755558732497922443}
   m_SourcePrefab: {fileID: 100100000, guid: c2f25961dbc65554fb49ff449248106d, type: 3}
 --- !u!1 &3101191389420430174 stripped
 GameObject:
@@ -106,7 +106,7 @@ MonoBehaviour:
       Data3: -1576399740
       Data4: 642664294
     Path: event:/Environment/Items/Loot/Loot_PickUp
---- !u!65 &-4737309978646037319
+--- !u!65 &755558732497922443
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -125,5 +125,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0.2, z: 0}
+  m_Size: {x: 1.2, y: 1, z: 1.2}
+  m_Center: {x: 0, y: 0.3, z: 0}

@@ -344,4 +344,5 @@ public class InputReader : ScriptableObject
     public bool IsCrouchPressed => crouchAction != null && crouchAction.IsPressed();
     public bool IsPrimaryActionPressed => attackAction != null && attackAction.IsPressed();
     public bool IsSecondaryActionPressed => secondaryAction != null && secondaryAction.IsPressed();
+    public bool IsInteractPressed => interactAction != null && interactAction.IsPressed();
 }

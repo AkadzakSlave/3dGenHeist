@@ -130,11 +130,30 @@ public class PlayerInteraction : MonoBehaviour
     void Update()
     {
         UpdateInteractionUI();
+        HandleHoldInteraction();
 
         // Переключение режимов по горячей клавише V для удобства теста
         if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.vKey.wasPressedThisFrame)
         {
             ToggleHoldingMode();
+        }
+    }
+
+    private void HandleHoldInteraction()
+    {
+        bool isEKeyPressed = inputReader != null ? inputReader.IsInteractPressed : 
+            (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.eKey.isPressed);
+
+        if (cachedInteractable is VaultDoor vaultDoor)
+        {
+            if (isEKeyPressed)
+            {
+                vaultDoor.ProcessHoldInteraction(Time.deltaTime);
+            }
+            else
+            {
+                vaultDoor.CancelHoldInteraction();
+            }
         }
     }
 

@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5737161914260769852}
   - component: {fileID: 8479415062954609583}
   - component: {fileID: 6255900330784543486}
-  - component: {fileID: 3778499498671985815}
+  - component: {fileID: 6799033135103540795}
   m_Layer: 0
   m_Name: Cash
   m_TagString: Untagged
@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.4, y: 0.25, z: 1}
+  m_LocalScale: {x: 0.5, y: 0.1, z: 0.2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -114,7 +114,7 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &3778499498671985815
+--- !u!65 &6799033135103540795
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

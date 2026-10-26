@@ -234,23 +234,64 @@ public class RoomLootManager : MonoBehaviour
         if (lootData.prefab == null) return;
 
         Quaternion finalRot = rot * lootData.prefab.transform.rotation;
-
         Transform parentTransform = lootContainer != null ? lootContainer : this.transform;
-        GameObject lootObj = Instantiate(lootData.prefab, pos, finalRot, parentTransform);
 
-        // Авто-посадка на поверхность: выравниваем нижнюю грань меша ровно по высоте pos.y (без летания и проваливания)
-        Renderer rend = lootObj.GetComponentInChildren<Renderer>();
-        if (rend != null)
+        // Поиск фактической поверхности (стола, полки или пола) прямо под точкой
+        Vector3 spawnPos = pos;
+        if (Physics.Raycast(pos + Vector3.up * 0.4f, Vector3.down, out RaycastHit hit, 1.5f))
         {
-            float bottomY = rend.bounds.min.y;
-            float diff = pos.y - bottomY;
-            lootObj.transform.position += Vector3.up * diff;
+            spawnPos.y = hit.point.y + 0.05f; // 5 см над столом/поверхностью для мягкого падения
+        }
+        else
+        {
+            spawnPos.y += 0.05f;
         }
 
+        GameObject lootObj = Instantiate(lootData.prefab, spawnPos, finalRot, parentTransform);
+
+        // Полная стандартизация экземпляра лута
+        StandardizeLootInstance(lootObj, lootData, isHighValue);
+    }
+
+    private void StandardizeLootInstance(GameObject lootObj, LootData lootData, bool isHighValue)
+    {
+        if (lootObj == null) return;
+
+        // 1. Проверяем масштаб: если FBX модель миниатюрная (< 5см), увеличиваем до реального размера
+        Renderer[] renderers = lootObj.GetComponentsInChildren<Renderer>(true);
+        if (renderers != null && renderers.Length > 0)
+        {
+            Bounds b = renderers[0].bounds;
+            for (int i = 1; i < renderers.Length; i++) b.Encapsulate(renderers[i].bounds);
+
+            if (b.size.magnitude < 0.05f)
+            {
+                lootObj.transform.localScale *= 50f;
+                b = renderers[0].bounds;
+                for (int i = 1; i < renderers.Length; i++) b.Encapsulate(renderers[i].bounds);
+            }
+
+            // 2. Настраиваем BoxCollider ровно по визуальным границам модели
+            BoxCollider box = lootObj.GetComponent<BoxCollider>();
+            if (box == null) box = lootObj.AddComponent<BoxCollider>();
+
+            box.center = box.transform.InverseTransformPoint(b.center);
+            Vector3 localSz = box.transform.InverseTransformVector(b.size);
+            box.size = new Vector3(Mathf.Abs(localSz.x), Mathf.Abs(localSz.y), Mathf.Abs(localSz.z));
+
+            // Минимальные габариты для удобного наведения взгляда и устойчивости
+            box.size = Vector3.Max(box.size, new Vector3(0.08f, 0.04f, 0.08f));
+        }
+
+        // 3. Компонент LootItem
         LootItem item = lootObj.GetComponent<LootItem>();
         if (item == null) item = lootObj.AddComponent<LootItem>();
-        
         item.data = lootData;
         item.Initialize(isHighValue);
+
+        // 4. Мягкая физика естественного приземления
+        LootPhysicsSettler settler = lootObj.GetComponent<LootPhysicsSettler>();
+        if (settler == null) settler = lootObj.AddComponent<LootPhysicsSettler>();
+        settler.BeginSettle();
     }
 }

@@ -81,7 +81,7 @@ PrefabInstance:
       addedObject: {fileID: 4017323868316869359}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: cd537fa0e1cf53f4fa3227214851475f, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5341689051599950013}
+      addedObject: {fileID: 27166685615949380}
   m_SourcePrefab: {fileID: 100100000, guid: cd537fa0e1cf53f4fa3227214851475f, type: 3}
 --- !u!1 &7484713037424819107 stripped
 GameObject:
@@ -110,7 +110,7 @@ MonoBehaviour:
       Data3: -1576399740
       Data4: 642664294
     Path: event:/Environment/Items/Loot/Loot_PickUp
---- !u!65 &5341689051599950013
+--- !u!65 &27166685615949380
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -129,5 +129,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.001173414, y: 0.0030221269, z: 0.0009379829}
-  m_Center: {x: 0, y: 0, z: -0.00000078399887}
+  m_Size: {x: 0.001173414, y: 0.003022128, z: 0.00093798334}
+  m_Center: {x: 0, y: 0, z: -0.00000078399916}

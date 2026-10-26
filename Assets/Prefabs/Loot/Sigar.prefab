@@ -10,15 +10,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 721af4ffccd7d484bae9b23f01fee22a, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.15
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 721af4ffccd7d484bae9b23f01fee22a, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.15
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 721af4ffccd7d484bae9b23f01fee22a, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.15
+      value: 0.12
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 721af4ffccd7d484bae9b23f01fee22a, type: 3}
       propertyPath: m_LocalPosition.x
@@ -62,7 +62,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 721af4ffccd7d484bae9b23f01fee22a, type: 3}
       propertyPath: m_ConstrainProportionsScale
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 721af4ffccd7d484bae9b23f01fee22a, type: 3}
       propertyPath: m_Name
@@ -83,9 +83,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 721af4ffccd7d484bae9b23f01fee22a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3382196882958739508}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 721af4ffccd7d484bae9b23f01fee22a, type: 3}
+    - targetCorrespondingSourceObject: {fileID: -5568371526223589888, guid: 721af4ffccd7d484bae9b23f01fee22a, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5169929351099294351}
+      addedObject: {fileID: 6890859710678920060}
   m_SourcePrefab: {fileID: 100100000, guid: 721af4ffccd7d484bae9b23f01fee22a, type: 3}
 --- !u!1 &6435782346074615943 stripped
 GameObject:
@@ -106,7 +106,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LootItem
   data: {fileID: 11400000, guid: 330fb0304f3920f48a94281897c62362, type: 2}
   value: 100
-  weight: 5
+  weight: 1
   pickUpSound:
     Guid:
       Data1: 936682925
@@ -114,13 +114,18 @@ MonoBehaviour:
       Data3: -1576399740
       Data4: 642664294
     Path: event:/Environment/Items/Loot/Loot_PickUp
---- !u!65 &5169929351099294351
+--- !u!1 &7433261255680836566 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -5568371526223589888, guid: 721af4ffccd7d484bae9b23f01fee22a, type: 3}
+  m_PrefabInstance: {fileID: 6165731509321649622}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &6890859710678920060
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6435782346074615943}
+  m_GameObject: {fileID: 7433261255680836566}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -133,5 +138,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.8, y: 0.75, z: 4.3}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 0.0077645318, y: 0.042602528, z: 0.007764531}
+  m_Center: {x: 4.6566123e-10, y: 0.00023426017, z: -4.6566118e-10}
