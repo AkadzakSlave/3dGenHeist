@@ -70,10 +70,10 @@ public class LootItem : MonoBehaviour, IInteractable
         }
         else if (bag.storedWeight + weight > bag.maxCapacity)
         {
-            return $"<color=#FF9933>{name} (${value}, {weight}kg) - Сумка полна! ({bag.storedWeight}/{bag.maxCapacity}кг)</color>";
+            return $"<color=#FF9933>{name} (${value}, {weight}kg) - Сумка полна!</color>";
         }
 
-        return $"Забрать {name} (${value}, {weight}kg) [{bag.storedWeight}/{bag.maxCapacity}кг]";
+        return $"Забрать {name} (${value}, {weight}kg)";
     }
 
     public void Collect()
@@ -95,9 +95,14 @@ public class LootItem : MonoBehaviour, IInteractable
         {
             if (bag.AddLoot(value, weight))
             {
+                string itemName = data != null ? data.itemName : "Loot";
+                if (HeistUI.Instance != null)
+                {
+                    HeistUI.Instance.ShowNotification($"+${value} ({itemName})", new Color(0.2f, 1f, 0.45f, 1f));
+                }
+
                 if (GameManager.Instance != null) 
                 {
-                    string itemName = data != null ? data.itemName : "Loot";
                     Debug.Log($"[Loot] Подобрано: {itemName}. В сумке: ${bag.storedMoney}, Вес: {GameManager.Instance.currentWeight}/{GameManager.Instance.maxWeight}кг");
                     GameManager.Instance.onMoneyChanged?.Invoke();
                     GameManager.Instance.RecalculateMapLoot();
@@ -115,18 +120,20 @@ public class LootItem : MonoBehaviour, IInteractable
             else
             {
                 Debug.Log("<color=red>[Loot] СУМКА ЗАПОЛНЕНА!</color>");
-                if (GameManager.Instance != null && GameManager.Instance.heistUI != null)
+                if (HeistUI.Instance != null)
                 {
-                    GameManager.Instance.heistUI.SetInteractionText("<color=red>Сумка переполнена!</color>");
+                    HeistUI.Instance.ShowNotification("Сумка переполнена!", new Color(1f, 0.35f, 0.35f, 1f));
+                    HeistUI.Instance.SetInteractionText("<color=red>Сумка переполнена!</color>");
                 }
             }
         }
         else
         {
             Debug.Log("[Loot] Нужна сумка в инвентаре!");
-            if (GameManager.Instance != null && GameManager.Instance.heistUI != null)
+            if (HeistUI.Instance != null)
             {
-                GameManager.Instance.heistUI.SetInteractionText("<color=yellow>Нужна сумка в инвентаре!</color>");
+                HeistUI.Instance.ShowNotification("Нужна сумка в инвентаре!", new Color(1f, 0.85f, 0.25f, 1f));
+                HeistUI.Instance.SetInteractionText("<color=yellow>Нужна сумка в инвентаре!</color>");
             }
         }
     }

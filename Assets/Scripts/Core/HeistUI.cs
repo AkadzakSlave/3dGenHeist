@@ -27,11 +27,15 @@ public class HeistUI : MonoBehaviour
     public GameObject reticleRoot;
     public Image reticleDot;
     public Image reticleRing;
+    public Image reticleTrack;
+    public Image reticleSweetSpot;
+    public RectTransform reticleNeedlePivot;
+    public Image reticleNeedle;
     public Color reticleIdleColor = new Color(1f, 1f, 1f, 0.75f);
     public Color reticleFocusColor = new Color(0.35f, 0.9f, 1f, 1f);
     public float reticleIdleSize = 4f;
     public float reticleFocusSize = 4.5f;
-    public float reticleRingSize = 26f;
+    public float reticleRingSize = 34f;
     public float reticleSmoothSpeed = 16f;
 
     private bool isReticleFocused = false;
@@ -140,6 +144,9 @@ public class HeistUI : MonoBehaviour
     [Tooltip("Дистанция уезда вверх при растворении (пикс)")]
     public float notificationExitSlideDistance = 36f;
 
+    [Tooltip("Максимальное количество одновременно видимых уведомлений на экране")]
+    public int maxNotificationsOnScreen = 5;
+
     private class ActiveNotification
     {
         public GameObject root;
@@ -151,6 +158,8 @@ public class HeistUI : MonoBehaviour
 
     private readonly System.Collections.Generic.List<ActiveNotification> activeNotifications = new System.Collections.Generic.List<ActiveNotification>();
     private static Sprite cachedCapsuleSprite;
+    private string lastNotificationText = "";
+    private float lastNotificationTime = -10f;
 
     [Header("Hotbar Badges Transform (Inspector Adjustable)")]
     [Tooltip("Позиция области подсказок относительно верха панели хотбара")]
@@ -607,24 +616,109 @@ public class HeistUI : MonoBehaviour
 
     public void SetInteractionProgress(float progress, string actionName)
     {
+        EnsureReticleCreated();
+        if (reticleDot != null) reticleDot.gameObject.SetActive(true);
+        if (reticleTrack != null)
+        {
+            reticleTrack.rectTransform.sizeDelta = new Vector2(reticleRingSize, reticleRingSize);
+            reticleTrack.gameObject.SetActive(true);
+        }
+        if (reticleSweetSpot != null) reticleSweetSpot.gameObject.SetActive(false);
+        if (reticleNeedlePivot != null) reticleNeedlePivot.gameObject.SetActive(false);
+
         if (reticleRing != null)
         {
             reticleRing.gameObject.SetActive(true);
+            reticleRing.rectTransform.sizeDelta = new Vector2(reticleRingSize, reticleRingSize);
             reticleRing.type = Image.Type.Filled;
             reticleRing.fillMethod = Image.FillMethod.Radial360;
+            reticleRing.fillOrigin = (int)Image.Origin360.Top;
             reticleRing.fillAmount = Mathf.Clamp01(progress);
-            reticleRing.color = Color.Lerp(Color.white, new Color(0.2f, 1f, 0.4f, 1f), progress);
+            reticleRing.color = Color.Lerp(Color.white, new Color(0.2f, 1f, 0.45f, 1f), progress);
+            reticleRing.transform.localRotation = Quaternion.identity;
         }
+
         SetInteractionText($"{actionName} [{Mathf.RoundToInt(progress * 100)}%]");
+    }
+
+    public void SetLockpickMode(bool active, float needleNormalizedAngle, float sweetSpotStartNorm, float sweetSpotSizeNorm, string prompt, bool flashSuccess = false, bool flashError = false)
+    {
+        EnsureReticleCreated();
+
+        if (!active)
+        {
+            HideInteractionProgress();
+            return;
+        }
+
+        float lockpickDiameter = 110f; // Увеличенный диаметр для четкой и понятной мини-игры
+
+        if (reticleDot != null) reticleDot.gameObject.SetActive(false);
+
+        if (reticleTrack != null)
+        {
+            reticleTrack.gameObject.SetActive(true);
+            reticleTrack.rectTransform.sizeDelta = new Vector2(lockpickDiameter, lockpickDiameter);
+            reticleTrack.color = new Color(0.12f, 0.14f, 0.18f, 0.75f);
+        }
+
+        if (reticleRing != null)
+        {
+            reticleRing.gameObject.SetActive(true);
+            reticleRing.rectTransform.sizeDelta = new Vector2(lockpickDiameter, lockpickDiameter);
+            reticleRing.fillAmount = 0f;
+        }
+
+        if (reticleSweetSpot != null)
+        {
+            reticleSweetSpot.gameObject.SetActive(true);
+            reticleSweetSpot.rectTransform.sizeDelta = new Vector2(lockpickDiameter, lockpickDiameter);
+            reticleSweetSpot.type = Image.Type.Filled;
+            reticleSweetSpot.fillMethod = Image.FillMethod.Radial360;
+            reticleSweetSpot.fillOrigin = (int)Image.Origin360.Top;
+            reticleSweetSpot.fillAmount = Mathf.Clamp01(sweetSpotSizeNorm);
+            reticleSweetSpot.transform.localRotation = Quaternion.Euler(0f, 0f, -sweetSpotStartNorm * 360f);
+
+            Color baseGreen = new Color(0.2f, 1f, 0.45f, 0.95f);
+            reticleSweetSpot.color = flashSuccess ? Color.white : baseGreen;
+        }
+
+        if (reticleNeedlePivot != null)
+        {
+            reticleNeedlePivot.gameObject.SetActive(true);
+            reticleNeedlePivot.localRotation = Quaternion.Euler(0f, 0f, -needleNormalizedAngle * 360f);
+
+            if (reticleNeedle != null)
+            {
+                reticleNeedle.rectTransform.anchoredPosition = new Vector2(0f, lockpickDiameter * 0.5f);
+                reticleNeedle.rectTransform.sizeDelta = new Vector2(4.5f, 16f);
+                reticleNeedle.color = flashError ? new Color(1f, 0.25f, 0.25f, 1f) : (flashSuccess ? Color.yellow : Color.white);
+            }
+        }
+
+        SetInteractionText(prompt);
     }
 
     public void HideInteractionProgress()
     {
         if (reticleRing != null)
         {
+            reticleRing.rectTransform.sizeDelta = new Vector2(reticleRingSize, reticleRingSize);
             reticleRing.fillAmount = 0f;
             reticleRing.color = reticleIdleColor;
         }
+        if (reticleTrack != null)
+        {
+            reticleTrack.rectTransform.sizeDelta = new Vector2(reticleRingSize, reticleRingSize);
+            reticleTrack.gameObject.SetActive(false);
+        }
+        if (reticleSweetSpot != null)
+        {
+            reticleSweetSpot.rectTransform.sizeDelta = new Vector2(reticleRingSize, reticleRingSize);
+            reticleSweetSpot.gameObject.SetActive(false);
+        }
+        if (reticleNeedlePivot != null) reticleNeedlePivot.gameObject.SetActive(false);
+        if (reticleDot != null) reticleDot.gameObject.SetActive(true);
     }
 
     public void UpdateMapLootInfo(int totalMapLoot, int count)
@@ -1058,6 +1152,12 @@ public class HeistUI : MonoBehaviour
         // Outer focus ring: expands around the dot and fades in when looking at an interactable
         if (reticleRing != null)
         {
+            if (reticleRing.type == Image.Type.Filled && reticleRing.fillAmount > 0.001f)
+            {
+                // Active hold progress interaction (e.g. turning safe valve or drop-off)! Keep fill progress visible
+                return;
+            }
+
             if (reticleRing.sprite == null)
             {
                 reticleRing.sprite = CreateRingSprite(64, 3);
@@ -1127,6 +1227,91 @@ public class HeistUI : MonoBehaviour
                 reticleRing.sprite = CreateRingSprite(64, 3);
             }
             reticleRing.rectTransform.sizeDelta = new Vector2(reticleRingSize, reticleRingSize);
+        }
+
+        // Ensure ReticleTrack (dark background track) exists
+        if (reticleTrack == null && reticleRoot != null)
+        {
+            Transform existingTrack = reticleRoot.transform.Find("ReticleTrack");
+            if (existingTrack != null)
+            {
+                reticleTrack = existingTrack.GetComponent<Image>();
+            }
+            else
+            {
+                GameObject trackObj = new GameObject("ReticleTrack", typeof(RectTransform), typeof(Image));
+                trackObj.transform.SetParent(reticleRoot.transform, false);
+                trackObj.transform.SetAsFirstSibling();
+                RectTransform trackRt = trackObj.GetComponent<RectTransform>();
+                trackRt.anchorMin = trackRt.anchorMax = trackRt.pivot = new Vector2(0.5f, 0.5f);
+                trackRt.anchoredPosition = Vector2.zero;
+                trackRt.sizeDelta = new Vector2(reticleRingSize, reticleRingSize);
+                reticleTrack = trackObj.GetComponent<Image>();
+                reticleTrack.sprite = CreateRingSprite(128, 8);
+                reticleTrack.color = new Color(0.08f, 0.08f, 0.12f, 0.55f);
+                reticleTrack.raycastTarget = false;
+                reticleTrack.gameObject.SetActive(false);
+            }
+        }
+
+        // Ensure ReticleSweetSpot exists
+        if (reticleSweetSpot == null && reticleRoot != null)
+        {
+            Transform existingSpot = reticleRoot.transform.Find("ReticleSweetSpot");
+            if (existingSpot != null)
+            {
+                reticleSweetSpot = existingSpot.GetComponent<Image>();
+            }
+            else
+            {
+                GameObject spotObj = new GameObject("ReticleSweetSpot", typeof(RectTransform), typeof(Image));
+                spotObj.transform.SetParent(reticleRoot.transform, false);
+                RectTransform spotRt = spotObj.GetComponent<RectTransform>();
+                spotRt.anchorMin = spotRt.anchorMax = spotRt.pivot = new Vector2(0.5f, 0.5f);
+                spotRt.anchoredPosition = Vector2.zero;
+                spotRt.sizeDelta = new Vector2(reticleRingSize, reticleRingSize);
+                reticleSweetSpot = spotObj.GetComponent<Image>();
+                reticleSweetSpot.sprite = CreateRingSprite(128, 8);
+                reticleSweetSpot.type = Image.Type.Filled;
+                reticleSweetSpot.fillMethod = Image.FillMethod.Radial360;
+                reticleSweetSpot.fillOrigin = (int)Image.Origin360.Top;
+                reticleSweetSpot.color = new Color(0.2f, 1f, 0.45f, 0.95f);
+                reticleSweetSpot.raycastTarget = false;
+                reticleSweetSpot.gameObject.SetActive(false);
+            }
+        }
+
+        // Ensure ReticleNeedlePivot exists
+        if (reticleNeedlePivot == null && reticleRoot != null)
+        {
+            Transform existingPivot = reticleRoot.transform.Find("ReticleNeedlePivot");
+            if (existingPivot != null)
+            {
+                reticleNeedlePivot = existingPivot.GetComponent<RectTransform>();
+                reticleNeedle = existingPivot.GetComponentInChildren<Image>();
+            }
+            else
+            {
+                GameObject pivotObj = new GameObject("ReticleNeedlePivot", typeof(RectTransform));
+                pivotObj.transform.SetParent(reticleRoot.transform, false);
+                reticleNeedlePivot = pivotObj.GetComponent<RectTransform>();
+                reticleNeedlePivot.anchorMin = reticleNeedlePivot.anchorMax = reticleNeedlePivot.pivot = new Vector2(0.5f, 0.5f);
+                reticleNeedlePivot.anchoredPosition = Vector2.zero;
+                reticleNeedlePivot.sizeDelta = Vector2.zero;
+
+                GameObject needleObj = new GameObject("Needle", typeof(RectTransform), typeof(Image));
+                needleObj.transform.SetParent(pivotObj.transform, false);
+                RectTransform nRt = needleObj.GetComponent<RectTransform>();
+                nRt.anchorMin = nRt.anchorMax = nRt.pivot = new Vector2(0.5f, 0.5f);
+                nRt.anchoredPosition = new Vector2(0f, reticleRingSize * 0.5f);
+                nRt.sizeDelta = new Vector2(3.5f, 8f);
+                reticleNeedle = needleObj.GetComponent<Image>();
+                reticleNeedle.sprite = GetOrCreateCircleSprite();
+                reticleNeedle.color = Color.white;
+                reticleNeedle.raycastTarget = false;
+
+                reticleNeedlePivot.gameObject.SetActive(false);
+            }
         }
 
         // Ensure ReticleDot exists
@@ -1869,8 +2054,10 @@ public class HeistUI : MonoBehaviour
                 {
                     if (invSlots[i] is BagTool b)
                     {
-                        slotUI.infoText.text = $"{b.storedWeight}/{b.maxCapacity}k";
-                        slotUI.infoText.color = (b.storedWeight >= b.maxCapacity) ? new Color(1f, 0.35f, 0.35f, 1f) : new Color(0.95f, 0.85f, 0.45f, 1f);
+                        string moneyStr = b.storedMoney >= 1000 ? $"${(b.storedMoney / 1000f):0.#}k" : $"${b.storedMoney}";
+                        slotUI.infoText.text = b.storedMoney > 0 ? $"{moneyStr}\n{b.storedWeight}/{b.maxCapacity}k" : $"{b.storedWeight}/{b.maxCapacity}k";
+                        slotUI.infoText.color = (b.storedWeight >= b.maxCapacity) ? new Color(1f, 0.35f, 0.35f, 1f) : 
+                            (b.storedMoney > 0 ? new Color(0.2f, 1f, 0.45f, 1f) : new Color(0.95f, 0.85f, 0.45f, 1f));
                         slotUI.infoText.gameObject.SetActive(true);
                     }
                     else if (invSlots[i] is WeaponItem w)
@@ -1931,10 +2118,30 @@ public class HeistUI : MonoBehaviour
     {
         if (string.IsNullOrEmpty(message)) return;
 
+        // Защита от спама дублирующимися уведомлениями
+        if (message == lastNotificationText && Time.time - lastNotificationTime < 0.4f)
+        {
+            return;
+        }
+        lastNotificationText = message;
+        lastNotificationTime = Time.time;
+
         if (drumNotificationRoot == null)
         {
             EnsureReleaseHudCreated();
             if (drumNotificationRoot == null) return;
+        }
+
+        // Очищаем удаленные объекты и ограничиваем максимум 5 уведомлений на экране
+        activeNotifications.RemoveAll(x => x == null || x.root == null);
+        while (activeNotifications.Count >= maxNotificationsOnScreen)
+        {
+            var oldest = activeNotifications[0];
+            activeNotifications.RemoveAt(0);
+            if (oldest != null && oldest.root != null)
+            {
+                Destroy(oldest.root);
+            }
         }
 
         // 1. Создаем плашку уведомления
@@ -1991,15 +2198,6 @@ public class HeistUI : MonoBehaviour
         float prefWidth = tmp.preferredWidth;
         itemRt.sizeDelta = new Vector2(Mathf.Max(notificationMinWidth, prefWidth + notificationHorizontalPadding), notificationBadgeHeight);
 
-        // Сдвигаем все уже висящие уведомления вверх, освобождая место новому снизу
-        for (int i = 0; i < activeNotifications.Count; i++)
-        {
-            if (activeNotifications[i] != null)
-            {
-                activeNotifications[i].targetBaseY += notificationStackSpacing;
-            }
-        }
-
         ActiveNotification activeItem = new ActiveNotification
         {
             root = itemObj,
@@ -2009,6 +2207,17 @@ public class HeistUI : MonoBehaviour
             currentBaseY = -notificationEnterSlideDistance
         };
         activeNotifications.Add(activeItem);
+
+        // Строгий шаг между уведомлениями: высота бейджа + гарантированный зазор 8px, чтобы плашки не наслаивались
+        float step = Mathf.Max(notificationStackSpacing, notificationBadgeHeight + 8f);
+        for (int i = 0; i < activeNotifications.Count; i++)
+        {
+            int slotFromBottom = activeNotifications.Count - 1 - i;
+            if (activeNotifications[i] != null)
+            {
+                activeNotifications[i].targetBaseY = slotFromBottom * step;
+            }
+        }
 
         if (Application.isPlaying)
         {
@@ -2092,6 +2301,17 @@ public class HeistUI : MonoBehaviour
         if (item != null && item.root != null)
         {
             Destroy(item.root);
+        }
+
+        // Плавный сдвиг оставшихся уведомлений
+        float step = Mathf.Max(notificationStackSpacing, notificationBadgeHeight + 8f);
+        for (int i = 0; i < activeNotifications.Count; i++)
+        {
+            int slotFromBottom = activeNotifications.Count - 1 - i;
+            if (activeNotifications[i] != null)
+            {
+                activeNotifications[i].targetBaseY = slotFromBottom * step;
+            }
         }
     }
 

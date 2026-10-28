@@ -465,13 +465,22 @@ public class GameManager : MonoBehaviour
         if (heistUI != null) heistUI.ShowLoadingScreen();
 
         accumulatedOperationMoney += depositedMoney;
+        depositedMoney = 0;
+        onMoneyChanged?.Invoke();
         Debug.Log($"<color=orange>[Economy] День {currentDay} завершен. Накоплено: ${accumulatedOperationMoney} / ${operationTargetQuota}</color>");
 
         if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
         if (levelGenerator != null) levelGenerator.ClearLevel();
-        if (PlayerInventory.Instance != null) PlayerInventory.Instance.ClearInventory();
+
+        BagTool bag = GetHeldBag();
+        if (bag != null)
+        {
+            bag.storedMoney = 0;
+            bag.storedWeight = 0;
+        }
 
         isHeistActive = false;
+        ReviveAllPlayers();
 
         if (currentDay < 3)
         {
@@ -512,7 +521,14 @@ public class GameManager : MonoBehaviour
 
         if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
         if (levelGenerator != null) levelGenerator.ClearLevel();
-        if (PlayerInventory.Instance != null) PlayerInventory.Instance.ClearInventory();
+        if (PlayerInventory.Instance != null)
+        {
+            PlayerInventory.Instance.ClearInventory();
+            if (PlayerInventory.Instance.autoEquipDefaultLoadout)
+            {
+                PlayerInventory.Instance.EnsureDefaultLoadout();
+            }
+        }
 
         isHeistActive = false;
 

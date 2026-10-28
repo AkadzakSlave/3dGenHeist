@@ -288,6 +288,7 @@ public class LevelGenerator : MonoBehaviour
                 generationSuccess = true;
                 ConnectLoops();
                 SealDeadEnds();
+                SetupSpecialInteractables();
                 PrintGenerationReport(currentAttempt + 1);
             }
             else
@@ -306,6 +307,7 @@ public class LevelGenerator : MonoBehaviour
             Debug.LogError($"<color=red>[Gen] ФАТАЛЬНАЯ ОШИБКА: Не удалось достичь minRooms ({minR}) за {maxRetries} попыток! Оставляем последний результат.</color>");
             ConnectLoops();
             SealDeadEnds();
+            SetupSpecialInteractables();
         }
     }
 
@@ -547,6 +549,80 @@ public class LevelGenerator : MonoBehaviour
             Debug.LogError("<color=red>[Gen] В префабе Фургона не найден RoomSocket!</color>");
             Destroy(vanObj);
         }
+    }
+
+    private void SetupSpecialInteractables()
+    {
+        // 1. Автоматическая привязка VaultDoor ко всем дверям сейфов на карте
+        int safeDoorsCount = 0;
+        foreach (GameObject room in spawnedRooms)
+        {
+            if (room == null) continue;
+            foreach (Transform t in room.GetComponentsInChildren<Transform>(true))
+            {
+                if (t.name.ToLower().Contains("safedoor"))
+                {
+                    VaultDoor vd = t.GetComponent<VaultDoor>();
+                    if (vd == null)
+                    {
+                        vd = t.gameObject.AddComponent<VaultDoor>();
+                        vd.doorHinge = t;
+                    }
+                    if (t.GetComponent<Collider>() == null)
+                    {
+                        var box = t.gameObject.AddComponent<BoxCollider>();
+                        box.size = new Vector3(1.2f, 2.2f, 0.4f);
+                    }
+                    safeDoorsCount++;
+                }
+            }
+        }
+        if (safeDoorsCount > 0)
+        {
+            Debug.Log($"<color=yellow>[Gen] Настроено дверей сейфов с мини-игрой взлома: {safeDoorsCount}</color>");
+        }
+
+        // 2. Настройка багажника фургона для выгрузки лута
+        if (vanSpawnPoint != null)
+        {
+            EnsureTrunkExtractionZone(vanSpawnPoint.gameObject);
+        }
+    }
+
+    private void EnsureTrunkExtractionZone(GameObject vanObj)
+    {
+        // Настройка зоны выгрузки сумок (все размещенные в Van_Room предметы остаются активными)
+
+        // 2. Настройка зоны выгрузки сумок
+        HeistExtractionZone zone = vanObj.GetComponentInChildren<HeistExtractionZone>();
+        if (zone == null)
+        {
+            Transform term = vanObj.transform.Find("VanTerminal");
+            Vector3 pos = term != null ? term.position + new Vector3(2.5f, 0f, 0f) : vanObj.transform.position + new Vector3(0f, 0f, 4f);
+
+            GameObject trunkObj = new GameObject("VanCargoTrunk");
+            trunkObj.transform.SetParent(vanObj.transform, true);
+            trunkObj.transform.position = pos;
+
+            BoxCollider col = trunkObj.AddComponent<BoxCollider>();
+            col.size = new Vector3(3.5f, 2.5f, 3.5f);
+            col.isTrigger = true;
+
+            zone = trunkObj.AddComponent<HeistExtractionZone>();
+            zone.zoneName = "Багажник фургона";
+            zone.textOffset = new Vector3(0f, 1.3f, 0f);
+        }
+        else
+        {
+            zone.zoneName = "Багажник фургона";
+            Collider col = zone.GetComponent<Collider>();
+            if (col is BoxCollider box)
+            {
+                box.size = Vector3.Max(box.size, new Vector3(3.0f, 2.2f, 3.0f));
+                box.isTrigger = true;
+            }
+        }
+        zone.UpdateCargoDisplay();
     }
 
     // --- ЛОГИКА ОГРАНИЧЕНИЙ И ВЕСОВ ---

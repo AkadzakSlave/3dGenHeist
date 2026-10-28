@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aff483bd6a05c74e95269d22fd7954f, type: 3}
   m_Name: Gold
   m_EditorClassIdentifier: Assembly-CSharp::LootData
-  itemName: Gold
+  itemName: "\u0417\u043E\u043B\u043E\u0442\u043E\u0439 \u0441\u043B\u0438\u0442\u043E\u043A"
   lootType: 1
   minValue: 400
   maxValue: 500

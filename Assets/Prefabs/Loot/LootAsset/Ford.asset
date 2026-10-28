@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aff483bd6a05c74e95269d22fd7954f, type: 3}
   m_Name: Ford
   m_EditorClassIdentifier: Assembly-CSharp::LootData
-  itemName: Ford
+  itemName: "\u041C\u043E\u0434\u0435\u043B\u044C\u043A\u0430"
   lootType: 1
   minValue: 1000
   maxValue: 1200
   weight: 10
+  dropWeight: 50
   prefab: {fileID: 6091717216496605067, guid: ce820c6c96ab6874b9f3bc88cd7b21e8, type: 3}

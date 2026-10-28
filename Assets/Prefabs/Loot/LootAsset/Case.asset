@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aff483bd6a05c74e95269d22fd7954f, type: 3}
   m_Name: Case
   m_EditorClassIdentifier: Assembly-CSharp::LootData
-  itemName: Luggage
+  itemName: "\u041A\u0435\u0439\u0441"
   lootType: 2
-  minValue: 500
-  maxValue: 1000
+  minValue: 1000
+  maxValue: 2000
   weight: 15
   dropWeight: 20
   prefab: {fileID: 7953836805146211083, guid: d951db94393d25443ab3df131ccddbb6, type: 3}

@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5aff483bd6a05c74e95269d22fd7954f, type: 3}
+  m_Name: Diamond
+  m_EditorClassIdentifier: Assembly-CSharp::LootData
+  itemName: "\u0410\u043B\u043C\u0430\u0437"
+  lootType: 3
+  minValue: 1000
+  maxValue: 1000
+  weight: 1
+  dropWeight: 8
+  prefab: {fileID: 8620463900785388500, guid: 64650db1647ef0140806b795a7c0bd79, type: 3}

@@ -105,11 +105,11 @@ MonoBehaviour:
   weight: 0
   pickUpSound:
     Guid:
-      Data1: 0
-      Data2: 0
-      Data3: 0
-      Data4: 0
-    Path: 
+      Data1: 936682925
+      Data2: 1121382176
+      Data3: -1576399740
+      Data4: 642664294
+    Path: event:/Environment/Items/Loot/Loot_PickUp
 --- !u!65 &2645338144772236415
 BoxCollider:
   m_ObjectHideFlags: 0

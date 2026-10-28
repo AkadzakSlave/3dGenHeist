@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aff483bd6a05c74e95269d22fd7954f, type: 3}
   m_Name: Sigar
   m_EditorClassIdentifier: Assembly-CSharp::LootData
-  itemName: Sigar
+  itemName: "\u041A\u0443\u0431\u0438\u043D\u0441\u043A\u0438\u0435 \u0421\u0438\u0433\u0430\u0440\u044B"
   lootType: 0
   minValue: 10
   maxValue: 200

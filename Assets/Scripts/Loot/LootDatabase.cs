@@ -10,7 +10,7 @@ public class LootDatabase : ScriptableObject
     public List<LootData> mediumLoot = new List<LootData>();
     public List<LootData> largeLoot = new List<LootData>();
 
-    public LootData GetRandomLoot(LootPointSize size, bool highValueOnly = false)
+    public LootData GetRandomLoot(LootPointSize size, bool highValueOnly = false, ICollection<LootData> excludeItems = null)
     {
         List<LootData> targetList = null;
         switch (size)
@@ -29,17 +29,28 @@ public class LootDatabase : ScriptableObject
             else return null;
         }
 
+        // Исключаем нежелательные дубликаты (если передан список исключений)
+        List<LootData> filteredList = targetList;
+        if (excludeItems != null && excludeItems.Count > 0)
+        {
+            var withoutExcluded = targetList.FindAll(x => x != null && !excludeItems.Contains(x));
+            if (withoutExcluded.Count > 0)
+            {
+                filteredList = withoutExcluded;
+            }
+        }
+
         if (highValueOnly)
         {
             // Фильтруем предметы повышенной ценности (золото, кейсы, драгоценности или от $400)
-            var highVal = targetList.FindAll(x => x != null && (x.minValue >= 400 || x.lootType == LootType.Gold || x.lootType == LootType.Case || x.lootType == LootType.Brilliant));
+            var highVal = filteredList.FindAll(x => x != null && (x.minValue >= 400 || x.lootType == LootType.Gold || x.lootType == LootType.Case || x.lootType == LootType.Brilliant));
             if (highVal.Count > 0)
             {
                 return SelectWeighted(highVal);
             }
         }
 
-        var valid = targetList.FindAll(x => x != null);
+        var valid = filteredList.FindAll(x => x != null);
         if (valid.Count == 0) return null;
         return SelectWeighted(valid);
     }

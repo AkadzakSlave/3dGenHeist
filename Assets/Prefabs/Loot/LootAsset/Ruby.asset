@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aff483bd6a05c74e95269d22fd7954f, type: 3}
   m_Name: Ruby
   m_EditorClassIdentifier: Assembly-CSharp::LootData
-  itemName: Ruby
+  itemName: "\u0420\u0443\u0431\u0438\u043D"
   lootType: 3
   minValue: 1000
   maxValue: 1000
-  weight: 5
-  dropWeight: 15
-  prefab: {fileID: 919132149155446097, guid: 2fab4e001e29d2b4a88502091dd9dc49, type: 3}
+  weight: 1
+  dropWeight: 8
+  prefab: {fileID: 3309189033978825566, guid: fb8966f784ba55040abfac85fe267e45, type: 3}

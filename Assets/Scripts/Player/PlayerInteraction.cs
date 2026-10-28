@@ -144,16 +144,16 @@ public class PlayerInteraction : MonoBehaviour
         bool isEKeyPressed = inputReader != null ? inputReader.IsInteractPressed : 
             (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.eKey.isPressed);
 
+        bool eWasPressed = (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.eKey.wasPressedThisFrame);
+        bool lmbPressed = (UnityEngine.InputSystem.Mouse.current != null && UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame);
+
         if (cachedInteractable is VaultDoor vaultDoor)
         {
-            if (isEKeyPressed)
-            {
-                vaultDoor.ProcessHoldInteraction(Time.deltaTime);
-            }
-            else
-            {
-                vaultDoor.CancelHoldInteraction();
-            }
+            vaultDoor.ProcessWheelTurn(Time.deltaTime, isEKeyPressed, transform.position);
+        }
+        else if (cachedInteractable is HeistExtractionZone extractionZone)
+        {
+            extractionZone.ProcessHoldInteraction(Time.deltaTime, isEKeyPressed);
         }
     }
 
@@ -321,11 +321,26 @@ public class PlayerInteraction : MonoBehaviour
         if (GameManager.Instance == null || GameManager.Instance.heistUI == null) return;
 
         cachedInteractable = FindBestInteractable(out lastHitCollider);
+        if (cachedInteractable == null && HeistExtractionZone.ActiveTrunkZone != null)
+        {
+            cachedInteractable = HeistExtractionZone.ActiveTrunkZone;
+        }
 
         string prompt = "";
         if (cachedInteractable != null)
         {
-            prompt = $"[{interactKey}] {cachedInteractable.GetInteractText()}";
+            string raw = cachedInteractable.GetInteractText();
+            if (!string.IsNullOrEmpty(raw))
+            {
+                if (raw.StartsWith($"[{interactKey}]") || raw.StartsWith("[E]") || raw.Contains($"[{interactKey}]") || raw.Contains("[E]") || raw.StartsWith("<color=") || raw.StartsWith("Удерживайте"))
+                {
+                    prompt = raw;
+                }
+                else
+                {
+                    prompt = $"[{interactKey}] {raw}";
+                }
+            }
         }
 
         GameManager.Instance.heistUI.SetInteractionText(prompt);
@@ -352,20 +367,30 @@ public class PlayerInteraction : MonoBehaviour
         Vector3 origin = playerCamera.position;
         Vector3 forward = playerCamera.forward;
 
-        // 1. Прямой точный луч имеет наивысший приоритет
-        if (Physics.Raycast(origin, forward, out RaycastHit directHit, interactDistance, interactLayer, QueryTriggerInteraction.Ignore))
+        // 1. Прямой точный луч имеет наивысший приоритет (включая интерактивные триггеры вроде багажника)
+        RaycastHit[] hits = Physics.RaycastAll(origin, forward, interactDistance, interactLayer, QueryTriggerInteraction.Collide);
+        if (hits != null && hits.Length > 0)
         {
-            IInteractable direct = directHit.collider.GetComponentInParent<IInteractable>();
-            if (direct != null && IsInteractableAvailable(direct))
+            System.Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+            foreach (var hit in hits)
             {
-                bestCollider = directHit.collider;
-                return direct;
+                if (hit.collider == null || hit.collider.transform.IsChildOf(transform)) continue;
+                IInteractable direct = hit.collider.GetComponentInParent<IInteractable>();
+                if (direct != null && IsInteractableAvailable(direct))
+                {
+                    bestCollider = hit.collider;
+                    return direct;
+                }
+                if (!hit.collider.isTrigger)
+                {
+                    break;
+                }
             }
         }
 
         // 2. Умный конусный поиск с взвешиванием по центру экрана (Dot Product Scoring)
         // Решает проблему выбора нужного предмета в плотных кучках/кластерах
-        Collider[] overlapCols = Physics.OverlapSphere(origin, interactDistance, interactLayer, QueryTriggerInteraction.Ignore);
+        Collider[] overlapCols = Physics.OverlapSphere(origin, interactDistance, interactLayer, QueryTriggerInteraction.Collide);
         if (overlapCols == null || overlapCols.Length == 0) return null;
 
         var evaluated = new System.Collections.Generic.HashSet<IInteractable>();
@@ -395,7 +420,7 @@ public class PlayerInteraction : MonoBehaviour
             if (dot < 0.82f) continue;
 
             // Проверка прямой видимости (чтобы не подбирать сквозь стены или столы)
-            if (Physics.Raycast(origin, dir, out RaycastHit losHit, dist, obstacleMask, QueryTriggerInteraction.Ignore))
+            if (!col.isTrigger && Physics.Raycast(origin, dir, out RaycastHit losHit, dist, obstacleMask, QueryTriggerInteraction.Ignore))
             {
                 if (losHit.collider != col && !losHit.collider.transform.IsChildOf(((Component)candidate).transform))
                 {

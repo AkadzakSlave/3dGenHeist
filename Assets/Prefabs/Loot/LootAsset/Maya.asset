@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aff483bd6a05c74e95269d22fd7954f, type: 3}
   m_Name: Maya
   m_EditorClassIdentifier: Assembly-CSharp::LootData
-  itemName: Maya
+  itemName: "\u0421\u0442\u0430\u0442\u0443\u0435\u0442\u043A\u0430"
   lootType: 1
   minValue: 200
   maxValue: 800

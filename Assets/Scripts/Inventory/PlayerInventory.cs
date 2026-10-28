@@ -215,14 +215,15 @@ public class PlayerInventory : MonoBehaviour
         }
     }
 
+    [Header("Starting Equipment")]
+    public bool autoEquipDefaultLoadout = false;
+
     private void Start()
     {
-        for (int i = 0; i < slots.Length; i++)
+        if (slots == null || slots.Length < 3)
         {
-            slots[i] = null;
+            System.Array.Resize(ref slots, 3);
         }
-
-        activeSlotIndex = 0;
 
         foreach (var item in allPossibleItems)
         {
@@ -232,12 +233,70 @@ public class PlayerInventory : MonoBehaviour
             item.Unequip();
         }
 
+        if (autoEquipDefaultLoadout)
+        {
+            EnsureDefaultLoadout();
+        }
+
         onInventoryChanged?.Invoke();
         UpdateWeaponText();
 
         if (GameManager.Instance != null && GameManager.Instance.onMoneyChanged != null)
         {
             GameManager.Instance.onMoneyChanged.AddListener(RefreshActiveItemUI);
+        }
+    }
+
+    public void EnsureDefaultLoadout()
+    {
+        if (slots == null || slots.Length < 3)
+        {
+            System.Array.Resize(ref slots, 3);
+        }
+
+        // 1. Стартовая сумка (Слот 0: Tool)
+        if (slots[0] == null && allPossibleItems != null)
+        {
+            EquipableItem bagItem = allPossibleItems.Find(item => item is BagTool);
+            if (bagItem == null)
+            {
+                bagItem = allPossibleItems.Find(item => item != null && item.itemData != null && item.itemData.itemType == ItemType.Tool);
+            }
+
+            if (bagItem != null)
+            {
+                slots[0] = bagItem;
+                Debug.Log($"<color=cyan>[Inventory] Экипирована стартовая сумка: {bagItem.name}</color>");
+            }
+        }
+
+        // 2. Стартовое оружие (Слот 1: Weapon)
+        if (slots[1] == null && allPossibleItems != null)
+        {
+            EquipableItem weaponItem = allPossibleItems.Find(item => item is WeaponItem && item.itemData != null && 
+                (item.itemData.itemName.ToLower().Contains("colt") || item.itemData.itemName.ToLower().Contains("pistol")));
+
+            if (weaponItem == null)
+            {
+                weaponItem = allPossibleItems.Find(item => item is WeaponItem);
+            }
+
+            if (weaponItem != null)
+            {
+                slots[1] = weaponItem;
+                Debug.Log($"<color=cyan>[Inventory] Экипировано стартовое оружие: {weaponItem.name}</color>");
+            }
+        }
+
+        // 3. Активируем слот (предпочитаем сумку или оружие)
+        if (activeSlotIndex < 0 || activeSlotIndex >= slots.Length || slots[activeSlotIndex] == null)
+        {
+            activeSlotIndex = slots[0] != null ? 0 : (slots[1] != null ? 1 : 0);
+        }
+
+        if (slots[activeSlotIndex] != null)
+        {
+            EnsureItemActive(slots[activeSlotIndex]);
         }
     }
 

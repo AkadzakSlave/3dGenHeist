@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5aff483bd6a05c74e95269d22fd7954f, type: 3}
   m_Name: Cash
   m_EditorClassIdentifier: Assembly-CSharp::LootData
-  itemName: Cash
+  itemName: "\u041A\u0443\u043F\u044E\u0440\u044B"
   lootType: 0
   minValue: 100
   maxValue: 1000

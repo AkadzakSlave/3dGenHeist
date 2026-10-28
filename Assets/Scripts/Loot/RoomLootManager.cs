@@ -183,11 +183,28 @@ public class RoomLootManager : MonoBehaviour
 
         // 2. Спавним каждый запланированный предмет со Scatter-смещением
         int totalItems = plannedSizes.Count;
+        List<LootData> spawnedAtThisPoint = new List<LootData>();
+
         for (int i = 0; i < totalItems; i++)
         {
             LootPointSize size = plannedSizes[i];
-            LootData lootData = lootDB.GetRandomLoot(size, isHighVal);
+
+            // Исключаем дубликаты на одной точке (самоцветы и уникальные предметы не дублируются,
+            // дублироваться разрешено только пачкам денег Cash)
+            List<LootData> excludeList = new List<LootData>();
+            foreach (var spawned in spawnedAtThisPoint)
+            {
+                if (spawned != null && spawned.lootType != LootType.Cash && !spawned.name.ToLower().Contains("cash"))
+                {
+                    excludeList.Add(spawned);
+                }
+            }
+
+            LootData lootData = lootDB.GetRandomLoot(size, isHighVal, excludeList);
+            if (lootData == null) lootData = lootDB.GetRandomLoot(size, isHighVal); // Fallback если все исключены
             if (lootData == null) continue;
+
+            spawnedAtThisPoint.Add(lootData);
 
             Vector3 spawnPos;
             Quaternion spawnRot;
@@ -257,30 +274,25 @@ public class RoomLootManager : MonoBehaviour
     {
         if (lootObj == null) return;
 
-        // 1. Проверяем масштаб: если FBX модель миниатюрная (< 5см), увеличиваем до реального размера
-        Renderer[] renderers = lootObj.GetComponentsInChildren<Renderer>(true);
-        if (renderers != null && renderers.Length > 0)
+        // 1. Проверяем наличие коллайдера.
+        // Если автор уже настроил коллайдер на префабе (BoxCollider, MeshCollider, SphereCollider и т.д.),
+        // мы ни в коем случае не трогаем его и не меняем масштаб объекта!
+        Collider existingCol = lootObj.GetComponentInChildren<Collider>();
+        if (existingCol == null)
         {
-            Bounds b = renderers[0].bounds;
-            for (int i = 1; i < renderers.Length; i++) b.Encapsulate(renderers[i].bounds);
-
-            if (b.size.magnitude < 0.05f)
+            // Только если у объекта вообще нет никакого коллайдера - создаем аккуратный BoxCollider
+            BoxCollider box = lootObj.AddComponent<BoxCollider>();
+            Renderer r = lootObj.GetComponentInChildren<Renderer>();
+            if (r != null)
             {
-                lootObj.transform.localScale *= 50f;
-                b = renderers[0].bounds;
-                for (int i = 1; i < renderers.Length; i++) b.Encapsulate(renderers[i].bounds);
+                box.center = box.transform.InverseTransformPoint(r.bounds.center);
+                Vector3 localSz = box.transform.InverseTransformVector(r.bounds.size);
+                box.size = new Vector3(Mathf.Abs(localSz.x), Mathf.Abs(localSz.y), Mathf.Abs(localSz.z));
             }
-
-            // 2. Настраиваем BoxCollider ровно по визуальным границам модели
-            BoxCollider box = lootObj.GetComponent<BoxCollider>();
-            if (box == null) box = lootObj.AddComponent<BoxCollider>();
-
-            box.center = box.transform.InverseTransformPoint(b.center);
-            Vector3 localSz = box.transform.InverseTransformVector(b.size);
-            box.size = new Vector3(Mathf.Abs(localSz.x), Mathf.Abs(localSz.y), Mathf.Abs(localSz.z));
-
-            // Минимальные габариты для удобного наведения взгляда и устойчивости
-            box.size = Vector3.Max(box.size, new Vector3(0.08f, 0.04f, 0.08f));
+            else
+            {
+                box.size = new Vector3(0.2f, 0.2f, 0.2f);
+            }
         }
 
         // 3. Компонент LootItem

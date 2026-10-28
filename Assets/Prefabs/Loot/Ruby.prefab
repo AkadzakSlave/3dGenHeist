@@ -9,9 +9,9 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6713808722181438584}
+  - component: {fileID: 111395805567865547}
   - component: {fileID: 7953817449512498109}
   - component: {fileID: 8792629051695249997}
-  - component: {fileID: 111395805567865547}
   - component: {fileID: 7993046196312107630}
   m_Layer: 0
   m_Name: Ruby
@@ -35,6 +35,28 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
+--- !u!114 &111395805567865547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3309189033978825566}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: adc21f5581ed1394cb6a915450f25597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootItem
+  data: {fileID: 11400000, guid: cfe26b1127073204b84d139649d9a741, type: 2}
+  value: 400
+  weight: 1
+  pickUpSound:
+    Guid:
+      Data1: 936682925
+      Data2: 1121382176
+      Data3: -1576399740
+      Data4: 642664294
+    Path: event:/Environment/Items/Loot/Loot_PickUp
 --- !u!33 &7953817449512498109
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -92,28 +114,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &111395805567865547
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3309189033978825566}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: adc21f5581ed1394cb6a915450f25597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LootItem
-  data: {fileID: 11400000, guid: cfe26b1127073204b84d139649d9a741, type: 2}
-  value: 400
-  weight: 1
-  pickUpSound:
-    Guid:
-      Data1: 0
-      Data2: 0
-      Data3: 0
-      Data4: 0
-    Path: 
 --- !u!65 &7993046196312107630
 BoxCollider:
   m_ObjectHideFlags: 0

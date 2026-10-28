@@ -10,11 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5aff483bd6a05c74e95269d22fd7954f, type: 3}
-  m_Name: GangStatue
+  m_Name: Emerald
   m_EditorClassIdentifier: Assembly-CSharp::LootData
-  itemName: Statue
-  lootType: 1
-  minValue: 300
-  maxValue: 500
+  itemName: "\u0418\u0437\u0443\u043C\u0440\u0443\u0434"
+  lootType: 3
+  minValue: 1000
+  maxValue: 1000
   weight: 1
-  prefab: {fileID: 1214243730013476256, guid: 1e939d136b87d214993fe5a77a2db770, type: 3}
+  dropWeight: 8
+  prefab: {fileID: 3067583788634245073, guid: b807b7b904197224fbb3b1f3aef5dd8b, type: 3}

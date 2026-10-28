@@ -14,12 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LootDatabase
   smallLoot:
   - {fileID: 11400000, guid: be606ffec2d6b694b95a9e361c9bf988, type: 2}
-  - {fileID: 11400000, guid: 3ceafc5764a2d934c972b7be1c5df3ae, type: 2}
   - {fileID: 11400000, guid: 330fb0304f3920f48a94281897c62362, type: 2}
-  - {fileID: 11400000, guid: bd5d7290772576c4fa0c2041201c7383, type: 2}
-  mediumLoot:
-  - {fileID: 11400000, guid: 913626887ed605944a748ee81b89078b, type: 2}
   - {fileID: 11400000, guid: cfe26b1127073204b84d139649d9a741, type: 2}
+  - {fileID: 11400000, guid: 6c1c387a92458ac4a9c059d81ad003fa, type: 2}
+  - {fileID: 11400000, guid: 0f09682839e119f43bd55bed9f44f56a, type: 2}
+  mediumLoot:
+  - {fileID: 11400000, guid: 03d22df481b35924aa1933f1c879e38d, type: 2}
   - {fileID: 11400000, guid: b2974bece0a9d3a48b6db1c5ecf15a46, type: 2}
+  - {fileID: 11400000, guid: bd5d7290772576c4fa0c2041201c7383, type: 2}
   largeLoot:
   - {fileID: 11400000, guid: c2631f2381ade6947b2ae418609a9d9e, type: 2}

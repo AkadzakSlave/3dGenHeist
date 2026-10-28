@@ -11,6 +11,9 @@ public class HeistExtractionZone : MonoBehaviour, IInteractable
     public float holdDuration = 2.5f;
     private float currentHoldTimer = 0f;
     private bool isPlayerInside = false;
+    public bool IsPlayerInside => isPlayerInside;
+
+    public static HeistExtractionZone ActiveTrunkZone { get; private set; }
 
     [Header("3D World Display")]
     [Tooltip("3D надпись на багажнике фургона с суммой загруженного лута")]
@@ -28,8 +31,21 @@ public class HeistExtractionZone : MonoBehaviour, IInteractable
         }
     }
 
+    private void OnDisable()
+    {
+        if (ActiveTrunkZone == this)
+        {
+            ActiveTrunkZone = null;
+        }
+    }
+
     private void OnDestroy()
     {
+        if (ActiveTrunkZone == this)
+        {
+            ActiveTrunkZone = null;
+        }
+
         if (GameManager.Instance != null && GameManager.Instance.onMoneyChanged != null)
         {
             GameManager.Instance.onMoneyChanged.RemoveListener(UpdateCargoDisplay);
@@ -44,15 +60,10 @@ public class HeistExtractionZone : MonoBehaviour, IInteractable
 
     private void HandleHoldInteraction()
     {
-        if (GameManager.Instance == null) return;
+        // Если игрок внутри триггера багажника
+        if (!isPlayerInside) return;
 
-        BagTool heldBag = GameManager.Instance.GetHeldBag();
-        bool hasMoneyInBag = heldBag != null && heldBag.storedMoney > 0;
-
-        // Если игрок держит клавишу взаимодействия
         bool isEKeyPressed = false;
-        
-        // 1. Проверяем через InputReader, если он есть
         var inputReader = FindAnyObjectByType<InputReader>();
         if (inputReader != null && inputReader.IsInteractPressed)
         {
@@ -63,15 +74,37 @@ public class HeistExtractionZone : MonoBehaviour, IInteractable
             isEKeyPressed = true;
         }
 
-        // Удерживать можно, если игрок внутри зоны триггера фургона
-        if (isPlayerInside && hasMoneyInBag && isEKeyPressed)
+        ProcessHoldInteraction(Time.deltaTime, isEKeyPressed);
+    }
+
+    public void ProcessHoldInteraction(float deltaTime, bool isHoldingE)
+    {
+        if (GameManager.Instance == null) return;
+
+        BagTool heldBag = GameManager.Instance.GetHeldBag();
+        bool hasBag = heldBag != null;
+        bool hasMoney = hasBag && heldBag.storedMoney > 0;
+
+        if (isHoldingE)
         {
-            currentHoldTimer += Time.deltaTime;
+            if (!hasBag)
+            {
+                CancelHoldInteraction();
+                return;
+            }
+
+            if (!hasMoney)
+            {
+                CancelHoldInteraction();
+                return;
+            }
+
+            currentHoldTimer += deltaTime;
             float progress = Mathf.Clamp01(currentHoldTimer / holdDuration);
 
             if (HeistUI.Instance != null)
             {
-                HeistUI.Instance.SetInteractionProgress(progress, $"Выгрузка сумки (${heldBag.storedMoney})");
+                HeistUI.Instance.SetInteractionProgress(progress, $"Выгрузка лута (${heldBag.storedMoney})");
             }
 
             if (currentHoldTimer >= holdDuration)
@@ -86,45 +119,42 @@ public class HeistExtractionZone : MonoBehaviour, IInteractable
         }
         else
         {
-            if (currentHoldTimer > 0f)
+            CancelHoldInteraction();
+        }
+    }
+
+    public void CancelHoldInteraction()
+    {
+        if (currentHoldTimer > 0f)
+        {
+            currentHoldTimer = 0f;
+            if (HeistUI.Instance != null)
             {
-                currentHoldTimer = 0f;
-                if (HeistUI.Instance != null)
-                {
-                    HeistUI.Instance.HideInteractionProgress();
-                }
+                HeistUI.Instance.HideInteractionProgress();
             }
         }
     }
 
     public void Interact()
     {
-        // При обычном клике E информируем игрока о необходимости удержания
-        if (GameManager.Instance == null) return;
-        BagTool heldBag = GameManager.Instance.GetHeldBag();
-
-        if (heldBag != null && heldBag.storedMoney > 0)
-        {
-            if (HeistUI.Instance != null)
-            {
-                HeistUI.Instance.ShowNotification($"Удерживайте [E] 2 сек для выгрузки ${heldBag.storedMoney}!", new Color(1f, 0.85f, 0.3f, 1f));
-            }
-        }
+        // Одиночное нажатие [E] не спамит длинными подсказками в плашки уведомлений
     }
 
     public string GetInteractText()
     {
-        if (GameManager.Instance == null) return "Багажник фургона";
+        if (GameManager.Instance == null) return "Багажник машины";
 
         BagTool heldBag = GameManager.Instance.GetHeldBag();
-        if (heldBag != null && heldBag.storedMoney > 0)
+        if (heldBag == null)
         {
-            return $"[Удерживайте E] Выгрузить сумку (${heldBag.storedMoney})";
+            return "Багажник машины (<color=#FF8888>Возьмите сумку в руки [1]</color>)";
+        }
+        if (heldBag.storedMoney <= 0)
+        {
+            return "Багажник машины (<color=#CCCCCC>Сумка пуста</color>)";
         }
 
-        int loaded = GameManager.Instance.depositedMoney;
-        int quota = GameManager.Instance.operationTargetQuota;
-        return $"Багажник фургона (Загружено: ${loaded} / ${quota})";
+        return "Удерживайте [E] чтобы опустошить сумку";
     }
 
     private void UnloadHeldBag(BagTool bag)
@@ -146,7 +176,7 @@ public class HeistExtractionZone : MonoBehaviour, IInteractable
 
         if (HeistUI.Instance != null)
         {
-            HeistUI.Instance.ShowNotification($"+${moneyExtracted} Выгружено в фургон!", new Color(0.2f, 1f, 0.4f, 1f));
+            HeistUI.Instance.ShowNotification($"+${moneyExtracted}", new Color(0.2f, 1f, 0.4f, 1f));
         }
 
         UpdateCargoDisplay();
@@ -166,10 +196,11 @@ public class HeistExtractionZone : MonoBehaviour, IInteractable
             }
         }
 
-        // 2. Игрок зашел в зону кузова
+        // 2. Игрок зашел в зону кузова/багажника
         if (other.CompareTag("Player") || other.GetComponent<CharacterController>() != null || other.GetComponentInParent<PlayerMovement>() != null)
         {
             isPlayerInside = true;
+            ActiveTrunkZone = this;
         }
     }
 
@@ -178,6 +209,10 @@ public class HeistExtractionZone : MonoBehaviour, IInteractable
         if (other.CompareTag("Player") || other.GetComponent<CharacterController>() != null || other.GetComponentInParent<PlayerMovement>() != null)
         {
             isPlayerInside = false;
+            if (ActiveTrunkZone == this)
+            {
+                ActiveTrunkZone = null;
+            }
             currentHoldTimer = 0f;
             if (HeistUI.Instance != null)
             {
