@@ -687,8 +687,23 @@ public class GameManager : MonoBehaviour
     private void OnTimerReachZero()
     {
         reinforcementCount++;
-        Debug.Log($"<color=red>[Backup] Прибыло подкрепление! (#{reinforcementCount})</color>");
-        heistTimer = 60f;
+        Debug.Log($"<color=red>[Backup] Прибыло подкрепление полиции! (#{reinforcementCount})</color>");
+        
+        if (EnemyManager.Instance != null)
+        {
+            EnemyManager.Instance.TriggerPoliceAssaultWave(reinforcementCount);
+        }
+
+        if (heistUI != null)
+        {
+            string msg = reinforcementCount == 1 
+                ? "⚠ ТРЕВОГА! В ЗДАНИЕ ВОШЛА ПОЛИЦИЯ! УХОДИТЕ К ФУРГОНУ!" 
+                : $"⚠ ШТУРМ: ВОЛНА ПОДКРЕПЛЕНИЯ #{reinforcementCount}!";
+            heistUI.ShowNotification(msg, new Color(1f, 0.25f, 0.25f, 1f));
+        }
+
+        // Таймер следующей волны подкреплений (45 секунд между волнами)
+        heistTimer = 45f;
     }
 
     public void DepositBag()

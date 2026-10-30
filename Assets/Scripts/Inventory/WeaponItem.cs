@@ -507,13 +507,24 @@ public class WeaponItem : EquipableItem
                 hitPoint = hit.point;
                 PlayBulletImpact(hit);
 
+                EnemyDamageHitbox damageHitbox = hit.collider.GetComponent<EnemyDamageHitbox>();
                 EnemyHealth enemyHealth = hit.collider.GetComponentInParent<EnemyHealth>();
-                if (enemyHealth != null)
+                if (damageHitbox != null)
+                {
+                    bool isHead = damageHitbox.IsHeadshot;
+                    int dealt = damageHitbox.TakeDamageWithHitbox(damage);
+                    if (HeistUI.Instance != null)
+                    {
+                        HeistUI.Instance.TriggerHitmarker(isHead);
+                    }
+                    Debug.Log($"[Weapon] Hit {hit.collider.name} ({damageHitbox.bodyPart}) for {dealt} damage (x{damageHitbox.damageMultiplier}).");
+                }
+                else if (enemyHealth != null)
                 {
                     enemyHealth.TakeDamage(damage);
                     if (HeistUI.Instance != null)
                     {
-                        HeistUI.Instance.TriggerHitmarker();
+                        HeistUI.Instance.TriggerHitmarker(false);
                     }
                     Debug.Log($"[Weapon] Pellet hit {enemyHealth.name} for {damage}.");
                 }

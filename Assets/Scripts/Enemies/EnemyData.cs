@@ -16,8 +16,8 @@ public class EnemyData : ScriptableObject
     
     [Header("Movement")]
     public float moveSpeed = 3.5f;
-    public float angularSpeed = 120f;
-    public float acceleration = 8f;
+    public float angularSpeed = 450f;
+    public float acceleration = 22f;
 
     [Header("Health")]
     public int maxHealth = 100;
@@ -38,4 +38,9 @@ public class EnemyData : ScriptableObject
 
     [Header("Audio (FMOD)")]
     public FMODUnity.EventReference fireEvent;
+    public FMODUnity.EventReference radioAlertEvent;
+    public FMODUnity.EventReference alertVoiceEvent;
+    public FMODUnity.EventReference hurtVoiceEvent;
+    public FMODUnity.EventReference deathVoiceEvent;
+    public FMODUnity.EventReference breachHitEvent;
 }

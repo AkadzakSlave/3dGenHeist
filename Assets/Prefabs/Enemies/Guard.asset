@@ -16,18 +16,57 @@ MonoBehaviour:
   enemyName: Bobik
   prefab: {fileID: 5607580012618176576, guid: e256e14bb56ecc54ea5b649886cfd8d2, type: 3}
   moveSpeed: 3.5
-  angularSpeed: 120
-  acceleration: 8
+  angularSpeed: 450
+  acceleration: 22
   maxHealth: 45
-  detectionRadius: 15
-  damagePerShot: 10
-  attackRange: 12
-  fireInterval: 1.5
-  hitChance: 0.3
+  detectionRadius: 28
+  damagePerShot: 2
+  attackRange: 28
+  fireInterval: 1.2
+  magazineSize: 10
+  reloadTime: 2.5
+  burstCount: 3
+  burstPause: 1.2
+  hitChance: 0.55
   lineOfSightMask:
     serializedVersion: 2
     m_Bits: 4294967295
   fireEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  radioAlertEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  alertVoiceEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  hurtVoiceEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  deathVoiceEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  breachHitEvent:
     Guid:
       Data1: 0
       Data2: 0

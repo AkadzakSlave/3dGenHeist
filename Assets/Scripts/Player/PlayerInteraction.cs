@@ -149,7 +149,7 @@ public class PlayerInteraction : MonoBehaviour
 
         if (cachedInteractable is VaultDoor vaultDoor)
         {
-            vaultDoor.ProcessWheelTurn(Time.deltaTime, isEKeyPressed, transform.position);
+            vaultDoor.ProcessLockpick(Time.deltaTime, isEKeyPressed, eWasPressed, lmbPressed, transform.position);
         }
         else if (cachedInteractable is HeistExtractionZone extractionZone)
         {

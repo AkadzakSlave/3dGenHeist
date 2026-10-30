@@ -93,8 +93,8 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 20201, guid: 0000000000000000f000000000000000, type: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingDataAsset: {fileID: 112000000, guid: 7a46f45fa3930f9429d3b2b9cf11e329, type: 2}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: 6772c5f2b3147da4db9194b34c67e812, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -2228,7 +2228,7 @@ MonoBehaviour:
   isInLobby: 1
   playerTransform: {fileID: 240950352}
   playerController: {fileID: 2732808680689780844}
-  levelGenerator: {fileID: 1147165239}
+  levelGenerator: {fileID: 0}
   lobbySpawnPoint: {fileID: 471719296}
   motelSpawnPoint: {fileID: 1644783000}
   bossRoomSpawnPoint: {fileID: 127213702}
@@ -11353,95 +11353,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1146788642}
   m_CullTransparentMesh: 1
---- !u!1 &1147165238
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1147165240}
-  - component: {fileID: 1147165239}
-  - component: {fileID: 1147165241}
-  m_Layer: 0
-  m_Name: LevelGenerator
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1147165239
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1147165238}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fa6ccade90d6038428f4c8a7c4f75c58, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LevelGenerator
-  defaultPreset: {fileID: 11400000, guid: 94e2c7645c98368439015818d678f76e, type: 2}
-  activePreset: {fileID: 0}
-  maxRetries: 5
-  boundsCenter: {x: 70, y: 10, z: 0}
-  boundsSize: {x: 150, y: 30, z: 500}
-  streetSocketName: Socket_Street
-  roomLayerMask:
-    serializedVersion: 2
-    m_Bits: 64
-  destructibleWallPrefab: {fileID: 5394952081114656650, guid: aab30e9ede35a674894acd4052f36be1, type: 3}
-  solidWallPrefab: {fileID: 5247707428247068767, guid: 1c8c186c7dde9fb4383f36157d349ca5, type: 3}
-  vanSpawnPoint: {fileID: 0}
---- !u!4 &1147165240
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1147165238}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1147165241
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1147165238}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
-  m_SerializedVersion: 0
-  m_AgentTypeID: 0
-  m_CollectObjects: 2
-  m_Size: {x: 10, y: 10, z: 10}
-  m_Center: {x: 0, y: 2, z: 0}
-  m_LayerMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_UseGeometry: 1
-  m_DefaultArea: 0
-  m_GenerateLinks: 1
-  m_IgnoreNavMeshAgent: 1
-  m_IgnoreNavMeshObstacle: 1
-  m_OverrideTileSize: 0
-  m_TileSize: 256
-  m_OverrideVoxelSize: 0
-  m_VoxelSize: 0.16666667
-  m_MinRegionArea: 2
-  m_NavMeshData: {fileID: 0}
-  m_BuildHeightMesh: 0
 --- !u!1 &1160266910
 GameObject:
   m_ObjectHideFlags: 0
@@ -13890,6 +13801,7 @@ MonoBehaviour:
   currentEnemyCount: 0
   initialSpawnPointCount: 0
   patrolDoorCount: 0
+  isAssaultWaveActive: 0
 --- !u!4 &1476531816
 Transform:
   m_ObjectHideFlags: 0
@@ -22861,7 +22773,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4180986155629760432, guid: 31e6ef9c278db9440acb80bb41d5c832, type: 3}
       propertyPath: currentHealth
-      value: 50
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 4840210628521289663, guid: 31e6ef9c278db9440acb80bb41d5c832, type: 3}
       propertyPath: m_IsActive
@@ -22938,7 +22850,6 @@ SceneRoots:
   - {fileID: 237729058}
   - {fileID: 448518877}
   - {fileID: 1476531816}
-  - {fileID: 1147165240}
   - {fileID: 7797889687121735173}
   - {fileID: 878608470}
   - {fileID: 2069931952}

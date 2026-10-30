@@ -93,6 +93,7 @@ public class HeistUI : MonoBehaviour
 
     public static HeistUI Instance { get; private set; }
     private float reticleHitmarkerTimer = 0f;
+    private bool isHeadshotHitmarker = false;
 
 
     [Header("Chamber Liquid Physics (Water / Honey Feel)")]
@@ -493,9 +494,10 @@ public class HeistUI : MonoBehaviour
                 if (releaseTimerText != null) releaseTimerText.text = formattedTimer;
             }
 
-            // Моргание красным, если таймер на нуле
-            Color timerColor = (t <= 0)
-                ? Color.Lerp(Color.red, Color.white, (Mathf.Sin(Time.time * timerBlinkSpeed) + 1.0f) / 2.0f)
+            // Моргание красным, если таймер на нуле или идет штурм полиции
+            bool isAssault = (EnemyManager.Instance != null && EnemyManager.Instance.isAssaultWaveActive) || (t <= 0);
+            Color timerColor = isAssault
+                ? Color.Lerp(Color.red, new Color(1f, 0.45f, 0.45f, 1f), (Mathf.Sin(Time.time * timerBlinkSpeed) + 1.0f) / 2.0f)
                 : Color.white;
 
             if (timerText != null) timerText.color = timerColor;
@@ -598,6 +600,12 @@ public class HeistUI : MonoBehaviour
             {
                 timerText.text = "<color=#55FF55>● СТЕЛС</color>";
             }
+            else if (EnemyManager.Instance != null && EnemyManager.Instance.isAssaultWaveActive)
+            {
+                int min = Mathf.FloorToInt(GameManager.Instance.heistTimer / 60);
+                int sec = Mathf.FloorToInt(GameManager.Instance.heistTimer % 60);
+                timerText.text = $"<color=#FF0000>⚠ ШТУРМ ПОЛИЦИИ {min:00}:{sec:00}</color>";
+            }
             else if (GameManager.Instance.heistTimer > 0)
             {
                 int min = Mathf.FloorToInt(GameManager.Instance.heistTimer / 60);
@@ -606,7 +614,7 @@ public class HeistUI : MonoBehaviour
             }
             else
             {
-                timerText.text = "<color=#FF0000>⚠ ШТУРМ: ПОДКРЕПЛЕНИЕ</color>";
+                timerText.text = "<color=#FF0000>⚠ ШТУРМ: ПОЛИЦИЯ</color>";
             }
         }
 
@@ -1139,8 +1147,8 @@ public class HeistUI : MonoBehaviour
         if (reticleHitmarkerTimer > 0f)
         {
             reticleHitmarkerTimer -= Time.deltaTime;
-            targetColor = new Color(1f, 0.22f, 0.22f, 1f);
-            targetSize = reticleFocusSize * 1.6f;
+            targetColor = isHeadshotHitmarker ? new Color(1f, 0.12f, 0.12f, 1f) : new Color(1f, 0.35f, 0.35f, 1f);
+            targetSize = isHeadshotHitmarker ? reticleFocusSize * 2.2f : reticleFocusSize * 1.6f;
         }
 
         currentReticleSize = Mathf.Lerp(currentReticleSize, targetSize, Time.deltaTime * reticleSmoothSpeed);
@@ -1346,9 +1354,10 @@ public class HeistUI : MonoBehaviour
     /// <summary>
     /// Вызывается при попадании по врагу для сочного хитмаркер-отклика прицела
     /// </summary>
-    public void TriggerHitmarker()
+    public void TriggerHitmarker(bool isHeadshot = false)
     {
-        reticleHitmarkerTimer = 0.14f;
+        isHeadshotHitmarker = isHeadshot;
+        reticleHitmarkerTimer = isHeadshot ? 0.22f : 0.14f;
     }
 
     private Sprite GetOrCreateCircleSprite()

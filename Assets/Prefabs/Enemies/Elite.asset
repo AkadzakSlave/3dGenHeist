@@ -12,17 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b944889f44bb84f47b8d4e6f20b61522, type: 3}
   m_Name: Elite
   m_EditorClassIdentifier: Assembly-CSharp::EnemyData
-  type: 1
+  type: 2
   enemyName: Kola
   prefab: {fileID: 3611918560336796357, guid: f2ed67ec54ca89644874de00f5eeb23e, type: 3}
-  moveSpeed: 3.5
-  angularSpeed: 120
-  acceleration: 8
-  maxHealth: 100
-  detectionRadius: 15
-  damagePerShot: 10
-  attackRange: 14
-  fireInterval: 0.2
+  moveSpeed: 2.8
+  angularSpeed: 400
+  acceleration: 20
+  maxHealth: 250
+  detectionRadius: 32
+  damagePerShot: 14
+  attackRange: 32
+  fireInterval: 0.18
   magazineSize: 40
   reloadTime: 3.5
   burstCount: 8

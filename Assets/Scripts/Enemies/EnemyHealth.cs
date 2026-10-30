@@ -22,6 +22,7 @@ public class EnemyHealth : MonoBehaviour
     private Coroutine flashCoroutine;
     private MaterialPropertyBlock propBlock;
     private static readonly int ColorShaderID = Shader.PropertyToID("_Color");
+    private static readonly int DieTriggerHash = Animator.StringToHash("Die");
 
     private void Awake()
     {
@@ -66,6 +67,12 @@ public class EnemyHealth : MonoBehaviour
         // Trigger red flash visual feedback
         FlashRed();
 
+        // Play hurt voice sound if assigned
+        if (enemyController != null && enemyController.data != null && !enemyController.data.hurtVoiceEvent.IsNull)
+        {
+            FMODUnity.RuntimeManager.PlayOneShot(enemyController.data.hurtVoiceEvent, transform.position);
+        }
+
         // Alert enemy AI of attacker position
         if (enemyController != null)
         {
@@ -97,7 +104,6 @@ public class EnemyHealth : MonoBehaviour
 
     private IEnumerator FlashRoutine()
     {
-        // Set all renderer colors to red
         for (int i = 0; i < renderers.Length; i++)
         {
             if (renderers[i] != null && renderers[i].sharedMaterial != null && renderers[i].sharedMaterial.HasProperty(ColorShaderID))
@@ -133,6 +139,19 @@ public class EnemyHealth : MonoBehaviour
 
         isDead = true;
         onDeath?.Invoke();
+
+        // Play death voice sound if assigned
+        if (enemyController != null && enemyController.data != null && !enemyController.data.deathVoiceEvent.IsNull)
+        {
+            FMODUnity.RuntimeManager.PlayOneShot(enemyController.data.deathVoiceEvent, transform.position);
+        }
+
+        // Trigger Death Animation
+        Animator anim = GetComponentInChildren<Animator>();
+        if (anim != null && anim.enabled)
+        {
+            anim.SetTrigger(DieTriggerHash);
+        }
 
         // Disable NavMeshAgent immediately so dead body doesn't block pathfinding
         var agent = GetComponent<UnityEngine.AI.NavMeshAgent>();

@@ -7,65 +7,51 @@ public class VaultDoor : MonoBehaviour, IInteractable
     public bool isLocked = true;
     public bool isOpen = false;
 
-    [Header("Valve Wheel & Unlock Settings")]
-    [Tooltip("Время удержания клавиши E для полного проворота вентиля (в секундах)")]
-    public float holdTimeToUnlock = 2.5f;
+    [Header("Safe Cracking Mini-Game Settings")]
+    [Tooltip("Количество штифтов/тумблеров для успешного взлома сейфа")]
+    public int totalPins = 3;
+    public int currentPin = 1;
 
-    [Tooltip("Объект вентиля / штурвала сейфа для вращения")]
-    public Transform doorWheel;
+    [Tooltip("Базовая скорость вращения стрелки (оборотов в секунду)")]
+    public float needleSpeed = 0.75f;
 
-    [Tooltip("Скорость вращения вентиля при удержании (градусов в секунду)")]
-    public float wheelSpinSpeed = 360f;
+    [Tooltip("Ширина зеленой зоны успеха (в долях окружности, 0.15 = 15% круга)")]
+    public float sweetSpotSize = 0.20f;
 
     [Tooltip("Запускать общую тревогу банка при вскрытии хранилища")]
     public bool triggerAlarmOnBreach = true;
 
     [Header("Animation & Visuals")]
-    [Tooltip("Объект петли/двери для поворота")]
-    public Transform doorHinge;
-    public Vector3 openEulerOffset = new Vector3(0f, -105f, 0f);
-    public float openSpeed = 1.5f;
+    public float openSpeed = 1.6f;
+    private const float targetOpenAngle = -105f;
 
     [Header("Audio")]
     public AudioSource audioSource;
     public AudioClip creakSound;
     public AudioClip unlockSound;
 
-    private Quaternion closedRotation;
-    private Quaternion targetOpenRotation;
+    // Внутреннее состояние мини-игры
+    private bool isMiniGameActive = false;
+    private float needleAngle = 0f;
+    private float sweetSpotStart = 0.35f;
+    private float needleDirection = 1f;
+    private float flashTimer = 0f;
+    private bool isSuccessFlash = false;
+    private bool isErrorFlash = false;
 
-    // Состояние проворота вентиля
-    private float currentHoldProgress = 0f;
-    private float clickTimer = 0f;
+    // Позиционирование и петли двери
+    private Vector3 hingeWorldPoint;
+    private float currentOpenAngle = 0f;
+
     private static AudioClip proceduralClickClip;
     private static AudioClip proceduralHeavyThudClip;
+    private static AudioClip proceduralErrorClip;
 
-    public bool IsLockpicking => currentHoldProgress > 0f;
+    public bool IsLockpicking => isMiniGameActive;
 
     private void Start()
     {
-        if (doorHinge == null)
-        {
-            doorHinge = transform;
-        }
-
-        closedRotation = doorHinge.localRotation;
-        targetOpenRotation = closedRotation * Quaternion.Euler(openEulerOffset);
-
-        // Автопоиск штурвала / вентиля среди дочерних объектов
-        if (doorWheel == null)
-        {
-            foreach (Transform child in GetComponentsInChildren<Transform>(true))
-            {
-                if (child == transform || child == doorHinge) continue;
-                string lower = child.name.ToLower();
-                if (lower.Contains("wheel") || lower.Contains("valve") || lower.Contains("handle") || lower.Contains("cylinder"))
-                {
-                    doorWheel = child;
-                    break;
-                }
-            }
-        }
+        CalculateHingePoint();
 
         if (audioSource == null)
         {
@@ -81,12 +67,44 @@ public class VaultDoor : MonoBehaviour, IInteractable
         EnsureAudioClips();
     }
 
+    private void CalculateHingePoint()
+    {
+        MeshFilter mf = GetComponent<MeshFilter>();
+        if (mf != null && mf.sharedMesh != null)
+        {
+            Bounds b = mf.sharedMesh.bounds;
+            // Рассчитываем край двери в локальных координатах и переводим в мировые
+            Vector3 localHinge = b.center + new Vector3(-b.extents.x * 0.95f, 0f, 0f);
+            hingeWorldPoint = transform.TransformPoint(localHinge);
+        }
+        else
+        {
+            hingeWorldPoint = transform.position;
+        }
+    }
+
     private void Update()
     {
-        if (doorHinge != null)
+        // Плавная анимация распахивания двери вокруг ее петли
+        float targetAngle = isOpen ? targetOpenAngle : 0f;
+        if (Mathf.Abs(currentOpenAngle - targetAngle) > 0.05f)
         {
-            Quaternion target = isOpen ? targetOpenRotation : closedRotation;
-            doorHinge.localRotation = Quaternion.Slerp(doorHinge.localRotation, target, Time.deltaTime * openSpeed);
+            float newAngle = Mathf.MoveTowards(currentOpenAngle, targetAngle, Time.deltaTime * 90f * openSpeed);
+            float delta = newAngle - currentOpenAngle;
+            currentOpenAngle = newAngle;
+
+            transform.RotateAround(hingeWorldPoint, transform.up, delta);
+        }
+
+        // Таймер вспышки в UI мини-игры
+        if (flashTimer > 0f)
+        {
+            flashTimer -= Time.deltaTime;
+            if (flashTimer <= 0f)
+            {
+                isSuccessFlash = false;
+                isErrorFlash = false;
+            }
         }
     }
 
@@ -94,9 +112,9 @@ public class VaultDoor : MonoBehaviour, IInteractable
     {
         if (isLocked)
         {
-            if (HeistUI.Instance != null)
+            if (!isMiniGameActive)
             {
-                HeistUI.Instance.ShowNotification("Удерживайте [E], чтобы провернуть вентиль сейфа!", new Color(1f, 0.85f, 0.2f, 1f));
+                StartLockpick();
             }
             return;
         }
@@ -111,112 +129,145 @@ public class VaultDoor : MonoBehaviour, IInteractable
         if (isOpen) return "Закрыть дверь хранилища";
         if (isLocked)
         {
-            return "Удерживайте [E] - Провернуть запорный вентиль";
+            if (isMiniGameActive)
+            {
+                return $"Взлом сейфа: Штифт {currentPin}/{totalPins} (Нажмите [E] или ЛКМ в зеленой зоне)";
+            }
+            return "[E] Вскрыть замок сейфа";
         }
         return "Открыть дверь хранилища";
+    }
+
+    public void StartLockpick()
+    {
+        if (!isLocked || isOpen) return;
+
+        isMiniGameActive = true;
+        currentPin = 1;
+        needleAngle = 0f;
+        needleDirection = 1f;
+        RandomizeSweetSpot();
+
+        PlaySound(proceduralClickClip, 1.1f);
+        Debug.Log("<color=yellow>[Vault] Мини-игра взлома сейфа запущена!</color>");
+    }
+
+    public void CancelLockpick()
+    {
+        if (!isMiniGameActive) return;
+
+        isMiniGameActive = false;
+        if (HeistUI.Instance != null)
+        {
+            HeistUI.Instance.HideInteractionProgress();
+        }
+    }
+
+    private void RandomizeSweetSpot()
+    {
+        // Располагаем зеленую зону в случайном месте циферблата
+        sweetSpotStart = Random.Range(0.12f, 0.88f - sweetSpotSize);
     }
 
     /// <summary>
     /// Вызывается каждый кадр из PlayerInteraction при наведении на дверь хранилища
     /// </summary>
-    public void ProcessWheelTurn(float deltaTime, bool isHoldingE, Vector3 playerPos)
+    public void ProcessLockpick(float deltaTime, bool isHoldingE, bool eWasPressed, bool lmbPressed, Vector3 playerPos)
     {
         if (!isLocked || isOpen)
         {
-            if (currentHoldProgress > 0f)
-            {
-                CancelWheelTurn();
-            }
+            if (isMiniGameActive) CancelLockpick();
             return;
         }
 
-        // Проверка дистанции: если игрок отошел дальше 4.0м - сбрасываем прогресс
-        if (Vector3.Distance(transform.position, playerPos) > 4.0f)
+        // Проверка дистанции: если игрок отошел дальше 3.8м — прерываем взлом
+        if (Vector3.Distance(transform.position, playerPos) > 3.8f)
         {
-            if (currentHoldProgress > 0f)
-            {
-                CancelWheelTurn();
-            }
+            if (isMiniGameActive) CancelLockpick();
             return;
         }
 
-        if (isHoldingE)
+        if (!isMiniGameActive)
         {
-            // 1. Накопление прогресса
-            currentHoldProgress += deltaTime / Mathf.Max(0.5f, holdTimeToUnlock);
-
-            // 2. Вращение вентиля / штурвала
-            if (doorWheel != null)
-            {
-                doorWheel.Rotate(Vector3.forward, wheelSpinSpeed * deltaTime, Space.Self);
-            }
-
-            // 3. Звук механических щелчков с нарастающей тональностью
-            clickTimer += deltaTime;
-            if (clickTimer >= 0.12f)
-            {
-                clickTimer = 0f;
-                float pitch = 0.95f + (currentHoldProgress * 0.65f);
-                PlaySound(proceduralClickClip, pitch);
-            }
-
-            // 4. Отрисовка кольца прогресса
-            if (HeistUI.Instance != null)
-            {
-                HeistUI.Instance.SetInteractionProgress(currentHoldProgress, "Проворот запорного вентиля");
-            }
-
-            // 5. Успех: 100% проворота
-            if (currentHoldProgress >= 1.0f)
-            {
-                CancelWheelTurn();
-                UnlockAndOpen();
-            }
+            return;
         }
-        else
+
+        // 1. Движение стрелки
+        float speed = needleSpeed * (0.85f + (currentPin * 0.2f)); // С каждым штифтом стрелка чуть быстрее
+        needleAngle = (needleAngle + speed * needleDirection * deltaTime) % 1.0f;
+        if (needleAngle < 0f) needleAngle += 1.0f;
+
+        // 2. Обработка клика игрока ([E] или ЛКМ)
+        if (eWasPressed || lmbPressed)
         {
-            // Клавиша отпущена - плавный откат назад
-            if (currentHoldProgress > 0f)
-            {
-                currentHoldProgress = Mathf.Max(0f, currentHoldProgress - deltaTime * 2.0f);
-                if (currentHoldProgress <= 0.01f)
-                {
-                    CancelWheelTurn();
-                }
-                else if (HeistUI.Instance != null)
-                {
-                    HeistUI.Instance.SetInteractionProgress(currentHoldProgress, "Проворот запорного вентиля");
-                }
-            }
+            EvaluateLockpickAttempt();
+        }
+
+        // 3. Обновление визуального циферблата в интерфейсе
+        if (HeistUI.Instance != null && isMiniGameActive)
+        {
+            string prompt = $"Взлом сейфа: Штифт {currentPin}/{totalPins} (Нажмите [E] в зеленой зоне)";
+            HeistUI.Instance.SetLockpickMode(true, needleAngle, sweetSpotStart, sweetSpotSize, prompt, isSuccessFlash, isErrorFlash);
         }
     }
 
     /// <summary>
-    /// Для обратной совместимости вызовов
+    /// Для обратной совместимости
     /// </summary>
-    public void ProcessLockpick(float deltaTime, bool isHoldingE, bool eWasPressed, bool lmbPressed, Vector3 playerPos)
+    public void ProcessWheelTurn(float deltaTime, bool isHoldingE, Vector3 playerPos)
     {
-        ProcessWheelTurn(deltaTime, isHoldingE, playerPos);
+        bool ePressed = UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.eKey.wasPressedThisFrame;
+        bool lmbPressed = UnityEngine.InputSystem.Mouse.current != null && UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame;
+        ProcessLockpick(deltaTime, isHoldingE, ePressed, lmbPressed, playerPos);
     }
 
-    public void StartLockpick()
+    private void EvaluateLockpickAttempt()
     {
-        // Не требуется для удержания вентиля
-    }
+        // Проверяем, попала ли стрелка в зеленую зону
+        float spotEnd = sweetSpotStart + sweetSpotSize;
+        bool isHit = (needleAngle >= sweetSpotStart && needleAngle <= spotEnd);
 
-    public void CancelLockpick()
-    {
-        CancelWheelTurn();
+        if (isHit)
+        {
+            // УСПЕШНОЕ ПОПАДАНИЕ В ШТИФТ
+            isSuccessFlash = true;
+            flashTimer = 0.22f;
+            float pitch = 1.0f + (currentPin * 0.3f);
+            PlaySound(proceduralClickClip, pitch);
+
+            if (currentPin >= totalPins)
+            {
+                // Все штифты взломаны — сейф открывается!
+                CancelLockpick();
+                UnlockAndOpen();
+            }
+            else
+            {
+                // Переходим к следующему штифту
+                currentPin++;
+                RandomizeSweetSpot();
+                needleDirection = -needleDirection; // Меняем направление вращения для разнообразия
+            }
+        }
+        else
+        {
+            // ПРОМАХ
+            isErrorFlash = true;
+            flashTimer = 0.28f;
+            PlaySound(proceduralErrorClip != null ? proceduralErrorClip : proceduralHeavyThudClip, 0.8f);
+
+            // Штраф: если игрок был на 2-м или 3-м штифте, откат назад
+            if (currentPin > 1)
+            {
+                currentPin--;
+                RandomizeSweetSpot();
+            }
+        }
     }
 
     public void CancelWheelTurn()
     {
-        currentHoldProgress = 0f;
-        clickTimer = 0f;
-        if (HeistUI.Instance != null)
-        {
-            HeistUI.Instance.HideInteractionProgress();
-        }
+        CancelLockpick();
     }
 
     private void PlaySound(AudioClip clip, float pitch = 1.0f)
@@ -232,15 +283,19 @@ public class VaultDoor : MonoBehaviour, IInteractable
     {
         if (proceduralClickClip == null)
         {
-            proceduralClickClip = CreateClickTone(1100f, 0.05f);
+            proceduralClickClip = CreateTone(1250f, 0.045f);
         }
         if (proceduralHeavyThudClip == null)
         {
-            proceduralHeavyThudClip = CreateClickTone(160f, 0.35f);
+            proceduralHeavyThudClip = CreateTone(140f, 0.35f);
+        }
+        if (proceduralErrorClip == null)
+        {
+            proceduralErrorClip = CreateBuzzTone(220f, 0.15f);
         }
     }
 
-    private static AudioClip CreateClickTone(float frequency, float duration)
+    private static AudioClip CreateTone(float frequency, float duration)
     {
         int sampleRate = 22050;
         int samples = Mathf.RoundToInt(sampleRate * duration);
@@ -249,11 +304,30 @@ public class VaultDoor : MonoBehaviour, IInteractable
         for (int i = 0; i < samples; i++)
         {
             float t = (float)i / sampleRate;
-            float envelope = Mathf.Exp(-t * 28f);
+            float envelope = Mathf.Exp(-t * 32f);
             data[i] = Mathf.Sin(2 * Mathf.PI * frequency * t) * envelope;
         }
 
         AudioClip clip = AudioClip.Create("RatchetTone", samples, 1, sampleRate, false);
+        clip.SetData(data, 0);
+        return clip;
+    }
+
+    private static AudioClip CreateBuzzTone(float frequency, float duration)
+    {
+        int sampleRate = 22050;
+        int samples = Mathf.RoundToInt(sampleRate * duration);
+        float[] data = new float[samples];
+
+        for (int i = 0; i < samples; i++)
+        {
+            float t = (float)i / sampleRate;
+            float envelope = Mathf.Exp(-t * 12f);
+            float square = Mathf.Sin(2 * Mathf.PI * frequency * t) > 0 ? 0.35f : -0.35f;
+            data[i] = square * envelope;
+        }
+
+        AudioClip clip = AudioClip.Create("BuzzTone", samples, 1, sampleRate, false);
         clip.SetData(data, 0);
         return clip;
     }
@@ -266,6 +340,7 @@ public class VaultDoor : MonoBehaviour, IInteractable
         if (isOpen) return;
 
         Debug.Log($"<color=orange>[Vault] Дверь хранилища получила взрывной урон ({damage})!</color>");
+        CancelLockpick();
         UnlockAndOpen();
     }
 

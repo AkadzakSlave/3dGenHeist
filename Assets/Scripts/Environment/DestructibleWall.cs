@@ -37,6 +37,12 @@ public class DestructibleWall : MonoBehaviour
         hitInstance.setParameterByName("HitNumber", currentHits);
         hitInstance.start();
         hitInstance.release();
+
+        // Оповещаем охрану поблизости об ударах кувалдой по стене
+        if (EnemyManager.Instance != null)
+        {
+            EnemyManager.Instance.NotifyNoise(transform.position, 20f);
+        }
         
         if (currentHits >= maxHits)
         {
@@ -47,6 +53,12 @@ public class DestructibleWall : MonoBehaviour
     private void BreakWall()
     {
         isDestroyed = true;
+
+        // Громкий грохот разрушения стены поднимает тревогу у всех охранников сектора
+        if (EnemyManager.Instance != null)
+        {
+            EnemyManager.Instance.NotifyNoise(transform.position, 35f);
+        }
         
         // ЗАПУСК ОГРАБЛЕНИЯ: Таймер, Сирены, Полиция
         if (GameManager.Instance != null)

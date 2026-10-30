@@ -26,6 +26,7 @@ public class EnemyManager : MonoBehaviour
 
     private float patrolTimer = 0f;
     private bool isHeistInitialized = false;
+    public bool isAssaultWaveActive = false;
 
     private readonly List<EnemySpawnPoint> initialSpawnPoints = new List<EnemySpawnPoint>();
     private readonly List<EnemySpawnPoint> activePatrolDoors = new List<EnemySpawnPoint>();
@@ -81,6 +82,45 @@ public class EnemyManager : MonoBehaviour
         patrolDoorCount = 0;
         patrolTimer = 0f;
         isHeistInitialized = false;
+        isAssaultWaveActive = false;
+    }
+
+    public void TriggerPoliceAssaultWave(int waveIndex)
+    {
+        isAssaultWaveActive = true;
+        mobCap += 6; // Расширяем лимит врагов на время штурма
+        currentPatrolLevel = Mathf.Max(currentPatrolLevel, 15f + waveIndex * 5f);
+
+        activePatrolDoors.RemoveAll(point => point == null || !point.gameObject.activeInHierarchy);
+        if (activePatrolDoors.Count == 0)
+        {
+            CacheSpawnPoints();
+        }
+
+        int squadsToSpawn = Mathf.Clamp(activePatrolDoors.Count, 1, 3);
+        List<EnemySpawnPoint> doors = new List<EnemySpawnPoint>(activePatrolDoors);
+
+        for (int i = 0; i < squadsToSpawn && doors.Count > 0; i++)
+        {
+            int idx = Random.Range(0, doors.Count);
+            EnemySpawnPoint door = doors[idx];
+            doors.RemoveAt(idx);
+
+            int assaulters = Random.Range(2, 4);
+            int elites = waveIndex >= 2 ? 1 : 0;
+            int guards = 1;
+
+            StartCoroutine(StaggeredSpawnRoutine(guards, assaulters, elites, door.transform));
+        }
+
+        // Поднимаем общую тревогу штурма по всей карте и ориентируем врагов на игроков
+        PlayerMovement player = FindAnyObjectByType<PlayerMovement>();
+        if (player != null)
+        {
+            NotifyRadioAlert(player.transform.position, 250f, player.transform);
+        }
+
+        Debug.Log($"<color=red>[EnemyManager] Волна штурма полиции #{waveIndex} активирована! Спавн штурмовых отрядов спецназа.</color>");
     }
 
     public void BeginHeist()
@@ -98,20 +138,33 @@ public class EnemyManager : MonoBehaviour
         }
 
         currentPatrolLevel = startingPatrolLevel + (diff - 1) * 3f;
-        mobCap = 12 + diff * 3;
+        mobCap = 10 + diff * 2;
         patrolTimerInterval = Mathf.Max(25f, 60f - (diff - 1) * 3.5f);
 
         CacheSpawnPoints();
 
+        // Расчёт целевого стартового пула врагов в зависимости от количества комнат и сложности
+        int roomCount = 8;
+        if (LevelGenerator.Instance != null && LevelGenerator.Instance.SpawnedRooms != null && LevelGenerator.Instance.SpawnedRooms.Count > 0)
+        {
+            roomCount = LevelGenerator.Instance.SpawnedRooms.Count;
+        }
+        else if (GameManager.Instance != null && GameManager.Instance.levelGenerator != null && GameManager.Instance.levelGenerator.SpawnedRooms != null)
+        {
+            roomCount = GameManager.Instance.levelGenerator.SpawnedRooms.Count;
+        }
+
+        int targetStartCount = Mathf.Clamp(Mathf.RoundToInt(roomCount * 0.6f) + diff, 3, mobCap);
+
         if (spawnInitialEnemiesOnHeistStart)
         {
-            SpawnInitialEnemies();
+            SpawnInitialEnemies(targetStartCount, diff);
         }
 
         patrolTimer = 0f;
         isHeistInitialized = true;
 
-        Debug.Log($"<color=orange>[EnemyManager] Heist Difficulty Level: {diff}. Initial points: {initialSpawnPointCount}, patrol doors: {patrolDoorCount}, mob cap: {mobCap}, patrol level: {currentPatrolLevel}%</color>");
+        Debug.Log($"<color=orange>[EnemyManager] Heist Difficulty: {diff}. Комнат: {roomCount}. Квота старта: {targetStartCount}. Точек: {initialSpawnPointCount}, дверей патрулей: {patrolDoorCount}, кап: {mobCap}</color>");
     }
 
     public void ClearActiveEnemies()
@@ -143,32 +196,92 @@ public class EnemyManager : MonoBehaviour
 
             point.isActivePool = true;
 
-            if (point.pointType == SpawnPointType.Initial)
-            {
-                initialSpawnPoints.Add(point);
-            }
-            else if (point.pointType == SpawnPointType.PatrolDoor)
+            if (point.pointType == SpawnPointType.PatrolDoor || point.spawnRole == EnemySpawnRole.Patrol_Door)
             {
                 activePatrolDoors.Add(point);
             }
+            else
+            {
+                initialSpawnPoints.Add(point);
+            }
         }
+
+        // Сортируем стартовые точки: приоритетные (Vault_Guard) идут первыми
+        initialSpawnPoints.Sort((a, b) => b.priority.CompareTo(a.priority));
 
         initialSpawnPointCount = initialSpawnPoints.Count;
         patrolDoorCount = activePatrolDoors.Count;
     }
 
-    private void SpawnInitialEnemies()
+    private void SpawnInitialEnemies(int targetCount, int difficulty)
     {
-        foreach (var point in initialSpawnPoints)
+        if (initialSpawnPoints.Count == 0)
         {
-            if (point == null)
-            {
-                continue;
-            }
+            Debug.Log("[EnemyManager] Точки спавна охраны (EnemySpawnPoint) не найдены на сцене.");
+            return;
+        }
+
+        int spawnedTotal = 0;
+        List<EnemySpawnPoint> pointsPool = new List<EnemySpawnPoint>(initialSpawnPoints);
+
+        // 1. Сначала спавним гарантированные ключевые точки (Vault_Guard, priority >= 10)
+        foreach (var point in pointsPool)
+        {
+            if (spawnedTotal >= targetCount || spawnedTotal >= mobCap) break;
+            if (point.priority < 10) continue;
 
             int count = Random.Range(point.minInitialCount, point.maxInitialCount + 1);
-            StartCoroutine(SpawnEnemiesOfType(GetPrefabForType(point.initialEnemyType), count, point.transform));
+            EnemyType spawnType = DetermineEnemyTypeForPoint(point, difficulty);
+            StartCoroutine(SpawnEnemiesOfType(GetPrefabForType(spawnType), count, point.transform));
+            spawnedTotal += count;
         }
+
+        // 2. Спавн постов комнат с учетом шанса spawnChance
+        foreach (var point in pointsPool)
+        {
+            if (spawnedTotal >= targetCount || spawnedTotal >= mobCap) break;
+            if (point.priority >= 10) continue; // Уже заспавнены
+
+            if (Random.Range(0f, 100f) <= point.spawnChance)
+            {
+                int count = Random.Range(point.minInitialCount, point.maxInitialCount + 1);
+                EnemyType spawnType = DetermineEnemyTypeForPoint(point, difficulty);
+                StartCoroutine(SpawnEnemiesOfType(GetPrefabForType(spawnType), count, point.transform));
+                spawnedTotal += count;
+            }
+        }
+
+        // 3. Если квота ещё не заполнена (не повезло с процентами), добираем оставшиеся посты
+        if (spawnedTotal < targetCount)
+        {
+            foreach (var point in pointsPool)
+            {
+                if (spawnedTotal >= targetCount || spawnedTotal >= mobCap) break;
+                int count = 1;
+                EnemyType spawnType = DetermineEnemyTypeForPoint(point, difficulty);
+                StartCoroutine(SpawnEnemiesOfType(GetPrefabForType(spawnType), count, point.transform));
+                spawnedTotal += count;
+            }
+        }
+
+        Debug.Log($"<color=orange>[EnemyManager] Стартовый спавн завершён: заспавнено {spawnedTotal} врагов (квота: {targetCount}, кап: {mobCap}).</color>");
+    }
+
+    private EnemyType DetermineEnemyTypeForPoint(EnemySpawnPoint point, int difficulty)
+    {
+        if (point.spawnRole == EnemySpawnRole.Vault_Guard)
+        {
+            if (difficulty >= 5) return EnemyType.Elite;
+            if (difficulty >= 3) return EnemyType.Assaulter;
+            return EnemyType.Guard;
+        }
+
+        if (difficulty >= 4 && Random.value < (difficulty - 2) * 0.10f)
+        {
+            return EnemyType.Assaulter;
+        }
+
+        return point.initialEnemyType;
     }
 
     private void OnPatrolMinutePassed()
@@ -320,6 +433,22 @@ public class EnemyManager : MonoBehaviour
                 if (dist <= soundRadius)
                 {
                     enemy.OnHearSound(soundPosition);
+                }
+            }
+        }
+    }
+
+    public void NotifyRadioAlert(Vector3 alertPosition, float alertRadius = 35f, Transform targetPlayer = null)
+    {
+        for (int i = 0; i < activeEnemies.Count; i++)
+        {
+            var enemy = activeEnemies[i];
+            if (enemy != null && enemy.gameObject.activeInHierarchy)
+            {
+                float dist = Vector3.Distance(enemy.transform.position, alertPosition);
+                if (dist <= alertRadius)
+                {
+                    enemy.OnRadioAlertReceived(alertPosition, targetPlayer);
                 }
             }
         }
