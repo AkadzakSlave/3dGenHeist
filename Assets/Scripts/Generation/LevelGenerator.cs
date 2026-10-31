@@ -39,8 +39,17 @@ public class LevelGenerator : MonoBehaviour
     public GameObject destructibleWallPrefab;
     public GameObject solidWallPrefab;
 
+    [Header("Branching & Vaults Settings (REPO Style)")]
+    [Range(0f, 1f)]
+    [Tooltip("Шанс переключения на параллельную ветку при генерации (ветвление как в REPO). 0 = одна линия, 0.4 = естественные ветки/корни в разные стороны")]
+    public float branchSwitchChance = 0.40f;
+
+    [Tooltip("Целевое количество хранилищ (сейфов) на уровне. Если комнат достаточно (>= 10), спавнится до 2 сейфов в разных ветках!")]
+    public int targetVaults = 2;
+    public int spawnedVaultsCount = 0;
+
     private int generatedRoomsCount = 0;
-    private Stack<SocketData> openSockets = new Stack<SocketData>();
+    private List<SocketData> openSockets = new List<SocketData>();
     private List<GameObject> spawnedRooms = new List<GameObject>();
     private List<GameObject> spawnedWalls = new List<GameObject>();
     private int connectedLoopsCount = 0;
@@ -103,8 +112,14 @@ public class LevelGenerator : MonoBehaviour
         connectedLoopsCount = 0;
         removedDuplicateWallsCount = 0;
         vaultSpawned = false;
+        spawnedVaultsCount = 0;
         securitySpawned = false;
         vipSpawned = false;
+
+        if (HeistMinimap.Instance != null)
+        {
+            HeistMinimap.Instance.ClearMinimap();
+        }
     }
 
     public void GenerateAsync(LevelPreset preset, System.Action onComplete)
@@ -338,12 +353,23 @@ public class LevelGenerator : MonoBehaviour
         generatedRoomsCount++;
         spawnedRooms.Add(startObj);
         roomTemplatesMap[startObj] = activePreset.startRoom;
+        AttachRoomTracker(startObj, activePreset.startRoom.prefab.name, isStartOrVan: true);
         Debug.Log($"<color=cyan>[Gen] Заспавнена стартовая комната: {startObj.name} (Локация: {activePreset.levelName})</color>");
 
         // 2. Фургон
         RoomSocket streetSocket = FindSocketByName(startObj, streetSocketName);
         if (streetSocket != null && activePreset.vanZonePrefab != null)
         {
+            // Защита от дублирования улицы: если в префабе Start был вложенный Van_Room, удаляем его
+            for (int i = startObj.transform.childCount - 1; i >= 0; i--)
+            {
+                Transform child = startObj.transform.GetChild(i);
+                if (child.name.ToLower().Contains("van"))
+                {
+                    Destroy(child.gameObject);
+                }
+            }
+
             SpawnVan(streetSocket);
         }
 
@@ -359,7 +385,8 @@ public class LevelGenerator : MonoBehaviour
         // 3. Основной цикл
         while (openSockets.Count > 0 && generatedRoomsCount < maxR)
         {
-            SocketData currentData = openSockets.Pop();
+            SocketData currentData = PickNextSocket();
+            if (currentData == null) break;
             RoomSocket targetSocket = currentData.socket;
             int currentDepth = currentData.depth;
 
@@ -408,6 +435,7 @@ public class LevelGenerator : MonoBehaviour
                         spawnedRooms.Add(newRoom);
                         roomTemplatesMap[newRoom] = selectedTemplate;
                         RegisterUniqueSpawn(selectedTemplate.category);
+                        AttachRoomTracker(newRoom, selectedTemplate.prefab.name);
                         Debug.Log($"[Gen] УСПЕШНО установлена комната #{generatedRoomsCount} ({selectedTemplate.prefab.name}) на глубине {currentDepth}");
 
                         if (destructibleWallPrefab != null)
@@ -415,6 +443,9 @@ public class LevelGenerator : MonoBehaviour
                             GameObject wall = Instantiate(destructibleWallPrefab, targetSocket.transform.position, targetSocket.transform.rotation, transform);
                             spawnedWalls.Add(wall);
                         }
+
+                        // Проверяем и соединяем соседние соприкасающиеся сокеты (создание петель и сплетение веток!)
+                        ConnectAdjacentSocketsForRoom(newRoom);
 
                         AddSocketsToStack(newRoom, currentDepth + 1);
                         placedSuccessfully = true;
@@ -442,7 +473,7 @@ public class LevelGenerator : MonoBehaviour
     /// </summary>
     private void PlaceVaultMaximin()
     {
-        if (vaultSpawned || activePreset == null) return;
+        if (activePreset == null) return;
 
         RoomTemplate vaultTemplate = activePreset.availableRooms.FirstOrDefault(t => t.category == RoomCategory.Vault);
         if (vaultTemplate == null || vaultTemplate.prefab == null) return;
@@ -450,88 +481,109 @@ public class LevelGenerator : MonoBehaviour
         GameObject startRoomObj = spawnedRooms.FirstOrDefault();
         Vector3 startPos = startRoomObj != null ? startRoomObj.transform.position : Vector3.zero;
 
-        // Собираем все свободные сокеты
-        List<RoomSocket> candidateSockets = new List<RoomSocket>();
-        foreach (GameObject room in spawnedRooms)
+        // Если комнат достаточно (>= 10) и включено ветвление, пробуем поставить до targetVaults (2) сейфов
+        int vaultsToPlace = (generatedRoomsCount >= 10 && targetVaults >= 2) ? 2 : 1;
+        List<Vector3> placedVaultPositions = new List<Vector3>();
+
+        for (int vIndex = 1; vIndex <= vaultsToPlace; vIndex++)
         {
-            if (room == null || room == startRoomObj) continue; // На стартовую комнату сейф не ставим!
-            RoomSocket[] sockets = room.GetComponentsInChildren<RoomSocket>();
-            foreach (var s in sockets)
+            List<RoomSocket> candidateSockets = new List<RoomSocket>();
+            foreach (GameObject room in spawnedRooms)
             {
-                if (s != null && !s.isConnected)
+                if (room == null || room == startRoomObj) continue;
+                RoomSocket[] sockets = room.GetComponentsInChildren<RoomSocket>();
+                foreach (var s in sockets)
                 {
-                    candidateSockets.Add(s);
+                    if (s != null && !s.isConnected)
+                    {
+                        candidateSockets.Add(s);
+                    }
                 }
             }
-        }
 
-        if (candidateSockets.Count == 0)
-        {
-            Debug.LogWarning("<color=orange>[Gen/Maximin] Нет свободных сокетов для размещения Хранилища!</color>");
-            return;
-        }
+            if (candidateSockets.Count == 0) break;
 
-        // Сортируем сокеты по максимальному расстоянию от старта (Maximin)
-        candidateSockets.Sort((a, b) =>
-        {
-            float distA = Vector3.Distance(a.transform.position, startPos);
-            float distB = Vector3.Distance(b.transform.position, startPos);
-            return distB.CompareTo(distA); // От самых дальних к ближним
-        });
+            // Сортировка:
+            // Для 1-го сейфа — максимальная дистанция от входа.
+            // Для 2-го сейфа — максимальная дистанция от входа и от 1-го сейфа (разные ветки!).
+            candidateSockets.Sort((a, b) =>
+            {
+                float scoreA = Vector3.Distance(a.transform.position, startPos);
+                float scoreB = Vector3.Distance(b.transform.position, startPos);
 
-        // Пробуем установить Vault на самый дальний подходящий сокет
-        foreach (RoomSocket targetSocket in candidateSockets)
-        {
-            if (targetSocket == null || targetSocket.isConnected) continue;
+                if (placedVaultPositions.Count > 0)
+                {
+                    float dist1A = Vector3.Distance(a.transform.position, placedVaultPositions[0]);
+                    float dist1B = Vector3.Distance(b.transform.position, placedVaultPositions[0]);
+                    scoreA = (scoreA * 0.4f) + (dist1A * 0.6f);
+                    scoreB = (scoreB * 0.4f) + (dist1B * 0.6f);
+                }
 
-            GameObject newVault = Instantiate(vaultTemplate.prefab);
-            newVault.SetActive(true);
-
-            RoomSocket[] freeSockets = newVault.GetComponentsInChildren<RoomSocket>();
-            // Перемешиваем сокеты кандидата для случайного выбора входа!
-            OrderSocketsWithPrimaryBias(freeSockets, 0.60f);
+                return scoreB.CompareTo(scoreA);
+            });
 
             bool vaultPlaced = false;
-            foreach (RoomSocket matchingSocket in freeSockets)
+            foreach (RoomSocket targetSocket in candidateSockets)
             {
-                if (matchingSocket == null || matchingSocket.isConnected) continue;
+                if (targetSocket == null || targetSocket.isConnected) continue;
 
-                AlignRooms(targetSocket, matchingSocket, newVault);
-
-                bool inBounds = IsWithinBounds(newVault);
-                bool noOverlap = CanPlaceRoom(newVault);
-
-                if (inBounds && noOverlap)
+                // Для 2-го сейфа проверяем минимальную дистанцию от 1-го (не ближе 16 метров)
+                if (placedVaultPositions.Count > 0)
                 {
-                    newVault.transform.SetParent(transform);
-                    targetSocket.isConnected = true;
-                    matchingSocket.isConnected = true;
-
-                    generatedRoomsCount++;
-                    spawnedRooms.Add(newVault);
-                    roomTemplatesMap[newVault] = vaultTemplate;
-                    vaultSpawned = true;
-
-                    if (destructibleWallPrefab != null)
-                    {
-                        GameObject wall = Instantiate(destructibleWallPrefab, targetSocket.transform.position, targetSocket.transform.rotation, transform);
-                        spawnedWalls.Add(wall);
-                    }
-
-                    float finalDistance = Vector3.Distance(newVault.transform.position, startPos);
-                    Debug.Log($"<color=cyan>[Gen/Maximin] Хранилище (Vault) успешно установлено в САМОЙ ДАЛЬНЕЙ ТОЧКЕ ({finalDistance:F1}м от старта) через сокет {matchingSocket.name}!</color>");
-                    vaultPlaced = true;
-                    return;
+                    float distToFirst = Vector3.Distance(targetSocket.transform.position, placedVaultPositions[0]);
+                    if (distToFirst < 16f) continue;
                 }
-            }
 
-            if (!vaultPlaced)
-            {
-                Destroy(newVault);
+                GameObject newVault = Instantiate(vaultTemplate.prefab);
+                newVault.SetActive(true);
+
+                RoomSocket[] freeSockets = newVault.GetComponentsInChildren<RoomSocket>();
+                OrderSocketsWithPrimaryBias(freeSockets, 0.60f);
+
+                foreach (RoomSocket matchingSocket in freeSockets)
+                {
+                    if (matchingSocket == null || matchingSocket.isConnected) continue;
+
+                    AlignRooms(targetSocket, matchingSocket, newVault);
+
+                    bool inBounds = IsWithinBounds(newVault);
+                    bool noOverlap = CanPlaceRoom(newVault);
+
+                    if (inBounds && noOverlap)
+                    {
+                        newVault.transform.SetParent(transform);
+                        targetSocket.isConnected = true;
+                        matchingSocket.isConnected = true;
+
+                        generatedRoomsCount++;
+                        spawnedRooms.Add(newVault);
+                        roomTemplatesMap[newVault] = vaultTemplate;
+                        vaultSpawned = true;
+                        spawnedVaultsCount++;
+                        placedVaultPositions.Add(newVault.transform.position);
+
+                        AttachRoomTracker(newVault, $"{vaultTemplate.prefab.name}_{spawnedVaultsCount}", isVault: true);
+
+                        if (destructibleWallPrefab != null)
+                        {
+                            GameObject wall = Instantiate(destructibleWallPrefab, targetSocket.transform.position, targetSocket.transform.rotation, transform);
+                            spawnedWalls.Add(wall);
+                        }
+
+                        // Соединяем соприкасающиеся сокеты сейфа с соседними комнатами, если есть
+                        ConnectAdjacentSocketsForRoom(newVault);
+
+                        float finalDistance = Vector3.Distance(newVault.transform.position, startPos);
+                        Debug.Log($"<color=cyan>[Gen/Maximin] Хранилище #{spawnedVaultsCount} (Vault) успешно установлено в ветке ({finalDistance:F1}м от старта)!</color>");
+                        vaultPlaced = true;
+                        break;
+                    }
+                }
+
+                if (vaultPlaced) break;
+                else Destroy(newVault);
             }
         }
-
-        Debug.LogWarning("<color=orange>[Gen/Maximin] Не удалось вписать Vault в дальние сокеты из-за коллизий.</color>");
     }
 
     private void ConnectLoops()
@@ -565,15 +617,15 @@ public class LevelGenerator : MonoBehaviour
                 // Не соединяем сокеты одной и той же комнаты
                 if (GetRoomRoot(socketA.gameObject) == GetRoomRoot(socketB.gameObject)) continue;
 
-                // Проверяем расстояние между сокетами (в пределах 1.8м по горизонтали, 0.6м по вертикали)
+                // Проверяем расстояние между сокетами (до 2.4м по горизонтали, 0.6м по вертикали)
                 Vector3 delta = socketA.transform.position - socketB.transform.position;
                 if (Mathf.Abs(delta.y) > 0.6f) continue;
                 delta.y = 0;
-                if (delta.magnitude > 1.8f) continue;
+                if (delta.magnitude > 2.4f) continue;
 
                 // Проверяем, что сокеты направлены навстречу друг другу
                 float dot = Vector3.Dot(socketA.transform.forward, -socketB.transform.forward);
-                if (dot < 0.8f) continue;
+                if (dot < 0.70f) continue;
 
                 // Соединяем сокеты
                 socketA.isConnected = true;
@@ -663,7 +715,7 @@ public class LevelGenerator : MonoBehaviour
 
         report += $"▪ Всего комнат: <b>{generatedRoomsCount} / {maxR}</b> (Мин: {minR})\n";
         report += $"▪ Уникальные комнаты:\n";
-        report += $"   - Хранилище (Vault): {(vaultSpawned ? "<color=green>Да</color>" : "<color=red>Нет</color>")}\n";
+        report += $"   - Хранилища (Vault): {(vaultSpawned ? $"<color=green>{spawnedVaultsCount} шт.</color>" : "<color=red>Нет</color>")}\n";
         report += $"   - Охранная (Security): {(securitySpawned ? "<color=green>Да</color>" : "<color=red>Нет</color>")}\n";
         report += $"   - VIP: {(vipSpawned ? "<color=green>Да</color>" : "<color=red>Нет</color>")}\n";
         report += $"▪ Создано закольцованных путей (петель): <b>{connectedLoopsCount}</b>\n";
@@ -690,6 +742,7 @@ public class LevelGenerator : MonoBehaviour
             vanObj.transform.SetParent(transform);
             spawnedRooms.Add(vanObj);
             vanSpawnPoint = vanObj.transform;
+            AttachRoomTracker(vanObj, "Van_Room", isStartOrVan: true);
             Debug.Log("<color=green>[Gen] Фургон успешно припаркован к Socket_Street!</color>");
         }
         else
@@ -697,6 +750,25 @@ public class LevelGenerator : MonoBehaviour
             Debug.LogError("<color=red>[Gen] В префабе Фургона не найден RoomSocket!</color>");
             Destroy(vanObj);
         }
+    }
+
+    private void AttachRoomTracker(GameObject roomObj, string roomName, bool isVault = false, bool isStartOrVan = false)
+    {
+        if (roomObj == null) return;
+        RoomTracker tracker = roomObj.GetComponent<RoomTracker>();
+        if (tracker == null) tracker = roomObj.AddComponent<RoomTracker>();
+
+        Bounds localBounds;
+        string key = roomName.Replace("(Clone)", "").Trim();
+        if (!prefabBoundsCache.TryGetValue(key, out localBounds))
+        {
+            if (!CalculateRoomLocalBounds(roomObj, out localBounds))
+            {
+                localBounds = new Bounds(Vector3.zero, new Vector3(16f, 4f, 16f));
+            }
+        }
+
+        tracker.Initialize(roomName, localBounds, isVault, isStartOrVan);
     }
 
 
@@ -1024,17 +1096,55 @@ public class LevelGenerator : MonoBehaviour
         }
     }
 
+    private float GetDynamicTemplateWeight(RoomTemplate t, int difficulty)
+    {
+        if (t == null) return 1f;
+        float baseWeight = Mathf.Max(1f, t.weight);
+
+        if (t.prefab == null) return baseWeight;
+
+        string pName = t.prefab.name.ToUpper();
+        bool isBigHall = pName.StartsWith("B1") || pName.StartsWith("B2") || pName.StartsWith("B3");
+
+        if (isBigHall)
+        {
+            if (difficulty <= 4)
+            {
+                // Сложность 1–4 (8–12 комнат): стандартная базовая система
+                return baseWeight;
+            }
+            else if (difficulty <= 8)
+            {
+                // Сложность 5–8 (13–16 комнат): повышаем шанс больших залов для разнообразия
+                return baseWeight * 2.2f;
+            }
+            else
+            {
+                // Сложность 9–10 (17–25 комнат): банк огромный, много центральных залов и атриумов
+                return baseWeight * 3.5f;
+            }
+        }
+
+        return baseWeight;
+    }
+
     private RoomTemplate GetRandomWeightedTemplate(List<RoomTemplate> templates)
     {
+        int difficulty = 1;
+        if (GameManager.Instance != null && GameManager.Instance.selectedDossier != null)
+        {
+            difficulty = Mathf.Clamp(GameManager.Instance.selectedDossier.difficultyLevel, 1, 10);
+        }
+
         float totalWeight = 0;
-        foreach (var t in templates) totalWeight += t.weight;
+        foreach (var t in templates) totalWeight += GetDynamicTemplateWeight(t, difficulty);
 
         float randomVal = Random.Range(0, totalWeight);
         float currentWeight = 0;
 
         foreach (var t in templates)
         {
-            currentWeight += t.weight;
+            currentWeight += GetDynamicTemplateWeight(t, difficulty);
             if (currentWeight >= randomVal)
             {
                 return t;
@@ -1336,6 +1446,28 @@ public class LevelGenerator : MonoBehaviour
         return null;
     }
 
+    private SocketData PickNextSocket()
+    {
+        if (openSockets == null || openSockets.Count == 0) return null;
+
+        // Ветвление в разные стороны (как в REPO):
+        // С шансом branchSwitchChance переключаемся на параллельную ветку или более раннюю развилку
+        if (openSockets.Count > 1 && Random.value < branchSwitchChance)
+        {
+            int randIdx = Random.Range(0, openSockets.Count);
+            SocketData data = openSockets[randIdx];
+            openSockets.RemoveAt(randIdx);
+            return data;
+        }
+        else
+        {
+            int lastIdx = openSockets.Count - 1;
+            SocketData data = openSockets[lastIdx];
+            openSockets.RemoveAt(lastIdx);
+            return data;
+        }
+    }
+
     private void AddSocketsToStack(GameObject room, int depth)
     {
         RoomSocket[] sockets = room.GetComponentsInChildren<RoomSocket>();
@@ -1343,7 +1475,53 @@ public class LevelGenerator : MonoBehaviour
         {
             if (!socket.isConnected)
             {
-                openSockets.Push(new SocketData(socket, depth));
+                openSockets.Add(new SocketData(socket, depth));
+            }
+        }
+    }
+
+    private void ConnectAdjacentSocketsForRoom(GameObject room)
+    {
+        if (room == null) return;
+        RoomSocket[] mySockets = room.GetComponentsInChildren<RoomSocket>();
+        foreach (var mySock in mySockets)
+        {
+            if (mySock == null || mySock.isConnected) continue;
+
+            foreach (var otherRoom in spawnedRooms)
+            {
+                if (otherRoom == null || otherRoom == room) continue;
+
+                RoomSocket[] otherSockets = otherRoom.GetComponentsInChildren<RoomSocket>();
+                foreach (var otherSock in otherSockets)
+                {
+                    if (otherSock == null || otherSock.isConnected) continue;
+
+                    Vector3 delta = mySock.transform.position - otherSock.transform.position;
+                    if (Mathf.Abs(delta.y) > 0.6f) continue;
+                    delta.y = 0f;
+                    if (delta.magnitude > 2.4f) continue;
+
+                    float dot = Vector3.Dot(mySock.transform.forward, -otherSock.transform.forward);
+                    if (dot < 0.70f) continue;
+
+                    // Соединяем сокеты между комнатами/ветками!
+                    mySock.isConnected = true;
+                    otherSock.isConnected = true;
+
+                    if (destructibleWallPrefab != null)
+                    {
+                        Vector3 midPos = (mySock.transform.position + otherSock.transform.position) * 0.5f;
+                        GameObject wall = Instantiate(destructibleWallPrefab, midPos, mySock.transform.rotation, transform);
+                        spawnedWalls.Add(wall);
+                    }
+
+                    connectedLoopsCount++;
+                    Debug.Log($"<color=cyan>[Gen/Loop] Стыковка веток на лету: петля создана между {room.name} и {otherRoom.name}!</color>");
+                    break;
+                }
+
+                if (mySock.isConnected) break;
             }
         }
     }

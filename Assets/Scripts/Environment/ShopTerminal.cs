@@ -2,6 +2,7 @@ using UnityEngine;
 
 public enum ShopItemType
 {
+    FullStoreUI,
     Weapon,
     Ammo
 }
@@ -9,7 +10,7 @@ public enum ShopItemType
 public class ShopTerminal : MonoBehaviour, IInteractable
 {
     [Header("Shop Settings")]
-    public ShopItemType itemType = ShopItemType.Ammo;
+    public ShopItemType itemType = ShopItemType.FullStoreUI;
     
     [Header("Weapon settings (if Type == Weapon)")]
     public ItemData weaponItemData;
@@ -21,6 +22,15 @@ public class ShopTerminal : MonoBehaviour, IInteractable
 
     public void Interact()
     {
+        if (itemType == ShopItemType.FullStoreUI || (StoreUI.Instance != null && itemType != ShopItemType.Weapon && itemType != ShopItemType.Ammo))
+        {
+            if (StoreUI.Instance != null)
+            {
+                StoreUI.Instance.OpenStore();
+                return;
+            }
+        }
+
         if (GameManager.Instance == null || PlayerInventory.Instance == null)
         {
             Debug.LogError("[ShopTerminal] GameManager or PlayerInventory is null.");
@@ -110,14 +120,18 @@ public class ShopTerminal : MonoBehaviour, IInteractable
 
     public string GetInteractText()
     {
-        if (itemType == ShopItemType.Weapon)
+        if (itemType == ShopItemType.FullStoreUI || (itemType != ShopItemType.Weapon && itemType != ShopItemType.Ammo))
+        {
+            return "[E] Оружейная и склад (Магазин / Снаряжение)";
+        }
+        else if (itemType == ShopItemType.Weapon)
         {
             string weaponName = weaponItemData != null ? weaponItemData.itemName : "Weapon";
-            return $"Buy {weaponName} (${weaponCost})";
+            return $"Купить {weaponName} (${weaponCost})";
         }
         else
         {
-            return $"Buy Ammo Refill (${ammoRefillCost})";
+            return $"Пополнить патроны (${ammoRefillCost})";
         }
     }
 }

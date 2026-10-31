@@ -291,15 +291,16 @@ MonoBehaviour:
   breachAttackInterval: 0.65
   breachDamage: 35
   radioCallDuration: 0.8
+  overrideCollidersFromScript: 0
   movementRadius: 0.26
   movementHeight: 1.7
   movementCenterY: 0.85
-  bodyHitboxRadius: 0.44
-  bodyHitboxHeight: 1.45
+  bodyHitboxRadius: 0.6
+  bodyHitboxHeight: 1.6
   bodyHitboxCenterY: 0.75
-  headHitboxRadius: 0.32
+  headHitboxRadius: 0.5
   headHitboxHeight: 0.6
-  headHitboxCenterY: 1.62
+  headHitboxCenterY: 1.85
   showOverheadDebugText: 1
 --- !u!114 &-2372503314134649297
 MonoBehaviour:

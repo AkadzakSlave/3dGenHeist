@@ -115,7 +115,10 @@ public class EnemyController : MonoBehaviour
     private float burstPauseTimer = 0f;
     private float fireTimer = 0f;
 
-        [Header("Colliders and Hitboxes Setup")]
+    [Header("Colliders and Hitboxes Setup")]
+    [Tooltip("Если выключено (по умолчанию), скрипт сохраняет и уважает ваши ручные настройки размеров в компонентах CapsuleCollider на объектах BodyDamageHitbox и HeadDamageHitbox. Включите, только если хотите принудительно перезаписать коллайдеры значениями из полей ниже.")]
+    public bool overrideCollidersFromScript = false;
+
     [Tooltip("Радиус физического коллайдера туловища для движения")]
     public float movementRadius = 0.26f;
     [Tooltip("Высота физического коллайдера туловища для движения")]
@@ -125,19 +128,19 @@ public class EnemyController : MonoBehaviour
 
     [Space(6)]
     [Tooltip("Радиус хитбокса тела (урон 1.0x)")]
-    public float bodyHitboxRadius = 0.44f;
+    public float bodyHitboxRadius = 0.60f;
     [Tooltip("Высота хитбокса тела")]
-    public float bodyHitboxHeight = 1.45f;
+    public float bodyHitboxHeight = 1.60f;
     [Tooltip("Смещение центра хитбокса тела (Y)")]
     public float bodyHitboxCenterY = 0.75f;
 
     [Space(6)]
     [Tooltip("Радиус хитбокса головы/шляпы (хэдшот 1.5x)")]
-    public float headHitboxRadius = 0.32f;
+    public float headHitboxRadius = 0.50f;
     [Tooltip("Высота хитбокса головы")]
     public float headHitboxHeight = 0.60f;
     [Tooltip("Смещение центра хитбокса головы (Y) - охватывает голову и шляпу")]
-    public float headHitboxCenterY = 1.62f;
+    public float headHitboxCenterY = 1.85f;
 
     [Header("Animation")]
     private Animator animator;
@@ -256,10 +259,21 @@ public class EnemyController : MonoBehaviour
 
         // 1. Физический коллайдер туловища для перемещения (аккуратный по телу персонажа)
         CapsuleCollider moveCap = GetComponent<CapsuleCollider>();
-        if (moveCap == null) moveCap = gameObject.AddComponent<CapsuleCollider>();
-        moveCap.radius = movementRadius;
-        moveCap.height = movementHeight;
-        moveCap.center = new Vector3(0f, movementCenterY, 0f);
+        bool hadMoveCap = moveCap != null;
+        if (!hadMoveCap) moveCap = gameObject.AddComponent<CapsuleCollider>();
+
+        if (hadMoveCap && !overrideCollidersFromScript)
+        {
+            movementRadius = moveCap.radius;
+            movementHeight = moveCap.height;
+            movementCenterY = moveCap.center.y;
+        }
+        else
+        {
+            moveCap.radius = movementRadius;
+            moveCap.height = movementHeight;
+            moveCap.center = new Vector3(0f, movementCenterY, 0f);
+        }
 
         // 2. Дочерний хитбокс ТЕЛА (шире видимой модели для комфортной стрельбы)
         Transform bodyHitboxTrans = transform.Find("BodyDamageHitbox");
@@ -284,10 +298,22 @@ public class EnemyController : MonoBehaviour
         }
 
         CapsuleCollider bodyCap = bodyHitboxObj.GetComponent<CapsuleCollider>();
-        if (bodyCap == null) bodyCap = bodyHitboxObj.AddComponent<CapsuleCollider>();
-                bodyCap.radius = bodyHitboxRadius;
-        bodyCap.height = bodyHitboxHeight;
-        bodyCap.center = new Vector3(0f, bodyHitboxCenterY, 0f);
+        bool hadBodyCap = bodyCap != null;
+        if (!hadBodyCap) bodyCap = bodyHitboxObj.AddComponent<CapsuleCollider>();
+
+        if (hadBodyCap && !overrideCollidersFromScript)
+        {
+            // Сохраняем ручные настройки пользователя из инспектора коллайдера
+            bodyHitboxRadius = bodyCap.radius;
+            bodyHitboxHeight = bodyCap.height;
+            bodyHitboxCenterY = bodyCap.center.y;
+        }
+        else
+        {
+            bodyCap.radius = bodyHitboxRadius;
+            bodyCap.height = bodyHitboxHeight;
+            bodyCap.center = new Vector3(0f, bodyHitboxCenterY, 0f);
+        }
         bodyCap.isTrigger = false;
 
         EnemyDamageHitbox bodyHitbox = bodyHitboxObj.GetComponent<EnemyDamageHitbox>();
@@ -311,10 +337,22 @@ public class EnemyController : MonoBehaviour
         }
 
         CapsuleCollider headCap = headHitboxObj.GetComponent<CapsuleCollider>();
-        if (headCap == null) headCap = headHitboxObj.AddComponent<CapsuleCollider>();
-                headCap.radius = headHitboxRadius;
-        headCap.height = headHitboxHeight;
-        headCap.center = new Vector3(0f, headHitboxCenterY, 0f);
+        bool hadHeadCap = headCap != null;
+        if (!hadHeadCap) headCap = headHitboxObj.AddComponent<CapsuleCollider>();
+
+        if (hadHeadCap && !overrideCollidersFromScript)
+        {
+            // Сохраняем ручные настройки пользователя из инспектора коллайдера
+            headHitboxRadius = headCap.radius;
+            headHitboxHeight = headCap.height;
+            headHitboxCenterY = headCap.center.y;
+        }
+        else
+        {
+            headCap.radius = headHitboxRadius;
+            headCap.height = headHitboxHeight;
+            headCap.center = new Vector3(0f, headHitboxCenterY, 0f);
+        }
         headCap.isTrigger = false;
 
         EnemyDamageHitbox headHitbox = headHitboxObj.GetComponent<EnemyDamageHitbox>();
@@ -390,6 +428,32 @@ public class EnemyController : MonoBehaviour
         else if (currentState == EnemyState.Patrol)
         {
             currentState = EnemyState.Investigate;
+        }
+    }
+
+    public void SetAssaultBreachMode(Transform target)
+    {
+        hasHomeRoomBounds = false; // Отключаем привязку к комнате улицы! Полиция штурмует все здание
+        isAlerted = true;
+        alertTimer = alertDuration;
+
+        if (target != null)
+        {
+            playerTarget = target;
+            playerHealth = target.GetComponent<PlayerHealth>();
+            lastHeardSoundPos = target.position;
+        }
+
+        currentState = EnemyState.CombatAssault;
+
+        if (agent != null && agent.enabled && agent.isOnNavMesh)
+        {
+            agent.isStopped = false;
+            agent.speed = MoveSpeed;
+            if (target != null)
+            {
+                agent.SetDestination(target.position);
+            }
         }
     }
 

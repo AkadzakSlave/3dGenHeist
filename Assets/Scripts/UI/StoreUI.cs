@@ -31,6 +31,18 @@ public class StoreUI : MonoBehaviour
     public Transform storageContainer;
     public TextMeshProUGUI storageStatusText;
 
+    [Header("Loadout Bar (Inspector / Equipment)")]
+    public TextMeshProUGUI loadoutSlot1Text;
+    public TextMeshProUGUI loadoutSlot2Text;
+    public TextMeshProUGUI loadoutSlot3Text;
+    public TextMeshProUGUI loadoutAmmoText;
+    public TextMeshProUGUI loadoutWeightText;
+
+    [Header("Ammo Quick Purchase Buttons")]
+    public Button buyLightAmmoButton;
+    public Button buyMediumAmmoButton;
+    public Button buyShotgunAmmoButton;
+
     [Header("Item Card Prefabs")]
     public GameObject itemCardPrefab;
     public GameObject cartCardPrefab;
@@ -39,7 +51,7 @@ public class StoreUI : MonoBehaviour
     [Header("Input Reader Reference")]
     public InputReader inputReader;
 
-    private Dictionary<ItemData, int> shoppingCart = new Dictionary<ItemData, int>();
+    private readonly Dictionary<ItemData, int> shoppingCart = new Dictionary<ItemData, int>();
     private ShopCategory activeCategory = ShopCategory.All;
     private bool isOpen = false;
     public bool IsStoreOpen => isOpen || (mainStoreWindow != null && mainStoreWindow.activeSelf);
@@ -53,6 +65,7 @@ public class StoreUI : MonoBehaviour
         else
         {
             Destroy(gameObject);
+            return;
         }
     }
 
@@ -65,6 +78,10 @@ public class StoreUI : MonoBehaviour
         if (closeButton != null) closeButton.onClick.AddListener(CloseStore);
         if (purchaseButton != null) purchaseButton.onClick.AddListener(OnPurchaseClicked);
         if (clearCartButton != null) clearCartButton.onClick.AddListener(ClearCart);
+
+        if (buyLightAmmoButton != null) buyLightAmmoButton.onClick.AddListener(() => BuyAmmo(AmmoType.Light, 18, 60));
+        if (buyMediumAmmoButton != null) buyMediumAmmoButton.onClick.AddListener(() => BuyAmmo(AmmoType.Medium, 50, 150));
+        if (buyShotgunAmmoButton != null) buyShotgunAmmoButton.onClick.AddListener(() => BuyAmmo(AmmoType.Shotgun, 12, 80));
 
         if (TeamStorageManager.Instance != null)
         {
@@ -82,12 +99,25 @@ public class StoreUI : MonoBehaviour
 
     private void Update()
     {
-        if (!isOpen) return;
-
-        // New Input System check for ESC
-        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        if (isOpen)
         {
-            CloseStore();
+            if (Keyboard.current != null && (Keyboard.current.escapeKey.wasPressedThisFrame || Keyboard.current.bKey.wasPressedThisFrame))
+            {
+                CloseStore();
+            }
+            return;
+        }
+
+        // В Лобби можно быстро открыть оружейную/склад по нажатию [B]
+        if (GameManager.Instance != null && GameManager.Instance.isInLobby)
+        {
+            if (Keyboard.current != null && Keyboard.current.bKey.wasPressedThisFrame)
+            {
+                if (PauseMenuUI.Instance == null || !PauseMenuUI.Instance.IsPaused)
+                {
+                    OpenStore();
+                }
+            }
         }
     }
 
@@ -129,6 +159,7 @@ public class StoreUI : MonoBehaviour
         if (storeTabPanel != null) storeTabPanel.SetActive(true);
         if (storageTabPanel != null) storageTabPanel.SetActive(false);
         RefreshStoreTab();
+        RefreshLoadoutUI();
     }
 
     public void ShowStorageTab()
@@ -136,6 +167,7 @@ public class StoreUI : MonoBehaviour
         if (storeTabPanel != null) storeTabPanel.SetActive(false);
         if (storageTabPanel != null) storageTabPanel.SetActive(true);
         RefreshStorageTab();
+        RefreshLoadoutUI();
     }
 
     public void SetCategoryFilter(int categoryIndex)
@@ -195,7 +227,35 @@ public class StoreUI : MonoBehaviour
         {
             shoppingCart.Clear();
             RefreshStoreTab();
+            RefreshLoadoutUI();
         }
+    }
+
+    public void BuyAmmo(AmmoType type, int amount, int cost)
+    {
+        if (GameManager.Instance == null || PlayerInventory.Instance == null) return;
+
+        if (GameManager.Instance.sessionMoney < cost)
+        {
+            Debug.LogWarning($"[StoreUI] Недостаточно средств для покупки патронов! Нужно: ${cost}, есть: ${GameManager.Instance.sessionMoney}");
+            return;
+        }
+
+        if (PlayerInventory.Instance.GetAmmo(type) >= PlayerInventory.Instance.GetMaxAmmo(type))
+        {
+            Debug.LogWarning("[StoreUI] Боезапас данного типа уже полон!");
+            return;
+        }
+
+        GameManager.Instance.sessionMoney -= cost;
+        PlayerInventory.Instance.AddAmmo(type, amount);
+
+        if (GameManager.Instance.onMoneyChanged != null)
+        {
+            GameManager.Instance.onMoneyChanged.Invoke();
+        }
+
+        RefreshUI();
     }
 
     private int CalculateTotalCost()
@@ -218,13 +278,14 @@ public class StoreUI : MonoBehaviour
     {
         RefreshStoreTab();
         RefreshStorageTab();
+        RefreshLoadoutUI();
     }
 
     private void RefreshStoreTab()
     {
         if (!isOpen) return;
 
-        // Re-populate catalog grid
+        // Заполняем каталог товаров
         if (catalogContainer != null && itemCardPrefab != null && TeamStorageManager.Instance != null && TeamStorageManager.Instance.catalog != null)
         {
             foreach (Transform child in catalogContainer) Destroy(child.gameObject);
@@ -238,15 +299,8 @@ public class StoreUI : MonoBehaviour
                 if (cardScript != null) cardScript.Setup(entry);
             }
         }
-        else
-        {
-            if (TeamStorageManager.Instance == null) Debug.LogWarning("[StoreUI] TeamStorageManager.Instance is null on scene!");
-            else if (TeamStorageManager.Instance.catalog == null) Debug.LogWarning("[StoreUI] TeamStorageManager.Instance.catalog is not assigned in Inspector!");
-            else if (catalogContainer == null) Debug.LogWarning("[StoreUI] catalogContainer is not assigned in Inspector!");
-            else if (itemCardPrefab == null) Debug.LogWarning("[StoreUI] itemCardPrefab is not assigned in Inspector!");
-        }
 
-        // Re-populate cart list
+        // Заполняем корзину покупок
         if (cartContainer != null && cartCardPrefab != null && TeamStorageManager.Instance != null && TeamStorageManager.Instance.catalog != null)
         {
             foreach (Transform child in cartContainer) Destroy(child.gameObject);
@@ -266,12 +320,12 @@ public class StoreUI : MonoBehaviour
         int playerMoney = GameManager.Instance != null ? GameManager.Instance.sessionMoney : 0;
         int remaining = playerMoney - totalCost;
 
-        if (totalCostText != null) totalCostText.text = $"Total: ${totalCost}";
-        if (availableMoneyText != null) availableMoneyText.text = $"Balance: ${playerMoney}";
+        if (totalCostText != null) totalCostText.text = $"К оплате: ${totalCost}";
+        if (availableMoneyText != null) availableMoneyText.text = $"Бюджет банды: ${playerMoney}";
         if (remainingMoneyText != null)
         {
-            remainingMoneyText.text = $"Remaining: ${remaining}";
-            remainingMoneyText.color = remaining >= 0 ? Color.white : Color.red;
+            remainingMoneyText.text = $"Остаток: ${remaining}";
+            remainingMoneyText.color = remaining >= 0 ? Color.white : new Color(1f, 0.4f, 0.4f, 1f);
         }
 
         if (purchaseButton != null)
@@ -303,11 +357,11 @@ public class StoreUI : MonoBehaviour
         {
             if (owned.Count == 0)
             {
-                storageStatusText.text = "Storage is empty.";
+                storageStatusText.text = "Склад пуст. Купите снаряжение во вкладке 'Магазин'.";
             }
             else
             {
-                string summary = "<b>TEAM STORAGE CONTENTS:</b>\n";
+                string summary = "<b>СКЛАД СНАРЯЖЕНИЯ БАНДЫ:</b>\n";
                 foreach (var kvp in owned)
                 {
                     int maxCap = TeamStorageManager.Instance.GetMaxCapacity(kvp.Key);
@@ -315,6 +369,52 @@ public class StoreUI : MonoBehaviour
                 }
                 storageStatusText.text = summary;
             }
+        }
+    }
+
+    public void RefreshLoadoutUI()
+    {
+        if (PlayerInventory.Instance == null) return;
+
+        var inv = PlayerInventory.Instance;
+
+        // Слот 1 (Инструмент)
+        if (loadoutSlot1Text != null)
+        {
+            string s1 = (inv.slots != null && inv.slots.Length > 0 && inv.slots[0] != null && inv.slots[0].itemData != null)
+                ? inv.slots[0].itemData.itemName : "[Пусто]";
+            loadoutSlot1Text.text = $"[1] Инструмент: <b>{s1}</b>";
+        }
+
+        // Слот 2 (Оружие)
+        if (loadoutSlot2Text != null)
+        {
+            string s2 = (inv.slots != null && inv.slots.Length > 1 && inv.slots[1] != null && inv.slots[1].itemData != null)
+                ? inv.slots[1].itemData.itemName : "[Пусто]";
+            loadoutSlot2Text.text = $"[2] Оружие: <b>{s2}</b>";
+        }
+
+        // Слот 3 (Расходник / Сумка)
+        if (loadoutSlot3Text != null)
+        {
+            string s3 = (inv.slots != null && inv.slots.Length > 2 && inv.slots[2] != null && inv.slots[2].itemData != null)
+                ? inv.slots[2].itemData.itemName : "[Пусто]";
+            loadoutSlot3Text.text = $"[3] Спецсредство: <b>{s3}</b>";
+        }
+
+        // Патроны
+        if (loadoutAmmoText != null)
+        {
+            loadoutAmmoText.text = $"Боезапас: Лёгкие {inv.lightAmmo}/{inv.maxLightAmmo} | Средние {inv.mediumAmmo}/{inv.maxMediumAmmo} | Дробь {inv.shotgunAmmo}/{inv.maxShotgunAmmo}";
+        }
+
+        // Вес
+        if (loadoutWeightText != null && GameManager.Instance != null)
+        {
+            int curWeight = GameManager.Instance.currentWeight;
+            int maxWeight = GameManager.Instance.maxWeight;
+            int freeWeight = Mathf.Max(0, maxWeight - curWeight);
+            loadoutWeightText.text = $"Вес: <b>{curWeight} / {maxWeight} кг</b> (Свободно под золото: <b>{freeWeight} кг</b>)";
         }
     }
 

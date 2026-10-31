@@ -119,6 +119,11 @@ public class GameManager : MonoBehaviour
             RegisterPlayerHealth(p);
         }
 
+        if (donResultUI == null)
+        {
+            donResultUI = FindAnyObjectByType<DonResultUI>(FindObjectsInactive.Include);
+        }
+
         onGlobalBalanceChanged?.Invoke();
         onMoneyChanged?.Invoke();
 
@@ -131,6 +136,7 @@ public class GameManager : MonoBehaviour
             // Для удобства тестов
             activeOperationPreset = levelGenerator.activePreset;
             if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
+        if (HeistMinimap.Instance != null) HeistMinimap.Instance.ClearMinimap();
             levelGenerator.GenerateAsync(levelGenerator.activePreset, null);
         }
     }
@@ -225,7 +231,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Применяем параметры из досье
-        heistTimer = selectedDossier.timeLimit;
+        heistTimer = Mathf.Max(300, selectedDossier.timeLimit);
         
         // Запускаем генерацию и телепортацию
         if (activeOperationPreset != null)
@@ -264,6 +270,7 @@ public class GameManager : MonoBehaviour
         reinforcementCount = 0;
         currentZeroDelay = 0f;
         if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
+        if (HeistMinimap.Instance != null) HeistMinimap.Instance.ClearMinimap();
         ReviveAllPlayers();
         onMoneyChanged?.Invoke();
 
@@ -470,6 +477,7 @@ public class GameManager : MonoBehaviour
         Debug.Log($"<color=orange>[Economy] День {currentDay} завершен. Накоплено: ${accumulatedOperationMoney} / ${operationTargetQuota}</color>");
 
         if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
+        if (HeistMinimap.Instance != null) HeistMinimap.Instance.ClearMinimap();
         if (levelGenerator != null) levelGenerator.ClearLevel();
 
         BagTool bag = GetHeldBag();
@@ -520,6 +528,7 @@ public class GameManager : MonoBehaviour
         Debug.Log($"<color=red>[Heist] All players died. Day {currentDay} ended. Penalty: ${allPlayersDeadPenalty}. Total: ${accumulatedOperationMoney} / ${operationTargetQuota}</color>");
 
         if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
+        if (HeistMinimap.Instance != null) HeistMinimap.Instance.ClearMinimap();
         if (levelGenerator != null) levelGenerator.ClearLevel();
         if (PlayerInventory.Instance != null)
         {
@@ -644,19 +653,38 @@ public class GameManager : MonoBehaviour
             // ПОКАЗЫВАЕМ ЭКРАН РЕЗУЛЬТАТОВ
             if (donResultUI != null)
             {
-                donResultUI.ShowResults(totalEarned, operationTargetQuota, cleanMoney, sessionShare);
+                int nextTargetQuota = 3000 + (completedQuotas * 1500);
+                donResultUI.ShowResults(totalEarned, operationTargetQuota, cleanMoney, sessionShare, nextTargetQuota, completedQuotas, true);
+                while (donResultUI.isOpen)
+                {
+                    yield return null;
+                }
+                operationTargetQuota = nextTargetQuota;
+                accumulatedOperationMoney = 0;
+                currentDay = 1;
             }
 
             if (heistUI != null) heistUI.ShowLoadingScreen();
         }
         else
         {
-            // Провал
+            int totalEarned = accumulatedOperationMoney;
             globalBankBalance = 0;
+            sessionMoney = 0;
             completedQuotas = 0;
-            Debug.Log($"<color=red>[Economy] Игровой процесс сброшен. Начинаем заново.</color>");
+            operationTargetQuota = 3000;
+            accumulatedOperationMoney = 0;
+            currentDay = 1;
             onGlobalBalanceChanged?.Invoke();
-            // Экран уже черный (BossRoomManager затемнил его перед выстрелом)
+
+            if (donResultUI != null)
+            {
+                donResultUI.ShowResults(totalEarned, operationTargetQuota, 0, 0, 3000, 1, false);
+                while (donResultUI.isOpen)
+                {
+                    yield return null;
+                }
+            }
         }
 
         // Возвращаемся в Лобби
@@ -703,7 +731,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Таймер следующей волны подкреплений (45 секунд между волнами)
-        heistTimer = 45f;
+        heistTimer = 30f;
     }
 
     public void DepositBag()

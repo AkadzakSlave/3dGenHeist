@@ -20,7 +20,7 @@ MonoBehaviour:
   acceleration: 22
   maxHealth: 100
   detectionRadius: 28
-  damagePerShot: 10
+  damagePerShot: 1
   attackRange: 28
   fireInterval: 0.2
   magazineSize: 20
@@ -32,6 +32,41 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   fireEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  radioAlertEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  alertVoiceEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  hurtVoiceEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  deathVoiceEvent:
+    Guid:
+      Data1: 0
+      Data2: 0
+      Data3: 0
+      Data4: 0
+    Path: 
+  breachHitEvent:
     Guid:
       Data1: 0
       Data2: 0

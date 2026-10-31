@@ -676,7 +676,7 @@ public class PlayerInventory : MonoBehaviour
         UpdateWeaponText();
     }
 
-    private void UpdateWeaponText()
+    public void UpdateWeaponText()
     {
         if (GameManager.Instance == null || GameManager.Instance.heistUI == null) return;
 

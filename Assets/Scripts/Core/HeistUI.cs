@@ -23,6 +23,9 @@ public class HeistUI : MonoBehaviour
     public GameObject[] difficultySkulls; 
     public TextMeshProUGUI interactionText;
 
+    [Header("Minimap Reference")]
+    public HeistMinimap minimap;
+
     [Header("Crosshair / Reticle")]
     public GameObject reticleRoot;
     public Image reticleDot;
