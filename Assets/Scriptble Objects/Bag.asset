@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fb9d01ddf9858246a62c027e3a1e6aa, type: 3}
   m_Name: Bag
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: Bag
+  itemName: "\u0421\u0443\u043C\u043A\u0430"
   itemType: 0
   fmodMainType: 2
   icon: {fileID: 21300000, guid: ce952cc4afa4a6d42b30261a35e4272e, type: 3}

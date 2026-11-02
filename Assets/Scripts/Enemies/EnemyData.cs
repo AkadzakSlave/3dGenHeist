@@ -43,4 +43,5 @@ public class EnemyData : ScriptableObject
     public FMODUnity.EventReference hurtVoiceEvent;
     public FMODUnity.EventReference deathVoiceEvent;
     public FMODUnity.EventReference breachHitEvent;
+    public FMODUnity.EventReference footstepEvent;
 }

@@ -151,12 +151,21 @@ public class EnemyController : MonoBehaviour
     private static readonly int InCoverHash = Animator.StringToHash("InCover");
 
     [Header("Debug Visualizer")]
-    public bool showOverheadDebugText = true;
+    public static bool GlobalShowOverheadDebugText = false; // По умолчанию ВЫКЛЮЧЕНО
+    public bool showOverheadDebugText = false;
+
+    public static void ToggleOverheadDebugText()
+    {
+        GlobalShowOverheadDebugText = !GlobalShowOverheadDebugText;
+        Debug.Log($"<color=cyan>[Enemy] Статусы над головами охраны: {(GlobalShowOverheadDebugText ? "ВКЛЮЧЕНЫ [F8]" : "ВЫКЛЮЧЕНЫ [F8]")}</color>");
+    }
     private TextMesh debugTextMesh;
 
     private NavMeshAgent agent;
     private Transform playerTarget;
     private PlayerHealth playerHealth;
+    private EnemyHealth enemyHealth;
+    private float footstepTimer = 0f;
     private float targetSearchTimer = 0f;
     private Vector3? lastHeardSoundPos;
     private float soundAlertTimer = 0f;
@@ -203,6 +212,7 @@ public class EnemyController : MonoBehaviour
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
+        enemyHealth = GetComponent<EnemyHealth>();
 
         // Настройка раздельных коллайдеров: компактный для перемещения и широкий для стрельбы игрока
         EnsureDualColliders();
@@ -614,8 +624,13 @@ public class EnemyController : MonoBehaviour
     {
         if (debugTextMesh != null)
         {
-            debugTextMesh.gameObject.SetActive(showOverheadDebugText);
-            if (showOverheadDebugText)
+            bool isVisible = GlobalShowOverheadDebugText;
+            if (debugTextMesh.gameObject.activeSelf != isVisible)
+            {
+                debugTextMesh.gameObject.SetActive(isVisible);
+            }
+
+            if (isVisible)
             {
                 string typeStr = data != null ? data.type.ToString() : "Enemy";
                 string preAimStr = isPreAiming ? " [PRE-AIM]" : "";
@@ -722,6 +737,42 @@ public class EnemyController : MonoBehaviour
         }
 
         UpdateAnimator();
+        UpdateFootsteps();
+    }
+
+    private void UpdateFootsteps()
+    {
+        if (enemyHealth != null && enemyHealth.isDead) return;
+        if (agent == null || !agent.enabled || !agent.isOnNavMesh) return;
+
+        float currentSpeed = agent.velocity.magnitude;
+        if (currentSpeed < 0.35f)
+        {
+            footstepTimer = 0.15f;
+            return;
+        }
+
+        footstepTimer -= Time.deltaTime;
+        if (footstepTimer <= 0f)
+        {
+            float speedRatio = Mathf.Clamp01(currentSpeed / Mathf.Max(0.1f, MoveSpeed));
+            footstepTimer = Mathf.Lerp(0.52f, 0.32f, speedRatio);
+
+            // Optimization: play only if player / main camera is within 32m
+            if (Camera.main != null && Vector3.Distance(transform.position, Camera.main.transform.position) > 32f)
+            {
+                return;
+            }
+
+            if (data != null && !data.footstepEvent.IsNull)
+            {
+                FMODUnity.RuntimeManager.PlayOneShot(data.footstepEvent, transform.position);
+            }
+            else
+            {
+                FMODUnity.RuntimeManager.PlayOneShot("event:/Enemy/Enemy_Footstep", transform.position);
+            }
+        }
     }
 
     #region State Executions

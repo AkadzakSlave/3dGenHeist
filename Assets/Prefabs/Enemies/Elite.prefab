@@ -226,7 +226,7 @@ MonoBehaviour:
   headHitboxRadius: 0.5
   headHitboxHeight: 0.6
   headHitboxCenterY: 1.85
-  showOverheadDebugText: 1
+  showOverheadDebugText: 0
 --- !u!114 &-2715718016000988868
 MonoBehaviour:
   m_ObjectHideFlags: 0

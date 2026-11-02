@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fb9d01ddf9858246a62c027e3a1e6aa, type: 3}
   m_Name: Tompson
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: Tompson
+  itemName: "\u0422\u043E\u043C\u043F\u0441\u043E\u043D"
   itemType: 1
   fmodMainType: 0
   icon: {fileID: 21300000, guid: 58296a3eeb7a1db43b6431a0f5a55a63, type: 3}

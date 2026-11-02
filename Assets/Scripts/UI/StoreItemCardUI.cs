@@ -11,6 +11,8 @@ public class StoreItemCardUI : MonoBehaviour
     public TextMeshProUGUI itemCapacityText;
     public TextMeshProUGUI itemDescriptionText;
     public Button addToCartButton;
+    public Button instantBuyButton;
+    public Image capacityBarFill;
 
     [Header("License & Exclusivity UI Tags")]
     public TextMeshProUGUI tagBadgeText;
@@ -23,54 +25,69 @@ public class StoreItemCardUI : MonoBehaviour
 
         currentItem = entry.itemData;
         if (itemIcon != null) itemIcon.sprite = entry.itemData.icon;
-        if (itemNameText != null) itemNameText.text = entry.itemData.itemName;
-        if (itemPriceText != null) itemPriceText.text = $"${entry.price}";
-        if (itemDescriptionText != null) itemDescriptionText.text = entry.description;
+
+        // Принудительно задаем приятные темные чернильные цвета стилистики 1920-х (Нуар)
+        if (itemNameText != null)
+        {
+            itemNameText.text = entry.itemData.itemName;
+            itemNameText.color = new Color(0.12f, 0.08f, 0.05f, 1f);
+        }
+
+        if (itemPriceText != null)
+        {
+            itemPriceText.text = $"${entry.price}";
+            itemPriceText.color = Color.white;
+        }
+
+        if (itemDescriptionText != null)
+        {
+            itemDescriptionText.text = entry.description;
+            itemDescriptionText.color = new Color(0.35f, 0.28f, 0.22f, 1f);
+        }
 
         int currentStorage = TeamStorageManager.Instance != null ? TeamStorageManager.Instance.GetItemCount(currentItem) : 0;
-        if (itemCapacityText != null) itemCapacityText.text = $"Storage: {currentStorage}/{entry.maxCapacity}";
+        if (itemCapacityText != null)
+        {
+            itemCapacityText.text = $"Storage: {currentStorage}/{entry.maxCapacity}";
+            itemCapacityText.color = new Color(0.2f, 0.15f, 0.1f, 1f);
+        }
 
-        bool isUnlocked = TeamStorageManager.Instance == null || TeamStorageManager.Instance.IsItemUnlocked(entry);
-        bool isDonAvailable = TeamStorageManager.Instance == null || TeamStorageManager.Instance.IsDonAvailable(entry);
+        if (capacityBarFill != null)
+        {
+            float fillRatio = entry.maxCapacity > 0 ? (float)currentStorage / entry.maxCapacity : 0f;
+            capacityBarFill.fillAmount = Mathf.Clamp01(fillRatio);
+        }
 
+        // Теги лицензий скрываем, чтобы не загромождать карточки товара
         if (tagBadgeText != null)
         {
-            if (entry.isDonExclusive)
-            {
-                tagBadgeText.text = "<color=#ffd700>👑 Don Exclusive</color>";
-                tagBadgeText.gameObject.SetActive(true);
-            }
-            else if (entry.requiresLicense)
-            {
-                tagBadgeText.text = "<color=#00ffff>🔒 License Required</color>";
-                tagBadgeText.gameObject.SetActive(true);
-            }
-            else
-            {
-                tagBadgeText.gameObject.SetActive(false);
-            }
-        }
-        else if (itemNameText != null)
-        {
-            if (entry.isDonExclusive)
-            {
-                itemNameText.text = $"{entry.itemData.itemName} <color=#ffd700>👑 [Don]</color>";
-            }
-            else if (entry.requiresLicense)
-            {
-                itemNameText.text = $"{entry.itemData.itemName} <color=#00ffff>🔒 [License]</color>";
-            }
+            tagBadgeText.gameObject.SetActive(false);
         }
 
+        // 1. Клик по всей карточке -> Добавление в Корзину
         if (addToCartButton != null)
         {
-            addToCartButton.interactable = isUnlocked && isDonAvailable;
+            addToCartButton.interactable = true;
             addToCartButton.onClick.RemoveAllListeners();
             addToCartButton.onClick.AddListener(() =>
             {
                 if (StoreUI.Instance != null)
                 {
                     StoreUI.Instance.AddToCart(currentItem);
+                }
+            });
+        }
+
+        // 2. Клик по красной кнопке с ценой ($XX) -> Мгновенная прямая покупка в руки / на склад
+        if (instantBuyButton != null)
+        {
+            instantBuyButton.interactable = true;
+            instantBuyButton.onClick.RemoveAllListeners();
+            instantBuyButton.onClick.AddListener(() =>
+            {
+                if (StoreUI.Instance != null)
+                {
+                    StoreUI.Instance.DirectBuyItem(currentItem);
                 }
             });
         }

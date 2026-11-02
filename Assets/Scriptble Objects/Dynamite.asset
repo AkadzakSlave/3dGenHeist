@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fb9d01ddf9858246a62c027e3a1e6aa, type: 3}
   m_Name: Dynamite
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: Dynamite
+  itemName: "\u0414\u0438\u043D\u0430\u043C\u0438\u0442"
   itemType: 2
   fmodMainType: 0
   icon: {fileID: 21300000, guid: 95668ae080c20584fa524473d0d4a7ba, type: 3}

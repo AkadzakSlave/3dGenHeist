@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 
@@ -435,7 +435,9 @@ public class HeistUI : MonoBehaviour
 
         bool isMenuOrLoading = (MainMenuUI.Instance != null && MainMenuUI.Instance.IsMainMenuActive) ||
                                (PauseMenuUI.Instance != null && PauseMenuUI.Instance.IsPaused) ||
-                               (loadingScreenPanel != null && loadingScreenPanel.activeSelf);
+                               (loadingScreenPanel != null && loadingScreenPanel.activeSelf) ||
+                               (StoreUI.Instance != null && StoreUI.Instance.IsStoreOpen) ||
+                               (DonResultUI.Instance != null && DonResultUI.Instance.isOpen);
 
         // В меню паузы, главном меню и на экране загрузки интерфейс должен быть полностью скрыт
         if (isMenuOrLoading)
@@ -443,6 +445,7 @@ public class HeistUI : MonoBehaviour
             if (debugHudRoot != null && debugHudRoot.activeSelf) debugHudRoot.SetActive(false);
             if (releaseHudRoot != null && releaseHudRoot.activeSelf) releaseHudRoot.SetActive(false);
             if (reticleRoot != null && reticleRoot.activeSelf) reticleRoot.SetActive(false);
+            if (interactionBadge != null && interactionBadge.activeSelf) interactionBadge.SetActive(false);
             return;
         }
         else
@@ -632,6 +635,8 @@ public class HeistUI : MonoBehaviour
         if (reticleTrack != null)
         {
             reticleTrack.rectTransform.sizeDelta = new Vector2(reticleRingSize, reticleRingSize);
+            reticleTrack.rectTransform.localScale = Vector3.one;
+            reticleTrack.color = new Color(0.12f, 0.14f, 0.18f, 0.75f);
             reticleTrack.gameObject.SetActive(true);
         }
         if (reticleSweetSpot != null) reticleSweetSpot.gameObject.SetActive(false);
@@ -640,12 +645,19 @@ public class HeistUI : MonoBehaviour
         if (reticleRing != null)
         {
             reticleRing.gameObject.SetActive(true);
+            if (reticleRing.sprite == null)
+            {
+                reticleRing.sprite = CreateRingSprite(64, 3);
+            }
             reticleRing.rectTransform.sizeDelta = new Vector2(reticleRingSize, reticleRingSize);
+            reticleRing.rectTransform.localScale = Vector3.one;
             reticleRing.type = Image.Type.Filled;
             reticleRing.fillMethod = Image.FillMethod.Radial360;
             reticleRing.fillOrigin = (int)Image.Origin360.Top;
+            reticleRing.fillClockwise = true;
             reticleRing.fillAmount = Mathf.Clamp01(progress);
-            reticleRing.color = Color.Lerp(Color.white, new Color(0.2f, 1f, 0.45f, 1f), progress);
+            // Плавный стильный градиент: от теплого золотого янтаря к сочному изумрудно-зеленому
+            reticleRing.color = Color.Lerp(new Color(1f, 0.82f, 0.25f, 1f), new Color(0.25f, 1f, 0.5f, 1f), progress);
             reticleRing.transform.localRotation = Quaternion.identity;
         }
 
@@ -1128,7 +1140,9 @@ public class HeistUI : MonoBehaviour
         }
 
         bool isMenuOpen = (MainMenuUI.Instance != null && MainMenuUI.Instance.IsMainMenuActive) ||
-                          (PauseMenuUI.Instance != null && PauseMenuUI.Instance.IsPaused);
+                          (PauseMenuUI.Instance != null && PauseMenuUI.Instance.IsPaused) ||
+                          (StoreUI.Instance != null && StoreUI.Instance.IsStoreOpen) ||
+                          (DonResultUI.Instance != null && DonResultUI.Instance.isOpen);
 
         if (reticleRoot != null)
         {
@@ -1163,7 +1177,7 @@ public class HeistUI : MonoBehaviour
         // Outer focus ring: expands around the dot and fades in when looking at an interactable
         if (reticleRing != null)
         {
-            if (reticleRing.type == Image.Type.Filled && reticleRing.fillAmount > 0.001f)
+            if (reticleRing.type == Image.Type.Filled && (reticleRing.fillAmount > 0.001f || (reticleTrack != null && reticleTrack.gameObject.activeSelf)))
             {
                 // Active hold progress interaction (e.g. turning safe valve or drop-off)! Keep fill progress visible
                 return;

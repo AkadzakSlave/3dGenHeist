@@ -3,7 +3,7 @@ Shader "Heist/SoftDustParticle"
     Properties
     {
         _Color ("Tint Color", Color) = (1, 1, 1, 1)
-        _FalloffPower ("Softness Falloff", Range(0.5, 3.0)) = 1.4
+        _FalloffPower ("Softness Falloff", Range(0.5, 3.0)) = 1.2
     }
 
     SubShader
@@ -16,7 +16,7 @@ Shader "Heist/SoftDustParticle"
             "PreviewType"="Plane"
         }
 
-        Blend SrcAlpha OneMinusSrcAlpha
+        Blend SrcAlpha One
         ColorMask RGB
         Cull Off 
         Lighting Off 
@@ -67,7 +67,7 @@ Shader "Heist/SoftDustParticle"
                 float falloff = saturate(1.0 - distSq);
                 falloff = pow(falloff, _FalloffPower);
 
-                return fixed4(i.color.rgb, i.color.a * falloff);
+                return fixed4(i.color.rgb * falloff, i.color.a * falloff);
             }
             ENDCG
         }

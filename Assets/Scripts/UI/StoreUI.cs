@@ -12,6 +12,7 @@ public class StoreUI : MonoBehaviour
     public GameObject mainStoreWindow;
     public GameObject storeTabPanel;
     public GameObject storageTabPanel;
+    public GameObject storeHeaderBanner;
 
     [Header("Tab Buttons")]
     public Button storeTabButton;
@@ -54,7 +55,8 @@ public class StoreUI : MonoBehaviour
     private readonly Dictionary<ItemData, int> shoppingCart = new Dictionary<ItemData, int>();
     private ShopCategory activeCategory = ShopCategory.All;
     private bool isOpen = false;
-    public bool IsStoreOpen => isOpen || (mainStoreWindow != null && mainStoreWindow.activeSelf);
+    private float lastClosedTime = -1f;
+    public bool IsStoreOpen => isOpen || (mainStoreWindow != null && mainStoreWindow.activeSelf) || (Time.unscaledTime - lastClosedTime < 0.35f);
 
     private void Awake()
     {
@@ -71,6 +73,12 @@ public class StoreUI : MonoBehaviour
 
     private void Start()
     {
+        if (storeHeaderBanner == null && mainStoreWindow != null)
+        {
+            Transform banner = mainStoreWindow.transform.Find("StoreHeader_Banner");
+            if (banner != null) storeHeaderBanner = banner.gameObject;
+        }
+
         if (mainStoreWindow != null) mainStoreWindow.SetActive(false);
 
         if (storeTabButton != null) storeTabButton.onClick.AddListener(ShowStoreTab);
@@ -79,9 +87,9 @@ public class StoreUI : MonoBehaviour
         if (purchaseButton != null) purchaseButton.onClick.AddListener(OnPurchaseClicked);
         if (clearCartButton != null) clearCartButton.onClick.AddListener(ClearCart);
 
-        if (buyLightAmmoButton != null) buyLightAmmoButton.onClick.AddListener(() => BuyAmmo(AmmoType.Light, 18, 60));
-        if (buyMediumAmmoButton != null) buyMediumAmmoButton.onClick.AddListener(() => BuyAmmo(AmmoType.Medium, 50, 150));
-        if (buyShotgunAmmoButton != null) buyShotgunAmmoButton.onClick.AddListener(() => BuyAmmo(AmmoType.Shotgun, 12, 80));
+        if (buyLightAmmoButton != null) buyLightAmmoButton.onClick.AddListener(() => BuyAmmo(AmmoType.Light, 18, 30));
+        if (buyMediumAmmoButton != null) buyMediumAmmoButton.onClick.AddListener(() => BuyAmmo(AmmoType.Medium, 50, 60));
+        if (buyShotgunAmmoButton != null) buyShotgunAmmoButton.onClick.AddListener(() => BuyAmmo(AmmoType.Shotgun, 12, 40));
 
         if (TeamStorageManager.Instance != null)
         {
@@ -99,6 +107,18 @@ public class StoreUI : MonoBehaviour
 
     private void Update()
     {
+        // Чит-бинд для быстрых тестов в лобби/магазине: [F1], [F2], [Numpad +] или [+] добавляет +$1000
+        if (Keyboard.current != null && (Keyboard.current.f1Key.wasPressedThisFrame || Keyboard.current.f2Key.wasPressedThisFrame || Keyboard.current.numpadPlusKey.wasPressedThisFrame || Keyboard.current.equalsKey.wasPressedThisFrame))
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.sessionMoney += 1000;
+                GameManager.Instance.onMoneyChanged?.Invoke();
+                if (isOpen) RefreshUI();
+                Debug.Log($"<color=green>[Cheat] Добавлено +$1000! Текущий баланс: ${GameManager.Instance.sessionMoney}</color>");
+            }
+        }
+
         if (isOpen)
         {
             if (Keyboard.current != null && (Keyboard.current.escapeKey.wasPressedThisFrame || Keyboard.current.bKey.wasPressedThisFrame))
@@ -109,55 +129,85 @@ public class StoreUI : MonoBehaviour
         }
 
         // В Лобби можно быстро открыть оружейную/склад по нажатию [B]
-        if (GameManager.Instance != null && GameManager.Instance.isInLobby)
+        if (Keyboard.current != null && Keyboard.current.bKey.wasPressedThisFrame)
         {
-            if (Keyboard.current != null && Keyboard.current.bKey.wasPressedThisFrame)
+            bool inLobby = GameManager.Instance == null || GameManager.Instance.isInLobby;
+            if (inLobby && (PauseMenuUI.Instance == null || !PauseMenuUI.Instance.IsPaused))
             {
-                if (PauseMenuUI.Instance == null || !PauseMenuUI.Instance.IsPaused)
-                {
-                    OpenStore();
-                }
+                OpenStore();
             }
         }
     }
 
     private InputReader EffectiveInputReader => inputReader != null ? inputReader : (PlayerInventory.Instance != null ? PlayerInventory.Instance.inputReader : null);
 
+    public bool isTruckStorageMode { get; private set; } = false;
+
     public void OpenStore()
     {
+        OpenStore(false);
+    }
+
+    public void OpenStore(bool truckStorageMode)
+    {
+        if (Instance == null) Instance = this;
+        isTruckStorageMode = truckStorageMode;
         isOpen = true;
+        gameObject.SetActive(true);
+        transform.SetAsLastSibling();
         if (mainStoreWindow != null) mainStoreWindow.SetActive(true);
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
 
-        if (EffectiveInputReader != null)
+        if (isTruckStorageMode)
         {
-            EffectiveInputReader.DisableAllActions();
+            if (storeTabButton != null) storeTabButton.gameObject.SetActive(false);
+            ShowStorageTab();
         }
-
-        ShowStoreTab();
+        else
+        {
+            if (storeTabButton != null) storeTabButton.gameObject.SetActive(true);
+            ShowStoreTab();
+        }
         RefreshUI();
     }
 
     public void CloseStore()
     {
         isOpen = false;
+        lastClosedTime = Time.unscaledTime;
         if (mainStoreWindow != null) mainStoreWindow.SetActive(false);
+        if (storeTabButton != null) storeTabButton.gameObject.SetActive(true);
+        isTruckStorageMode = false;
 
-        if (EffectiveInputReader != null)
+        if (UnityEngine.EventSystems.EventSystem.current != null)
         {
-            EffectiveInputReader.EnableAllActions();
+            UnityEngine.EventSystems.EventSystem.current.SetSelectedGameObject(null);
         }
 
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        StartCoroutine(EnforceCursorLock());
+    }
+
+    private System.Collections.IEnumerator EnforceCursorLock()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            if (isOpen) yield break;
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            yield return null;
+        }
     }
 
     public void ShowStoreTab()
     {
         if (storeTabPanel != null) storeTabPanel.SetActive(true);
         if (storageTabPanel != null) storageTabPanel.SetActive(false);
+        if (storeHeaderBanner != null) storeHeaderBanner.SetActive(true);
         RefreshStoreTab();
         RefreshLoadoutUI();
     }
@@ -166,6 +216,7 @@ public class StoreUI : MonoBehaviour
     {
         if (storeTabPanel != null) storeTabPanel.SetActive(false);
         if (storageTabPanel != null) storageTabPanel.SetActive(true);
+        if (storeHeaderBanner != null) storeHeaderBanner.SetActive(false);
         RefreshStorageTab();
         RefreshLoadoutUI();
     }
@@ -179,15 +230,16 @@ public class StoreUI : MonoBehaviour
     // Shopping Cart Methods
     public void AddToCart(ItemData item)
     {
-        if (item == null || TeamStorageManager.Instance == null) return;
+        if (item == null) return;
 
         int currentInCart = shoppingCart.TryGetValue(item, out int count) ? count : 0;
-        int currentInStorage = TeamStorageManager.Instance.GetItemCount(item);
-        int maxCap = TeamStorageManager.Instance.GetMaxCapacity(item);
+        int currentInStorage = TeamStorageManager.Instance != null ? TeamStorageManager.Instance.GetItemCount(item) : 0;
+        int maxCap = TeamStorageManager.Instance != null ? TeamStorageManager.Instance.GetMaxCapacity(item) : 99;
 
-        if ((currentInStorage + currentInCart + 1) > maxCap)
+        // Лимит корзины не должен блокировать покупку, если в хранилище свободно
+        if ((currentInStorage + currentInCart + 1) > Mathf.Max(maxCap, 6) && currentInCart >= 2)
         {
-            Debug.LogWarning($"[StoreUI] Нельзя добавить в корзину: превышен лимит ({currentInStorage + currentInCart}/{maxCap}) для {item.itemName}");
+            Debug.LogWarning($"[StoreUI] Достигнут лимит для {item.itemName} ({currentInCart} уже в корзине)");
             return;
         }
 
@@ -210,6 +262,59 @@ public class StoreUI : MonoBehaviour
     {
         shoppingCart.Clear();
         RefreshStoreTab();
+    }
+
+    /// <summary>
+    /// Мгновенная прямая покупка предмета (1 клик по ценнику в стиле старого терминала)
+    /// </summary>
+    public bool DirectBuyItem(ItemData item)
+    {
+        if (item == null) return false;
+
+        StoreCatalogEntry entry = (TeamStorageManager.Instance != null && TeamStorageManager.Instance.catalog != null)
+            ? TeamStorageManager.Instance.catalog.GetEntry(item) : null;
+        int price = entry != null ? entry.price : 50;
+
+        int playerMoney = GameManager.Instance != null ? GameManager.Instance.sessionMoney : 0;
+        if (playerMoney < price)
+        {
+            Debug.LogWarning($"[StoreUI] Недостаточно денег для покупки {item.itemName}! Нужно ${price}, доступно ${playerMoney}");
+            return false;
+        }
+
+        // Списываем деньги
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.sessionMoney -= price;
+            if (GameManager.Instance.onMoneyChanged != null)
+            {
+                GameManager.Instance.onMoneyChanged.Invoke();
+            }
+        }
+
+        // Если соответствующий слот в руках/кобуре игрока пуст — экипируем сразу в руки!
+        bool autoEquipped = false;
+        if (PlayerInventory.Instance != null && PlayerInventory.Instance.slots != null)
+        {
+            int slotIdx = (int)item.itemType;
+            if (slotIdx >= 0 && slotIdx < PlayerInventory.Instance.slots.Length)
+            {
+                if (PlayerInventory.Instance.slots[slotIdx] == null)
+                {
+                    autoEquipped = PlayerInventory.Instance.PickupItem(item);
+                }
+            }
+        }
+
+        // Иначе отправляем в командное хранилище (Склад банды)
+        if (!autoEquipped && TeamStorageManager.Instance != null)
+        {
+            TeamStorageManager.Instance.AddItem(item, 1);
+        }
+
+        RefreshUI();
+        Debug.Log($"<color=green>[StoreUI] Успешно куплен {item.itemName} за ${price}! {(autoEquipped ? "Экипирован в руки!" : "Отправлен на склад банды.")}</color>");
+        return true;
     }
 
     private void OnPurchaseClicked()
@@ -320,12 +425,11 @@ public class StoreUI : MonoBehaviour
         int playerMoney = GameManager.Instance != null ? GameManager.Instance.sessionMoney : 0;
         int remaining = playerMoney - totalCost;
 
-        if (totalCostText != null) totalCostText.text = $"К оплате: ${totalCost}";
-        if (availableMoneyText != null) availableMoneyText.text = $"Бюджет банды: ${playerMoney}";
+        if (totalCostText != null) totalCostText.text = "";
+        if (availableMoneyText != null) availableMoneyText.text = $"<color=#dfd6c6>Balance:</color> <color=#ffd700>${playerMoney}</color>";
         if (remainingMoneyText != null)
         {
-            remainingMoneyText.text = $"Остаток: ${remaining}";
-            remainingMoneyText.color = remaining >= 0 ? Color.white : new Color(1f, 0.4f, 0.4f, 1f);
+            remainingMoneyText.text = $"<color=#dfd6c6>Remaining:</color> <color={(remaining >= 0 ? "#ffffff" : "#ff5555")}>${remaining}</color>";
         }
 
         if (purchaseButton != null)
@@ -336,38 +440,116 @@ public class StoreUI : MonoBehaviour
 
     private void RefreshStorageTab()
     {
-        if (!isOpen || TeamStorageManager.Instance == null) return;
+        if (!isOpen) return;
 
-        var owned = TeamStorageManager.Instance.GetAllOwnedItems();
+        HeistLoadoutStorage heistStorage = HeistLoadoutStorage.EnsureInstance();
 
         if (storageContainer != null && storageCardPrefab != null)
         {
             foreach (Transform child in storageContainer) Destroy(child.gameObject);
 
-            foreach (var kvp in owned)
+            if (isTruckStorageMode)
             {
-                int maxCap = TeamStorageManager.Instance.GetMaxCapacity(kvp.Key);
-                GameObject cardObj = Instantiate(storageCardPrefab, storageContainer);
-                StorageItemCardUI cardScript = cardObj.GetComponent<StorageItemCardUI>();
-                if (cardScript != null) cardScript.Setup(kvp.Key, kvp.Value, maxCap);
-            }
-        }
+                // ============================================
+                // РЕЖИМ 2: ХРАНИЛИЩЕ ВЫЛАЗКИ (В МАШИНЕ)
+                // ============================================
+                Dictionary<ItemData, int> truckItems = new Dictionary<ItemData, int>();
 
-        if (storageStatusText != null)
-        {
-            if (owned.Count == 0)
-            {
-                storageStatusText.text = "Склад пуст. Купите снаряжение во вкладке 'Магазин'.";
+                var onHeist = heistStorage.GetAllItems();
+                foreach (var kvp in onHeist)
+                {
+                    if (kvp.Key != null && kvp.Value > 0) truckItems[kvp.Key] = kvp.Value;
+                }
+
+                // Плюс предметы в руках игрока
+                if (PlayerInventory.Instance != null && PlayerInventory.Instance.slots != null)
+                {
+                    foreach (var slot in PlayerInventory.Instance.slots)
+                    {
+                        if (slot != null && slot.itemData != null)
+                        {
+                            if (!truckItems.ContainsKey(slot.itemData))
+                            {
+                                truckItems[slot.itemData] = 0;
+                            }
+                        }
+                    }
+                }
+
+                foreach (var kvp in truckItems)
+                {
+                    int maxCap = TeamStorageManager.Instance != null ? TeamStorageManager.Instance.GetMaxCapacity(kvp.Key) : 10;
+                    GameObject cardObj = Instantiate(storageCardPrefab, storageContainer);
+                    StorageItemCardUI cardScript = cardObj.GetComponent<StorageItemCardUI>();
+                    if (cardScript != null)
+                    {
+                        cardScript.Setup(kvp.Key, 0, kvp.Value, maxCap, isTruckMode: true);
+                    }
+                }
+
+                if (storageStatusText != null)
+                {
+                    if (truckItems.Count == 0)
+                    {
+                        storageStatusText.gameObject.SetActive(true);
+                        storageStatusText.text = "В машине нет снаряжения! Загрузите предметы во вкладке 'Склад' перед вылазкой.";
+                    }
+                    else
+                    {
+                        storageStatusText.gameObject.SetActive(false);
+                    }
+                }
             }
             else
             {
-                string summary = "<b>СКЛАД СНАРЯЖЕНИЯ БАНДЫ:</b>\n";
+                // ============================================
+                // РЕЖИМ 1: ОСНОВНОЙ СКЛАД БАНДЫ (УБЕЖИЩЕ)
+                // ============================================
+                if (TeamStorageManager.Instance == null) return;
+
+                Dictionary<ItemData, int> mainItems = new Dictionary<ItemData, int>();
+                var owned = TeamStorageManager.Instance.GetAllOwnedItems();
                 foreach (var kvp in owned)
                 {
-                    int maxCap = TeamStorageManager.Instance.GetMaxCapacity(kvp.Key);
-                    summary += $"• {kvp.Key.itemName}: {kvp.Value}/{maxCap}\n";
+                    if (kvp.Key != null) mainItems[kvp.Key] = kvp.Value;
                 }
-                storageStatusText.text = summary;
+
+                // Также показываем предметы, загруженные в машину
+                var onHeist = heistStorage.GetAllItems();
+                foreach (var kvp in onHeist)
+                {
+                    if (kvp.Key != null && !mainItems.ContainsKey(kvp.Key))
+                    {
+                        mainItems[kvp.Key] = 0;
+                    }
+                }
+
+                foreach (var kvp in mainItems)
+                {
+                    int mainCount = kvp.Value;
+                    int heistCount = heistStorage.GetItemCount(kvp.Key);
+                    int maxCap = TeamStorageManager.Instance.GetMaxCapacity(kvp.Key);
+
+                    GameObject cardObj = Instantiate(storageCardPrefab, storageContainer);
+                    StorageItemCardUI cardScript = cardObj.GetComponent<StorageItemCardUI>();
+                    if (cardScript != null)
+                    {
+                        cardScript.Setup(kvp.Key, mainCount, heistCount, maxCap, isTruckMode: false);
+                    }
+                }
+
+                if (storageStatusText != null)
+                {
+                    if (mainItems.Count == 0)
+                    {
+                        storageStatusText.gameObject.SetActive(true);
+                        storageStatusText.text = "Склад пуст. Купите снаряжение во вкладке 'Магазин'.";
+                    }
+                    else
+                    {
+                        storageStatusText.gameObject.SetActive(false);
+                    }
+                }
             }
         }
     }

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -47,6 +47,37 @@ public class LevelGenerator : MonoBehaviour
     [Tooltip("Целевое количество хранилищ (сейфов) на уровне. Если комнат достаточно (>= 10), спавнится до 2 сейфов в разных ветках!")]
     public int targetVaults = 2;
     public int spawnedVaultsCount = 0;
+
+    [Header("Room Lighting & Bulbs (Method B)")]
+    [Tooltip("Включить обработку освещения генератором. Для Способа Б оставляем включенным, но с override = false, чтобы префабы управляли светом сами")]
+    public bool enableRoomLighting = true;
+
+    [Tooltip("Если включено, перезаписывает лампы в префабах значениями ниже. Для Способа Б должно быть FALSE, чтобы сохранялись ваши настройки из префабов!")]
+    public bool overrideExistingRoomLights = false;
+
+    [Tooltip("Создавать потолочный светильник в комнатах, где вообще нет ламп. Если FALSE — генератор не создает ничего лишнего (чистый Способ Б).")]
+    public bool spawnFallbackLampIfMissing = false;
+
+    [Tooltip("Цвет света в комнатах (для оверрайда или автоламп)")]
+    public Color roomLightColor = new Color(1.0f, 0.95f, 0.86f);
+
+    [Tooltip("Яркость света в комнатах (по умолчанию 2.6)")]
+    public float roomLightIntensity = 2.6f;
+
+    [Tooltip("Радиус освещения ламп (в метрах)")]
+    public float roomLightRange = 22f;
+
+    [Tooltip("Высота автоматического светильника от пола комнаты (Y)")]
+    public float defaultLampHeight = 5.0f;
+
+    [Tooltip("Создавать визуальный светящийся шарик (плафон) на лампочке")]
+    public bool spawnGlowingBulbMesh = false;
+
+    [Tooltip("Размер светящегося шарика-плафона")]
+    public float bulbMeshScale = 0.45f;
+
+    [Tooltip("Материал светящегося плафона лампочки (по умолчанию M_LampBulb_Emission)")]
+    public Material bulbEmissionMaterial;
 
     private int generatedRoomsCount = 0;
     private List<SocketData> openSockets = new List<SocketData>();
@@ -769,6 +800,108 @@ public class LevelGenerator : MonoBehaviour
         }
 
         tracker.Initialize(roomName, localBounds, isVault, isStartOrVan);
+
+        // Гарантируем яркое основное освещение комнат с горящими плафонами
+        EnsureRoomPrimaryLighting(roomObj, isStartOrVan);
+    }
+
+    private void EnsureRoomPrimaryLighting(GameObject roomObj, bool isStartOrVan)
+    {
+        if (!enableRoomLighting || roomObj == null || isStartOrVan) return;
+
+        // 1. Ищем существующие лампы в комнате
+        Light[] existingLights = roomObj.GetComponentsInChildren<Light>();
+        if (existingLights != null && existingLights.Length > 0)
+        {
+            foreach (var l in existingLights)
+            {
+                if (overrideExistingRoomLights)
+                {
+                    l.type = LightType.Point;
+                    l.intensity = roomLightIntensity;
+                    l.range = roomLightRange;
+                    l.color = roomLightColor;
+                    l.shadows = LightShadows.None;
+
+                    if (l.transform.localPosition.y > 7f)
+                    {
+                        Vector3 lp = l.transform.localPosition;
+                        lp.y = defaultLampHeight;
+                        l.transform.localPosition = lp;
+                    }
+                }
+                else
+                {
+                    // Сохраняем индивидуальные настройки ламп из префаба комнаты!
+                    // Отключаем динамические тени для гладкой производительности
+                    l.shadows = LightShadows.None;
+                }
+
+                if (spawnGlowingBulbMesh)
+                {
+                    EnsureBulbMesh(l.gameObject);
+                }
+            }
+            return;
+        }
+
+        // 2. Если в комнате нет ламп и выключен спавн фоллбэк-ламп — ничего не делаем (чистый Способ Б)
+        if (!spawnFallbackLampIfMissing) return;
+
+        // Создаем потолочный светильник с настройками из Инспектора только если включен спавн запасных ламп
+        GameObject lampObj = new GameObject("CeilingLamp");
+        lampObj.transform.SetParent(roomObj.transform, false);
+        lampObj.transform.localPosition = new Vector3(0f, defaultLampHeight, 0f);
+
+        Light roomLight = lampObj.AddComponent<Light>();
+        roomLight.type = LightType.Point;
+        roomLight.range = roomLightRange;
+        roomLight.intensity = roomLightIntensity;
+        roomLight.color = roomLightColor;
+        roomLight.shadows = LightShadows.None;
+
+        if (spawnGlowingBulbMesh)
+        {
+            EnsureBulbMesh(lampObj);
+        }
+    }
+
+    private void EnsureBulbMesh(GameObject lampObj)
+    {
+        if (lampObj == null || lampObj.transform.Find("GlowingBulb") != null) return;
+
+        // Создаем аккуратный светящийся шарик-плафон
+        GameObject bulb = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        bulb.name = "GlowingBulb";
+        bulb.transform.SetParent(lampObj.transform, false);
+        bulb.transform.localPosition = Vector3.zero;
+        bulb.transform.localScale = Vector3.one * bulbMeshScale;
+
+        Collider c = bulb.GetComponent<Collider>();
+        if (c != null) Destroy(c);
+
+        Material emissiveMat = bulbEmissionMaterial;
+        if (emissiveMat == null)
+        {
+            emissiveMat = Resources.Load<Material>("Materials/M_LampBulb_Emission");
+        }
+        if (emissiveMat == null)
+        {
+            Shader std = Shader.Find("Standard");
+            if (std != null)
+            {
+                emissiveMat = new Material(std);
+                emissiveMat.color = new Color(1f, 0.98f, 0.92f);
+                emissiveMat.EnableKeyword("_EMISSION");
+                emissiveMat.SetColor("_EmissionColor", new Color(2.5f, 2.3f, 1.8f));
+            }
+        }
+
+        if (emissiveMat != null)
+        {
+            MeshRenderer mr = bulb.GetComponent<MeshRenderer>();
+            if (mr != null) mr.sharedMaterial = emissiveMat;
+        }
     }
 
 
@@ -782,7 +915,7 @@ public class LevelGenerator : MonoBehaviour
     {
         removedDuplicateWallsCount = 0;
 
-        // 1. Собираем все стены префабов комнат
+        // 1. Собираем все стены префабов комнат и процедурно установленные стены (spawnedWalls)
         List<GameObject> roomWalls = new List<GameObject>();
 
         foreach (GameObject room in spawnedRooms)
@@ -809,7 +942,19 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
-        // 2. Ликвидация Z-fighting (строго для пар стен из РАЗНЫХ комнат, находящихся в одной плоскости):
+        // Добавляем процедурные стены (DestructibleWall и SolidWall из spawnedWalls)
+        if (spawnedWalls != null)
+        {
+            foreach (var sw in spawnedWalls)
+            {
+                if (sw != null && sw.activeSelf && !roomWalls.Contains(sw))
+                {
+                    roomWalls.Add(sw);
+                }
+            }
+        }
+
+        // 2. Ликвидация Z-fighting и дублирующих друг друга стен
         HashSet<GameObject> wallsToDisable = new HashSet<GameObject>();
 
         for (int i = 0; i < roomWalls.Count; i++)
@@ -819,51 +964,82 @@ public class LevelGenerator : MonoBehaviour
 
             Renderer rendA = wallA.GetComponent<Renderer>();
             Collider colA = wallA.GetComponent<Collider>();
-            Bounds bA = rendA != null ? rendA.bounds : colA.bounds;
-
-            Vector3 fwdA = wallA.transform.forward;
+            Bounds bA = rendA != null ? rendA.bounds : (colA != null ? colA.bounds : new Bounds(wallA.transform.position, Vector3.one));
 
             for (int j = i + 1; j < roomWalls.Count; j++)
             {
                 GameObject wallB = roomWalls[j];
                 if (wallB == null || !wallB.activeSelf || wallsToDisable.Contains(wallB)) continue;
 
-                // Стены одной и той же комнаты никогда не конфликтуют
-                if (GetRoomRoot(wallA) == GetRoomRoot(wallB)) continue;
-
                 Renderer rendB = wallB.GetComponent<Renderer>();
                 Collider colB = wallB.GetComponent<Collider>();
-                Bounds bB = rendB != null ? rendB.bounds : colB.bounds;
+                Bounds bB = rendB != null ? rendB.bounds : (colB != null ? colB.bounds : new Bounds(wallB.transform.position, Vector3.one));
 
-                // Проверяем параллельность нормалей стен (угол ~ 0 или 180 градусов)
-                Vector3 fwdB = wallB.transform.forward;
-                float dot = Mathf.Abs(Vector3.Dot(fwdA, fwdB));
-                if (dot < 0.85f) continue;
+                // 1. Проверка по вертикали (стены на разных этажах никогда не конфликтуют)
+                if (Mathf.Abs(bA.center.y - bB.center.y) > 0.85f) continue;
 
-                // Проверяем расстояние между плоскостями стен (должны быть в пределах 0.3м друг от друга)
-                Vector3 centerDiff = bA.center - bB.center;
-                float distAlongNormal = Mathf.Abs(Vector3.Dot(centerDiff, fwdA));
-                if (distAlongNormal > 0.35f) continue;
+                // 2. Стены одной и той же комнаты пропускаем (за исключением абсолютных дубликатов в одной точке < 0.25м)
+                bool sameRoom = GetRoomRoot(wallA) == GetRoomRoot(wallB);
+                float dist3D = Vector3.Distance(bA.center, bB.center);
+                if (sameRoom && dist3D > 0.25f) continue;
 
-                // Проверяем перекрытие в горизонтальной плоскости (2D overlap по осям стены)
-                Vector3 tangentA = Vector3.Cross(Vector3.up, fwdA).normalized;
-                float projCenterA = Vector3.Dot(bA.center, tangentA);
-                float projCenterB = Vector3.Dot(bB.center, tangentA);
+                // 3. Определение ориентации стен (вдоль оси X или вдоль оси Z)
+                bool isA_alongX = (bA.size.x > bA.size.z);
+                bool isB_alongX = (bB.size.x > bB.size.z);
 
-                float halfExtentA = Mathf.Abs(Vector3.Dot(bA.extents, tangentA));
-                float halfExtentB = Mathf.Abs(Vector3.Dot(bB.extents, tangentA));
+                // ПЕРПЕНДИКУЛЯРНЫЕ СТЕНЫ (одна вдоль X, другая вдоль Z) образуют угол комнат и НИКОГДА не удаляются!
+                if (isA_alongX != isB_alongX) continue;
 
-                float minA = projCenterA - halfExtentA;
-                float maxA = projCenterA + halfExtentA;
-                float minB = projCenterB - halfExtentB;
-                float maxB = projCenterB + halfExtentB;
+                // 4. Проверка копланарности (расстояние между плоскостями параллельных стен по нормали)
+                float normalDist = isA_alongX ? Mathf.Abs(bA.center.z - bB.center.z) : Mathf.Abs(bA.center.x - bB.center.x);
+                if (normalDist > 0.35f) continue;
 
-                float overlap = Mathf.Min(maxA, maxB) - Mathf.Max(minA, minB);
+                // 5. Проверка длины и взаимного перекрытия
+                float lenA = isA_alongX ? bA.size.x : bA.size.z;
+                float lenB = isB_alongX ? bB.size.x : bB.size.z;
+                float minLen = Mathf.Min(lenA, lenB);
 
-                // Если стены реально накладываются друг на друга вдоль своей длины более чем на 0.5м
-                if (overlap > 0.5f && Mathf.Abs(bA.center.y - bB.center.y) < 1.5f)
+                float overlap = isA_alongX
+                    ? (Mathf.Min(bA.max.x, bB.max.x) - Mathf.Max(bA.min.x, bB.min.x))
+                    : (Mathf.Min(bA.max.z, bB.max.z) - Mathf.Max(bA.min.z, bB.min.z));
+
+                // Стены, стоящие в стык друг за другом вдоль коридора (overlap ~ 0), НЕ являются дубликатами!
+                // Для признания дубликатом они должны перекрываться минимум на 70% длины меньшей стены:
+                if (overlap < minLen * 0.70f) continue;
+
+                // 6. ЗАЩИТА БОЛЬШИХ ВНЕШНИХ СТЕН:
+                // Если одна стена — длинная стена комнаты (например, 16м в S3), а вторая — короткая перегородка (например, 4м),
+                // длинная стена НИ ПРИ КАКИХ ОБСТОЯТЕЛЬСТВАХ не удаляется!
+                if (lenA >= lenB * 1.5f && lenA > 6f)
                 {
-                    // Найдено наложение! Отключаем стену B, стена A остаётся перегородкой
+                    // Сохраняем стену A, отключаем дублирующую короткую стену B
+                    wallsToDisable.Add(wallB);
+                    continue;
+                }
+                if (lenB >= lenA * 1.5f && lenB > 6f)
+                {
+                    // Сохраняем стену B, отключаем дублирующую короткую стену A
+                    wallsToDisable.Add(wallA);
+                    break;
+                }
+
+                // 7. Разрешение между сравнимыми по размеру параллельными стенками:
+                // Приоритет: разрушаемая стена (DestructibleWall) ВСЕГДА сохраняется перед глухой
+                DestructibleWall destA = wallA.GetComponentInParent<DestructibleWall>();
+                DestructibleWall destB = wallB.GetComponentInParent<DestructibleWall>();
+
+                if (destA != null && destB == null)
+                {
+                    wallsToDisable.Add(wallB);
+                }
+                else if (destB != null && destA == null)
+                {
+                    wallsToDisable.Add(wallA);
+                    break;
+                }
+                else
+                {
+                    // Одинаковые стены — отключаем wallB, wallA остаётся
                     wallsToDisable.Add(wallB);
                 }
             }
@@ -878,7 +1054,7 @@ public class LevelGenerator : MonoBehaviour
             }
         }
 
-        Debug.Log($"<color=green>[SmartWalls 3.0] Устранено {removedDuplicateWallsCount} наложений стен! Боковые стены сохранены.</color>");
+        Debug.Log($"<color=green>[SmartWalls 4.0] Устранено {removedDuplicateWallsCount} конфликтов/наложений стен! DestructibleWall сохранены.</color>");
     }
 
     private void SetupSpecialInteractables()
@@ -893,33 +1069,30 @@ public class LevelGenerator : MonoBehaviour
                 if (t.name.ToLower().Contains("safedoor"))
                 {
                     VaultDoor vd = t.GetComponent<VaultDoor>();
+                    if (vd == null) vd = t.GetComponentInParent<VaultDoor>();
+                    if (vd == null) vd = t.GetComponentInChildren<VaultDoor>();
                     if (vd == null)
                     {
                         vd = t.gameObject.AddComponent<VaultDoor>();
                     }
+                    vd.AutoConfigureReferences();
 
-                    // Настройка точного коллайдера для дверей сейфов по геометрии модели
+                    // Удаляем узкий невыпуклый MeshCollider, который мешает рейкастам
+                    MeshCollider mc = t.GetComponent<MeshCollider>();
+                    if (mc != null && !mc.convex) DestroyImmediate(mc);
+
+                    BoxCollider box = t.GetComponent<BoxCollider>();
+                    if (box == null) box = t.gameObject.AddComponent<BoxCollider>();
                     MeshFilter mf = t.GetComponent<MeshFilter>();
-                    Collider existingCol = t.GetComponent<Collider>();
-                    if (existingCol == null)
+                    if (mf != null && mf.sharedMesh != null)
                     {
-                        if (mf != null && mf.sharedMesh != null)
-                        {
-                            var mc = t.gameObject.AddComponent<MeshCollider>();
-                            mc.sharedMesh = mf.sharedMesh;
-                            mc.convex = false;
-                        }
-                        else
-                        {
-                            var box = t.gameObject.AddComponent<BoxCollider>();
-                            box.size = new Vector3(1.4f, 2.4f, 0.5f);
-                        }
-                    }
-                    else if (existingCol is BoxCollider box && mf != null && mf.sharedMesh != null)
-                    {
-                        // Центрируем BoxCollider по реальным границам меша
                         box.center = mf.sharedMesh.bounds.center;
-                        box.size = Vector3.Max(mf.sharedMesh.bounds.size, new Vector3(0.5f, 0.5f, 0.3f));
+                        box.size = Vector3.Max(mf.sharedMesh.bounds.size, new Vector3(1.4f, 2.2f, 0.6f));
+                    }
+                    else
+                    {
+                        box.center = Vector3.zero;
+                        box.size = new Vector3(1.4f, 2.2f, 0.6f);
                     }
                     safeDoorsCount++;
                 }
@@ -934,7 +1107,52 @@ public class LevelGenerator : MonoBehaviour
         if (vanSpawnPoint != null)
         {
             EnsureTrunkExtractionZone(vanSpawnPoint.gameObject);
+            EnsureVanLighting(vanSpawnPoint.gameObject);
         }
+
+        // 3. Автоматическая настройка разрушаемых лампочек и атмосферного мерцания
+        int breakableLightsCount = 0;
+        foreach (GameObject room in spawnedRooms)
+        {
+            if (room == null) continue;
+            foreach (Light l in room.GetComponentsInChildren<Light>(true))
+            {
+                if (l.type == LightType.Directional) continue;
+
+                // Назначаем BreakableLight напрямую на сам объект источника света (а не на стену-родитель!)
+                BreakableLight bl = l.GetComponent<BreakableLight>();
+                if (bl == null)
+                {
+                    bl = l.gameObject.AddComponent<BreakableLight>();
+                }
+                bl.targetLight = l;
+                bl.FindBulbRenderer();
+                bl.InitializeComponents();
+                breakableLightsCount++;
+            }
+        }
+        if (breakableLightsCount > 0)
+        {
+            Debug.Log($"<color=yellow>[Gen] Настроено разрушаемых лампочек с мерцанием: {breakableLightsCount}</color>");
+        }
+    }
+
+    private void EnsureVanLighting(GameObject vanObj)
+    {
+        if (vanObj == null) return;
+        Transform existingLight = vanObj.transform.Find("VanStreetLamp");
+        if (existingLight != null) return;
+
+        GameObject lampObj = new GameObject("VanStreetLamp");
+        lampObj.transform.SetParent(vanObj.transform, false);
+        lampObj.transform.localPosition = new Vector3(0f, 4.5f, 2.5f);
+
+        Light lamp = lampObj.AddComponent<Light>();
+        lamp.type = LightType.Point;
+        lamp.range = 16f;
+        lamp.color = new Color(1.0f, 0.72f, 0.38f); // Теплый янтарный свет уличного фонаря базы
+        lamp.intensity = 2.0f;
+        lamp.shadows = LightShadows.None; // 0 нагрузки на видеокарту
     }
 
     private void EnsureTrunkExtractionZone(GameObject vanObj)

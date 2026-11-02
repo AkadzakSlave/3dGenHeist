@@ -528,6 +528,43 @@ public class WeaponItem : EquipableItem
                     }
                     Debug.Log($"[Weapon] Pellet hit {enemyHealth.name} for {damage}.");
                 }
+
+                BreakableLight bulb = hit.collider.GetComponentInParent<BreakableLight>();
+                if (bulb == null) bulb = hit.collider.GetComponentInChildren<BreakableLight>();
+
+                // Если пуля попала в плафон, крепление или стену в непосредственной близости от лампочки (< 0.7м)
+                if (bulb == null)
+                {
+                    Collider[] nearby = Physics.OverlapSphere(hit.point, 0.65f);
+                    foreach (var c in nearby)
+                    {
+                        BreakableLight cand = c.GetComponentInParent<BreakableLight>();
+                        if (cand == null) cand = c.GetComponentInChildren<BreakableLight>();
+                        if (cand != null && !cand.isBroken)
+                        {
+                            bulb = cand;
+                            break;
+                        }
+                    }
+                }
+
+                if (bulb == null)
+                {
+                    for (int lIdx = 0; lIdx < BreakableLight.ActiveLights.Count; lIdx++)
+                    {
+                        var bl = BreakableLight.ActiveLights[lIdx];
+                        if (bl != null && !bl.isBroken && Vector3.Distance(bl.transform.position, hit.point) <= 0.70f)
+                        {
+                            bulb = bl;
+                            break;
+                        }
+                    }
+                }
+
+                if (bulb != null && !bulb.isBroken)
+                {
+                    bulb.Break();
+                }
             }
             else
             {

@@ -42,7 +42,7 @@ public class HeistMinimap : MonoBehaviour
     public float notificationFontSize = 13f;
 
     [Header("Visibility & Modes")]
-    public bool isMinimapVisible = true;
+    public bool isMinimapVisible = false;
     [Tooltip("Показывать отладочные маркеры врагов (красные точки). Переключается клавишей F4")]
     public bool showEnemiesOnMap = true;
     [Tooltip("Показывать слабый силуэт неисследованных комнат (архитектурный чертеж)")]
@@ -56,26 +56,26 @@ public class HeistMinimap : MonoBehaviour
     public Color lootColor = new Color(1.0f, 0.85f, 0.20f, 0.95f);
     public float lootDotSize = 5.5f;
 
-    [Header("Theme Colors (Blueprint Styling)")]
-    public Color radarBgColor = new Color(0.04f, 0.07f, 0.12f, 0.94f);
-    public Color radarBorderColor = new Color(0.18f, 0.55f, 0.95f, 0.90f);
-    public Color headerBgColor = new Color(0.07f, 0.13f, 0.22f, 0.98f);
-    public Color exploredRoomColor = new Color(0.08f, 0.24f, 0.44f, 0.88f);
-    public Color exploredRoomBorderColor = new Color(0.28f, 0.72f, 1.0f, 0.92f);
-    public Color unexploredColor = new Color(0.06f, 0.11f, 0.18f, 0.42f);
-    public Color unexploredBorderColor = new Color(0.14f, 0.25f, 0.38f, 0.45f);
+    [Header("Theme Colors (Warm Noir / Heist Styling)")]
+    public Color radarBgColor = new Color(0.08f, 0.07f, 0.05f, 0.94f);
+    public Color radarBorderColor = new Color(0.85f, 0.65f, 0.22f, 0.90f);
+    public Color headerBgColor = new Color(0.16f, 0.12f, 0.08f, 0.98f);
+    public Color exploredRoomColor = new Color(0.24f, 0.18f, 0.11f, 0.88f);
+    public Color exploredRoomBorderColor = new Color(0.90f, 0.72f, 0.32f, 0.92f);
+    public Color unexploredColor = new Color(0.10f, 0.08f, 0.06f, 0.45f);
+    public Color unexploredBorderColor = new Color(0.35f, 0.28f, 0.18f, 0.45f);
     public Color vaultColor = new Color(0.95f, 0.72f, 0.12f, 0.95f);
     public Color vaultBorderColor = new Color(1.0f, 0.88f, 0.35f, 1.0f);
-    public Color vanColor = new Color(0.12f, 0.82f, 0.45f, 0.95f);
-    public Color vanBorderColor = new Color(0.35f, 1.0f, 0.65f, 1.0f);
-    public Color playerColor = new Color(0.20f, 0.95f, 1.0f, 1f);
-    public Color enemyColor = new Color(1.0f, 0.22f, 0.22f, 0.95f);
+    public Color vanColor = new Color(0.20f, 0.75f, 0.40f, 0.95f);
+    public Color vanBorderColor = new Color(0.40f, 0.95f, 0.55f, 1.0f);
+    public Color playerColor = new Color(1.0f, 0.85f, 0.35f, 1f);
+    public Color enemyColor = new Color(0.95f, 0.25f, 0.22f, 0.95f);
 
     [Header("Alert State")]
     public string defaultTickerText = "СТАТУС: ОБЪЕКТ ПОД НАБЛЮДЕНИЕМ";
-    public Color defaultTickerColor = new Color(0.35f, 0.75f, 1.0f, 0.85f);
+    public Color defaultTickerColor = new Color(0.95f, 0.80f, 0.40f, 0.90f);
     public string currentAlertText = "СТАТУС: ОБЪЕКТ ПОД НАБЛЮДЕНИЕМ";
-    public Color currentAlertColor = new Color(0.35f, 0.75f, 1.0f, 0.85f);
+    public Color currentAlertColor = new Color(0.95f, 0.80f, 0.40f, 0.90f);
     private float alertResetTimer = 0f;
 
     // UI элементы
@@ -130,6 +130,9 @@ public class HeistMinimap : MonoBehaviour
         }
 
         BuildMinimapUI();
+        if (rootPanel != null) rootPanel.gameObject.SetActive(false);
+        if (tickerRect != null) tickerRect.gameObject.SetActive(false);
+        transform.SetSiblingIndex(0);
     }
 
     private void Start()
@@ -139,6 +142,20 @@ public class HeistMinimap : MonoBehaviour
 
         BuildMinimapUI();
         ApplyLayout();
+
+        // По умолчанию миникарта выключена, включается по клавише [M]
+        isMinimapVisible = false;
+        if (rootPanel != null)
+        {
+            rootPanel.gameObject.SetActive(false);
+        }
+        if (tickerRect != null)
+        {
+            tickerRect.gameObject.SetActive(false);
+        }
+
+        // Миникарта является частью фонового HUD и всегда рендерится под меню/диалогами
+        transform.SetSiblingIndex(0);
 
         if (Application.isPlaying)
         {
@@ -230,6 +247,16 @@ public class HeistMinimap : MonoBehaviour
         }
         BuildMinimapUI();
         ApplyLayout();
+
+        // По умолчанию миникарта выключена, включается по клавише [M]
+        if (rootPanel != null)
+        {
+            rootPanel.gameObject.SetActive(isMinimapVisible);
+        }
+        if (tickerRect != null)
+        {
+            tickerRect.gameObject.SetActive(isMinimapVisible);
+        }
     }
 
     public void BuildMinimapUI()
@@ -385,7 +412,7 @@ public class HeistMinimap : MonoBehaviour
             headerText.fontSize = 12.5f;
             headerText.fontStyle = FontStyles.Bold;
             headerText.alignment = TextAlignmentOptions.MidlineLeft;
-            headerText.color = new Color(0.40f, 0.85f, 1.0f, 0.95f);
+            headerText.color = new Color(1.0f, 0.85f, 0.38f, 0.95f);
             headerText.text = "ТАКТИЧЕСКИЙ ПЛАН [M]";
 
             // Координаты игрока в правом углу шапки
@@ -403,7 +430,7 @@ public class HeistMinimap : MonoBehaviour
             coordsText.fontSize = 11.5f;
             coordsText.fontStyle = FontStyles.Bold;
             coordsText.alignment = TextAlignmentOptions.MidlineRight;
-            coordsText.color = new Color(0.40f, 0.70f, 0.95f, 0.85f);
+            coordsText.color = new Color(0.95f, 0.78f, 0.40f, 0.85f);
             coordsText.text = "X: 00  Z: 00";
         }
         else
@@ -525,12 +552,14 @@ public class HeistMinimap : MonoBehaviour
         {
             headerText.fontSize = 12.5f;
             headerText.fontStyle = FontStyles.Bold;
+            headerText.color = new Color(1.0f, 0.85f, 0.38f, 0.95f);
         }
 
         if (coordsText != null)
         {
             coordsText.fontSize = 11.5f;
             coordsText.fontStyle = FontStyles.Bold;
+            coordsText.color = new Color(0.95f, 0.78f, 0.40f, 0.85f);
         }
 
         if (tickerRect != null)
@@ -553,12 +582,31 @@ public class HeistMinimap : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Проверяет, открыто ли в данный момент любое меню (пауза, магазин, выбор досье, терминал)
+    /// </summary>
+    public static bool IsAnyMenuOpen()
+    {
+        if (PauseMenuUI.Instance != null && PauseMenuUI.Instance.IsPaused) return true;
+        if (MainMenuUI.Instance != null && MainMenuUI.Instance.IsMainMenuActive) return true;
+        if (StoreUI.Instance != null && StoreUI.Instance.IsStoreOpen) return true;
+        if (DossierSelectionUI.Instance != null && DossierSelectionUI.Instance.IsDossierOpen) return true;
+        if (MapSelectionUI.Instance != null && MapSelectionUI.Instance.IsMapOpen) return true;
+        if (DonResultUI.Instance != null && DonResultUI.Instance.isOpen) return true;
+        if (HeistTruckStorageUI.Instance != null && HeistTruckStorageUI.Instance.IsOpen) return true;
+        if (HeistUI.Instance != null && HeistUI.Instance.loadingScreenPanel != null && HeistUI.Instance.loadingScreenPanel.activeSelf) return true;
+        return false;
+    }
+
     private void Update()
     {
-        // 1. Горячая клавиша [M] для включения/выключения карты
+        // 1. Горячая клавиша [M] для включения/выключения карты (только в геймплее, не во время меню)
         if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.mKey.wasPressedThisFrame)
         {
-            ToggleMinimap();
+            if (!IsAnyMenuOpen())
+            {
+                ToggleMinimap();
+            }
         }
 
         // Горячая клавиша [F4] для переключения отладочных меток врагов
@@ -577,15 +625,20 @@ public class HeistMinimap : MonoBehaviour
 
         if (rootPanel == null) return;
 
-        if (!isMinimapVisible)
+        // Карта является частью HUD и никогда не перекрывает меню паузы, магазин, досье или результаты
+        bool menuOpen = IsAnyMenuOpen();
+        bool shouldShow = isMinimapVisible && !menuOpen;
+
+        if (rootPanel.gameObject.activeSelf != shouldShow)
         {
-            if (rootPanel.gameObject.activeSelf) rootPanel.gameObject.SetActive(false);
-            if (tickerRect != null && tickerRect.gameObject.activeSelf) tickerRect.gameObject.SetActive(false);
-            return;
+            rootPanel.gameObject.SetActive(shouldShow);
+        }
+        if (tickerRect != null && tickerRect.gameObject.activeSelf != shouldShow)
+        {
+            tickerRect.gameObject.SetActive(shouldShow);
         }
 
-        if (!rootPanel.gameObject.activeSelf) rootPanel.gameObject.SetActive(true);
-        if (tickerRect != null && !tickerRect.gameObject.activeSelf) tickerRect.gameObject.SetActive(true);
+        if (!shouldShow) return;
 
         if (!Application.isPlaying) return;
 
@@ -1036,6 +1089,9 @@ public class HeistMinimap : MonoBehaviour
 
     public void ToggleMinimap()
     {
+        // Не открываем карту во время паузы, магазина, терминала или выбора миссии
+        if (IsAnyMenuOpen()) return;
+
         isMinimapVisible = !isMinimapVisible;
         if (rootPanel != null)
         {

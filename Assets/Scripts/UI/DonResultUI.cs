@@ -73,6 +73,7 @@ public class DonResultUI : MonoBehaviour
     /// </summary>
     public void ShowResults(int total, int quota, int clean, int session, int nextQuota = 0, int quotaNumber = 1, bool isSuccess = true)
     {
+        gameObject.SetActive(true);
         if (panel != null) panel.SetActive(true);
         isOpen = true;
 
@@ -85,8 +86,21 @@ public class DonResultUI : MonoBehaviour
             continueButton.interactable = false;
         }
 
-        if (activeAnimRoutine != null) StopCoroutine(activeAnimRoutine);
-        activeAnimRoutine = StartCoroutine(AnimateResultsRoutine(total, quota, clean, session, nextQuota, quotaNumber, isSuccess));
+        if (activeAnimRoutine != null)
+        {
+            StopCoroutine(activeAnimRoutine);
+            activeAnimRoutine = null;
+        }
+
+        // Если объект активен в иерархии — запускаем стандартно, если нет — через постоянный GameManager
+        if (gameObject.activeInHierarchy)
+        {
+            activeAnimRoutine = StartCoroutine(AnimateResultsRoutine(total, quota, clean, session, nextQuota, quotaNumber, isSuccess));
+        }
+        else if (GameManager.Instance != null)
+        {
+            GameManager.Instance.StartCoroutine(AnimateResultsRoutine(total, quota, clean, session, nextQuota, quotaNumber, isSuccess));
+        }
     }
 
     private IEnumerator AnimateResultsRoutine(int total, int quota, int clean, int session, int nextQuota, int quotaNumber, bool isSuccess)
@@ -196,9 +210,37 @@ public class DonResultUI : MonoBehaviour
 
         isOpen = false;
         if (panel != null) panel.SetActive(false);
+        gameObject.SetActive(false);
 
         // Курсор блокируется обратно только если мы в игре/лобби
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
+
+#if UNITY_EDITOR
+    [ContextMenu("👁️ Preview In Editor (Show)")]
+    public void EditorPreviewShow()
+    {
+        if (panel != null) panel.SetActive(true);
+        gameObject.SetActive(true);
+    }
+
+    [ContextMenu("🙈 Preview In Editor (Hide)")]
+    public void EditorPreviewHide()
+    {
+        if (panel != null) panel.SetActive(false);
+    }
+
+    [ContextMenu("🧪 Test Show Results (Quota Met)")]
+    public void EditorTestShowSuccess()
+    {
+        ShowResults(4500, 3000, 1500, 1500, 1500, 4000, true);
+    }
+
+    [ContextMenu("🧪 Test Show Results (Quota Failed)")]
+    public void EditorTestShowFailed()
+    {
+        ShowResults(1800, 3000, -1200, 0, 0, 3000, false);
+    }
+#endif
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 public class StoreTerminal : MonoBehaviour, IInteractable
 {
     [Header("Terminal Configuration")]
-    public string terminalTitle = "Team Store & Equipment Storage";
+    public string terminalTitle = "Оружейная и склад (Магазин / Загрузка)";
 
     public void Interact()
     {
@@ -13,7 +13,15 @@ public class StoreTerminal : MonoBehaviour, IInteractable
         }
         else
         {
-            Debug.LogError("[StoreTerminal] StoreUI.Instance не найден на сцене!");
+            StoreUI store = FindAnyObjectByType<StoreUI>(FindObjectsInactive.Include);
+            if (store != null)
+            {
+                store.OpenStore();
+            }
+            else
+            {
+                Debug.LogError("[StoreTerminal] StoreUI не найден на сцене!");
+            }
         }
     }
 

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.InputSystem;
 
 public enum ItemHoldingMode
@@ -9,6 +9,8 @@ public enum ItemHoldingMode
 
 public class PlayerInteraction : MonoBehaviour
 {
+    public static PlayerInteraction Instance { get; private set; }
+    private VaultDoor activeHoldingVault = null;
     [Header("Settings")]
     public Transform playerCamera;
     public Transform playerBody;
@@ -66,6 +68,16 @@ public class PlayerInteraction : MonoBehaviour
     private readonly System.Collections.Generic.Dictionary<Transform, Vector3> baseItemPositions = new System.Collections.Generic.Dictionary<Transform, Vector3>();
     private readonly System.Collections.Generic.Dictionary<Transform, Quaternion> baseItemRotations = new System.Collections.Generic.Dictionary<Transform, Quaternion>();
     private Transform lastActiveItemTransform = null;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
+    }
 
     private void Start()
     {
@@ -129,6 +141,18 @@ public class PlayerInteraction : MonoBehaviour
 
     void Update()
     {
+        if ((StoreUI.Instance != null && StoreUI.Instance.IsStoreOpen) ||
+            (DonResultUI.Instance != null && DonResultUI.Instance.isOpen))
+        {
+            if (highlighter != null) highlighter.ClearHighlight();
+            if (GameManager.Instance != null && GameManager.Instance.heistUI != null)
+            {
+                GameManager.Instance.heistUI.SetInteractionText("");
+                GameManager.Instance.heistUI.SetReticleFocus(false);
+            }
+            return;
+        }
+
         UpdateInteractionUI();
         HandleHoldInteraction();
 
@@ -141,15 +165,32 @@ public class PlayerInteraction : MonoBehaviour
 
     private void HandleHoldInteraction()
     {
-        bool isEKeyPressed = inputReader != null ? inputReader.IsInteractPressed : 
-            (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.eKey.isPressed);
+        bool isEKeyPressed = (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.eKey.isPressed) ||
+                             (inputReader != null && inputReader.IsInteractPressed);
 
-        bool eWasPressed = (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.eKey.wasPressedThisFrame);
-        bool lmbPressed = (UnityEngine.InputSystem.Mouse.current != null && UnityEngine.InputSystem.Mouse.current.leftButton.wasPressedThisFrame);
+        // 1. Если игрок удерживает [E] на сейфе — продолжаем взлом без срывов от микродвижений взгляда
+        if (activeHoldingVault != null)
+        {
+            if (!isEKeyPressed || Vector3.Distance(transform.position, activeHoldingVault.transform.position) > 5.0f || !activeHoldingVault.isLocked || activeHoldingVault.isOpen)
+            {
+                activeHoldingVault.CancelHoldInteraction();
+                activeHoldingVault = null;
+            }
+            else
+            {
+                activeHoldingVault.ProcessHoldInteraction(Time.deltaTime, true, transform.position);
+                return;
+            }
+        }
 
+        // 2. Старт удержания, если смотрим на закрытый сейф
         if (cachedInteractable is VaultDoor vaultDoor)
         {
-            vaultDoor.ProcessLockpick(Time.deltaTime, isEKeyPressed, eWasPressed, lmbPressed, transform.position);
+            if (isEKeyPressed && vaultDoor.isLocked && !vaultDoor.isOpen)
+            {
+                activeHoldingVault = vaultDoor;
+            }
+            vaultDoor.ProcessHoldInteraction(Time.deltaTime, isEKeyPressed, transform.position);
         }
         else if (cachedInteractable is HeistExtractionZone extractionZone)
         {
@@ -320,13 +361,26 @@ public class PlayerInteraction : MonoBehaviour
         if (playerCamera == null) return;
         if (GameManager.Instance == null || GameManager.Instance.heistUI == null) return;
 
-        cachedInteractable = FindBestInteractable(out lastHitCollider);
-        if (cachedInteractable == null && HeistExtractionZone.ActiveTrunkZone != null)
+        if (activeHoldingVault != null)
         {
-            cachedInteractable = HeistExtractionZone.ActiveTrunkZone;
+            cachedInteractable = activeHoldingVault;
+        }
+        else
+        {
+            cachedInteractable = FindBestInteractable(out lastHitCollider);
+            if (cachedInteractable == null && HeistExtractionZone.ActiveTrunkZone != null)
+            {
+                cachedInteractable = HeistExtractionZone.ActiveTrunkZone;
+            }
         }
 
         string prompt = "";
+        if ((StoreUI.Instance != null && StoreUI.Instance.IsStoreOpen) ||
+            (DonResultUI.Instance != null && DonResultUI.Instance.isOpen))
+        {
+            return;
+        }
+
         if (cachedInteractable != null)
         {
             string raw = cachedInteractable.GetInteractText();
@@ -376,6 +430,17 @@ public class PlayerInteraction : MonoBehaviour
             {
                 if (hit.collider == null || hit.collider.transform.IsChildOf(transform)) continue;
                 IInteractable direct = hit.collider.GetComponentInParent<IInteractable>();
+                if (direct == null) direct = hit.collider.GetComponentInChildren<IInteractable>();
+                if (direct == null)
+                {
+                    Transform cur = hit.collider.transform;
+                    for (int lvl = 0; lvl < 4 && cur != null; lvl++)
+                    {
+                        direct = cur.GetComponentInChildren<VaultDoor>();
+                        if (direct != null) break;
+                        cur = cur.parent;
+                    }
+                }
                 if (direct != null && IsInteractableAvailable(direct))
                 {
                     bestCollider = hit.collider;
@@ -404,6 +469,17 @@ public class PlayerInteraction : MonoBehaviour
             if (col.transform.IsChildOf(transform)) continue;
 
             IInteractable candidate = col.GetComponentInParent<IInteractable>();
+            if (candidate == null) candidate = col.GetComponentInChildren<IInteractable>();
+            if (candidate == null)
+            {
+                Transform cur = col.transform;
+                for (int lvl = 0; lvl < 4 && cur != null; lvl++)
+                {
+                    candidate = cur.GetComponentInChildren<VaultDoor>();
+                    if (candidate != null) break;
+                    cur = cur.parent;
+                }
+            }
             if (candidate == null || !IsInteractableAvailable(candidate)) continue;
             if (evaluated.Contains(candidate)) continue;
             evaluated.Add(candidate);
@@ -457,6 +533,12 @@ public class PlayerInteraction : MonoBehaviour
 
     private void TryInteract()
     {
+        if ((StoreUI.Instance != null && StoreUI.Instance.IsStoreOpen) ||
+            (DonResultUI.Instance != null && DonResultUI.Instance.isOpen))
+        {
+            return;
+        }
+
         if (cachedInteractable != null)
         {
             cachedInteractable.Interact();

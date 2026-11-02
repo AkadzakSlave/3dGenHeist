@@ -17,9 +17,24 @@ public class StoreCartCardUI : MonoBehaviour
         if (item == null) return;
 
         if (itemIcon != null) itemIcon.sprite = item.icon;
-        if (itemNameText != null) itemNameText.text = item.itemName;
-        if (itemQuantityText != null) itemQuantityText.text = $"x{quantity}";
-        if (itemSubtotalText != null) itemSubtotalText.text = $"${unitPrice * quantity}";
+
+        if (itemNameText != null)
+        {
+            itemNameText.text = item.itemName;
+            itemNameText.color = new Color(0.12f, 0.08f, 0.05f, 1f); // Dark ink
+        }
+
+        if (itemQuantityText != null)
+        {
+            itemQuantityText.text = $"x{quantity}";
+            itemQuantityText.color = new Color(0.35f, 0.28f, 0.22f, 1f); // Warm muted
+        }
+
+        if (itemSubtotalText != null)
+        {
+            itemSubtotalText.text = $"${unitPrice * quantity}";
+            itemSubtotalText.color = new Color(0.55f, 0.12f, 0.1f, 1f); // Crimson/dark red
+        }
 
         if (addButton != null)
         {

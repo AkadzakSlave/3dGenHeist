@@ -19,11 +19,36 @@ public class HeistExtractionZone : MonoBehaviour, IInteractable
     [Tooltip("3D надпись на багажнике фургона с суммой загруженного лута")]
     public TextMesh cargo3DText;
     public Vector3 textOffset = new Vector3(0f, 1.2f, -0.6f);
+    [Tooltip("Максимальная дистанция видимости текста фургона")]
+    public float maxVisibleDistance = 9f;
+
+    [Header("Audio (FMOD)")]
+    public FMODUnity.EventReference ambienceEvent;
+    private FMOD.Studio.EventInstance ambienceInstance;
 
     private void Start()
     {
         Ensure3DText();
         UpdateCargoDisplay();
+
+        // Фоновый уличный эмбиент возле фургона (на улице)
+        string ambiencePath = !ambienceEvent.IsNull ? ambienceEvent.Path : "event:/Environment/Ambience_Street";
+        if (!string.IsNullOrEmpty(ambiencePath))
+        {
+            try
+            {
+                ambienceInstance = FMODUnity.RuntimeManager.CreateInstance(ambiencePath);
+                Camera cam = Camera.main;
+                Vector3 listenerPos = cam != null ? cam.transform.position : transform.position;
+                ambienceInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(listenerPos));
+                ambienceInstance.setVolume(0.25f);
+                ambienceInstance.start();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[ExtractionZone] Ambience start warning: {ex.Message}");
+            }
+        }
 
         if (GameManager.Instance != null && GameManager.Instance.onMoneyChanged != null)
         {
@@ -46,6 +71,12 @@ public class HeistExtractionZone : MonoBehaviour, IInteractable
             ActiveTrunkZone = null;
         }
 
+        if (ambienceInstance.isValid())
+        {
+            ambienceInstance.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            ambienceInstance.release();
+        }
+
         if (GameManager.Instance != null && GameManager.Instance.onMoneyChanged != null)
         {
             GameManager.Instance.onMoneyChanged.RemoveListener(UpdateCargoDisplay);
@@ -56,6 +87,27 @@ public class HeistExtractionZone : MonoBehaviour, IInteractable
     {
         // Проверяем удержание кнопки E, когда игрок рядом с багажником
         HandleHoldInteraction();
+        UpdateCargoTextVisibility();
+
+        if (ambienceInstance.isValid())
+        {
+            Camera cam = Camera.main;
+            if (cam != null)
+            {
+                // Привязываем позицию к камере: окружает в обоих ушах одинаково при любом повороте
+                ambienceInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(cam.transform.position));
+
+                // Плавное затухание по мере удаления от фургона вглубь здания (тихий атмосферный фон)
+                float maxStreetVolume = 0.25f;
+                float dist = Vector3.Distance(cam.transform.position, transform.position);
+                float volume = maxStreetVolume;
+                if (dist > 10f)
+                {
+                    volume = Mathf.Clamp01(1f - ((dist - 10f) / 16f)) * maxStreetVolume; // затухает от 10м до 26м
+                }
+                ambienceInstance.setVolume(volume);
+            }
+        }
     }
 
     private void HandleHoldInteraction()
@@ -280,6 +332,39 @@ public class HeistExtractionZone : MonoBehaviour, IInteractable
             cargo3DText.anchor = TextAnchor.MiddleCenter;
             cargo3DText.fontStyle = FontStyle.Bold;
             cargo3DText.color = new Color(1f, 0.85f, 0.1f, 1f);
+        }
+    }
+
+    private void UpdateCargoTextVisibility()
+    {
+        if (cargo3DText == null) return;
+
+        Camera cam = Camera.main;
+        if (cam == null)
+        {
+            if (cargo3DText.gameObject.activeSelf) cargo3DText.gameObject.SetActive(false);
+            return;
+        }
+
+        Vector3 textPos = cargo3DText.transform.position;
+        Vector3 camPos = cam.transform.position;
+        float dist = Vector3.Distance(camPos, textPos);
+
+        // Простая проверка дистанции: виден строго в пределах 9 метров
+        if (dist > maxVisibleDistance)
+        {
+            if (cargo3DText.gameObject.activeSelf) cargo3DText.gameObject.SetActive(false);
+            return;
+        }
+
+        if (!cargo3DText.gameObject.activeSelf) cargo3DText.gameObject.SetActive(true);
+
+        // Поворачиваем текст лицом к игроку
+        Vector3 lookDir = textPos - camPos;
+        lookDir.y = 0;
+        if (lookDir.sqrMagnitude > 0.01f)
+        {
+            cargo3DText.transform.rotation = Quaternion.LookRotation(lookDir);
         }
     }
 

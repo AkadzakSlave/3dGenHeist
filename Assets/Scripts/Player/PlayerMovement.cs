@@ -146,6 +146,8 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         if (controller == null || !controller.enabled) return;
+        if ((StoreUI.Instance != null && StoreUI.Instance.IsStoreOpen) ||
+            (DonResultUI.Instance != null && DonResultUI.Instance.isOpen)) return;
 
         bool isGrounded = controller.isGrounded;
         

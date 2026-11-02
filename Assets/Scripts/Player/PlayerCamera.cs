@@ -64,8 +64,25 @@ public class PlayerCamera : MonoBehaviour
     }
 
     [Header("Visual Atmosphere (Noir Comic & Dust)")]
-    public bool enableNoirComicEffect = false;
+    public bool enableNoirComicEffect = true;
     public bool enableDustParticles = true;
+
+    [Header("Flashlight [F]")]
+    public bool enableFlashlight = true;
+    public Light flashlight;
+    public bool isFlashlightOn = false; // По умолчанию выключен в игре
+
+    private void OnValidate()
+    {
+        if (flashlight == null)
+        {
+            Transform flChild = transform.Find("PlayerFlashlight");
+            if (flChild != null)
+            {
+                flashlight = flChild.GetComponent<Light>();
+            }
+        }
+    }
 
     void Start()
     {
@@ -76,10 +93,11 @@ public class PlayerCamera : MonoBehaviour
             playerMovement = GetComponentInParent<PlayerMovement>();
         }
 
-        // Автоматически подключаем полноэкранный нуар/комикс эффект к камере
+        // Автоматически подключаем мягкий полноэкранный нуар/комикс эффект к камере
         if (enableNoirComicEffect && GetComponent<NoirPostProcessEffect>() == null)
         {
-            gameObject.AddComponent<NoirPostProcessEffect>();
+            var noir = gameObject.AddComponent<NoirPostProcessEffect>();
+            noir.ApplyPresetSubtleComic();
         }
 
         // Автоматически подключаем парящие пылинки по всей игре
@@ -89,6 +107,46 @@ public class PlayerCamera : MonoBehaviour
             dustObj.transform.SetParent(transform, false);
             var dust = dustObj.AddComponent<AtmosphericDust>();
             dust.followTarget = transform;
+        }
+
+        // 1. Ищем фонарик, настроенный на камере в префабе или на сцене
+        if (flashlight == null)
+        {
+            Transform flChild = transform.Find("PlayerFlashlight");
+            if (flChild != null)
+            {
+                flashlight = flChild.GetComponent<Light>();
+            }
+            else
+            {
+                flashlight = GetComponentInChildren<Light>();
+            }
+        }
+
+        // 2. Если фонарика не было в префабе, создаем его с аутентичным теплым винтажным светом 1930-х
+        if (enableFlashlight && flashlight == null)
+        {
+            GameObject flObj = new GameObject("PlayerFlashlight");
+            flObj.transform.SetParent(transform, false);
+            flObj.transform.localPosition = new Vector3(0f, 0f, 1f);
+
+            flashlight = flObj.AddComponent<Light>();
+            flashlight.type = LightType.Spot;
+            flashlight.range = 7f;
+            flashlight.spotAngle = 70f;
+            flashlight.innerSpotAngle = 35f;
+            flashlight.useColorTemperature = true;
+            flashlight.colorTemperature = 3500f;
+            flashlight.color = new Color(1.0f, 0.902f, 0.655f, 1.0f);
+            flashlight.intensity = 10f;
+            flashlight.shadows = LightShadows.Soft;
+            flashlight.shadowStrength = 0.942f;
+            flashlight.cookie = null;
+        }
+
+        if (flashlight != null)
+        {
+            flashlight.enabled = isFlashlightOn;
         }
 
         if (MainMenuUI.Instance != null && MainMenuUI.Instance.IsMainMenuActive)
@@ -115,7 +173,31 @@ public class PlayerCamera : MonoBehaviour
             ToggleThirdPersonView();
         }
 
-        if (Cursor.lockState != CursorLockMode.Locked) return;
+        // Переключение фонарика по клавише [F]
+        if (enableFlashlight && Keyboard.current != null && Keyboard.current.fKey.wasPressedThisFrame)
+        {
+            ToggleFlashlight();
+        }
+
+        // Переключение надписей статуса над головами охраны по [F8] (по умолчанию ВЫКЛ)
+        if (Keyboard.current != null && Keyboard.current.f8Key.wasPressedThisFrame)
+        {
+            EnemyController.ToggleOverheadDebugText();
+        }
+
+        // Если никакой UI не открыт — автоматически блокируем курсор без необходимости кликать по экрану
+        if (Cursor.lockState != CursorLockMode.Locked)
+        {
+            if (!IsAnyUiOpen())
+            {
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+            }
+            else
+            {
+                return;
+            }
+        }
 
         HandleMouseLook();
         HandleHeadBobbing();
@@ -124,6 +206,27 @@ public class PlayerCamera : MonoBehaviour
         HandleLandingImpact();
 
         ApplyCameraPosition();
+    }
+
+    public void ToggleFlashlight()
+    {
+        if (flashlight != null)
+        {
+            isFlashlightOn = !flashlight.enabled;
+            flashlight.enabled = isFlashlightOn;
+            Debug.Log($"<color=yellow>[Flashlight] Фонарик {(isFlashlightOn ? "ВКЛЮЧЕН" : "ВЫКЛЮЧЕН")} [F]</color>");
+        }
+    }
+
+    public static bool IsAnyUiOpen()
+    {
+        if (MainMenuUI.Instance != null && MainMenuUI.Instance.IsMainMenuActive) return true;
+        if (PauseMenuUI.Instance != null && PauseMenuUI.Instance.IsPaused) return true;
+        if (StoreUI.Instance != null && StoreUI.Instance.IsStoreOpen) return true;
+        if (DonResultUI.Instance != null && DonResultUI.Instance.isOpen) return true;
+        if (DossierSelectionUI.Instance != null && DossierSelectionUI.Instance.IsDossierOpen) return true;
+        if (MapSelectionUI.Instance != null && MapSelectionUI.Instance.IsMapOpen) return true;
+        return false;
     }
 
     private void HandleMouseLook()

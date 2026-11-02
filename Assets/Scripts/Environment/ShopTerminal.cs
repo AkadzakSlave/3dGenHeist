@@ -2,9 +2,9 @@ using UnityEngine;
 
 public enum ShopItemType
 {
-    FullStoreUI,
-    Weapon,
-    Ammo
+    Weapon = 0,
+    Ammo = 1,
+    FullStoreUI = 2
 }
 
 public class ShopTerminal : MonoBehaviour, IInteractable
@@ -22,13 +22,10 @@ public class ShopTerminal : MonoBehaviour, IInteractable
 
     public void Interact()
     {
-        if (itemType == ShopItemType.FullStoreUI || (StoreUI.Instance != null && itemType != ShopItemType.Weapon && itemType != ShopItemType.Ammo))
+        if (itemType == ShopItemType.FullStoreUI)
         {
-            if (StoreUI.Instance != null)
-            {
-                StoreUI.Instance.OpenStore();
-                return;
-            }
+            OpenFullStore();
+            return;
         }
 
         if (GameManager.Instance == null || PlayerInventory.Instance == null)
@@ -44,6 +41,26 @@ public class ShopTerminal : MonoBehaviour, IInteractable
         else if (itemType == ShopItemType.Ammo)
         {
             TryBuyAmmo();
+        }
+    }
+
+    private void OpenFullStore()
+    {
+        if (StoreUI.Instance != null)
+        {
+            StoreUI.Instance.OpenStore();
+        }
+        else
+        {
+            StoreUI store = FindAnyObjectByType<StoreUI>(FindObjectsInactive.Include);
+            if (store != null)
+            {
+                store.OpenStore();
+            }
+            else
+            {
+                Debug.LogError("[ShopTerminal] StoreUI не найден на сцене!");
+            }
         }
     }
 
@@ -120,9 +137,9 @@ public class ShopTerminal : MonoBehaviour, IInteractable
 
     public string GetInteractText()
     {
-        if (itemType == ShopItemType.FullStoreUI || (itemType != ShopItemType.Weapon && itemType != ShopItemType.Ammo))
+        if (itemType == ShopItemType.FullStoreUI)
         {
-            return "[E] Оружейная и склад (Магазин / Снаряжение)";
+            return "[E] Оружейная и склад (Магазин / Загрузка)";
         }
         else if (itemType == ShopItemType.Weapon)
         {

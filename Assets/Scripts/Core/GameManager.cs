@@ -389,6 +389,7 @@ public class GameManager : MonoBehaviour
         isProcessingPlayerWipe = true;
         if (heistUI != null) heistUI.ShowLoadingScreen();
         yield return new WaitForSecondsRealtime(0.5f);
+        isInLobby = true;
         if (lobbySpawnPoint != null)
         {
             yield return StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));
@@ -446,6 +447,7 @@ public class GameManager : MonoBehaviour
             levelGenerator.ClearLevel();
         }
 
+        isInLobby = true;
         if (lobbySpawnPoint != null)
         {
             yield return StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));
@@ -478,6 +480,10 @@ public class GameManager : MonoBehaviour
 
         if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
         if (HeistMinimap.Instance != null) HeistMinimap.Instance.ClearMinimap();
+
+        // Спасение снаряжения, оставленного в зоне улицы / фургона
+        RecoverStreetEquipmentToStorage();
+
         if (levelGenerator != null) levelGenerator.ClearLevel();
 
         BagTool bag = GetHeldBag();
@@ -505,6 +511,12 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            // Переход к боссу (День 3 завершен — переносим оставшееся снаряжение вылазки в Общий склад банды)
+            if (HeistLoadoutStorage.Instance != null)
+            {
+                HeistLoadoutStorage.Instance.ReturnAllToMainStorage();
+            }
+
             // Переход к боссу
             if (bossRoomSpawnPoint != null)
             {
@@ -529,9 +541,29 @@ public class GameManager : MonoBehaviour
 
         if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
         if (HeistMinimap.Instance != null) HeistMinimap.Instance.ClearMinimap();
+
+        // Спасение снаряжения, оставленного в зоне улицы / фургона
+        RecoverStreetEquipmentToStorage();
+
         if (levelGenerator != null) levelGenerator.ClearLevel();
         if (PlayerInventory.Instance != null)
         {
+            // Если игрок умер на улице (возле фургона), его инвентарь спасается в Хранилище вылазки (машину)
+            if (IsInStreetZone(PlayerInventory.Instance.transform.position))
+            {
+                if (PlayerInventory.Instance.slots != null)
+                {
+                    var hStorage = HeistLoadoutStorage.EnsureInstance();
+                    foreach (var slot in PlayerInventory.Instance.slots)
+                    {
+                        if (slot != null && slot.itemData != null)
+                        {
+                            hStorage.AddItem(slot.itemData, 1);
+                            Debug.Log($"<color=green>[HeistStorage] Игрок погиб на улице — снаряжение '{slot.itemData.itemName}' спасено в машину!</color>");
+                        }
+                    }
+                }
+            }
             PlayerInventory.Instance.ClearInventory();
             if (PlayerInventory.Instance.autoEquipDefaultLoadout)
             {
@@ -559,13 +591,20 @@ public class GameManager : MonoBehaviour
         }
         else
         {
+            // День 3 завершен — возвращаем всё уцелевшее снаряжение в Общий склад банды
+            if (HeistLoadoutStorage.Instance != null)
+            {
+                HeistLoadoutStorage.Instance.ReturnAllToMainStorage();
+            }
+
             if (bossRoomSpawnPoint != null)
             {
                 yield return StartCoroutine(TeleportPlayer(bossRoomSpawnPoint.position, bossRoomSpawnPoint.rotation));
                 ReviveAllPlayers();
                 isInLobby = false;
             }
-            else if (lobbySpawnPoint != null)
+            else isInLobby = true;
+        if (lobbySpawnPoint != null)
             {
                 yield return StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));
                 ReviveAllPlayers();
@@ -607,6 +646,64 @@ public class GameManager : MonoBehaviour
     }
 
     // ============================================
+    // СНАРЯЖЕНИЕ: СПАСЕНИЕ С УЛИЦЫ И ПОТЕРИ В БАНКЕ
+    // ============================================
+
+    public void RecoverStreetEquipmentToStorage()
+    {
+        HeistLoadoutStorage heistStorage = HeistLoadoutStorage.EnsureInstance();
+
+        WorldEquipment[] allEquip = FindObjectsByType<WorldEquipment>(FindObjectsInactive.Exclude);
+        if (allEquip == null || allEquip.Length == 0) return;
+
+        foreach (var we in allEquip)
+        {
+            if (we == null || we.itemData == null) continue;
+            if (we.GetComponentInParent<EquipmentBoard>() != null) continue;
+
+            if (IsInStreetZone(we.transform.position))
+            {
+                heistStorage.AddItem(we.itemData, 1);
+                Debug.Log($"<color=green>[HeistStorage] Предмет '{we.itemData.itemName}' спасён из зоны улицы в Хранилище вылазки (машину)!</color>");
+            }
+            else
+            {
+                Debug.Log($"<color=red>[HeistStorage] Предмет '{we.itemData.itemName}' оставлен в банке и потерян!</color>");
+            }
+        }
+    }
+
+    public bool IsInStreetZone(Vector3 position)
+    {
+        if (levelGenerator != null && levelGenerator.vanSpawnPoint != null)
+        {
+            float distToVan = Vector3.Distance(position, levelGenerator.vanSpawnPoint.position);
+            if (distToVan <= 35f) return true;
+        }
+
+        foreach (var rt in RoomTracker.All)
+        {
+            if (rt != null && rt.isStartOrVan)
+            {
+                if (rt.worldBounds.Contains(position) || Vector3.Distance(position, rt.transform.position) <= 25f)
+                {
+                    return true;
+                }
+            }
+        }
+
+        if (HeistExtractionZone.ActiveTrunkZone != null)
+        {
+            if (Vector3.Distance(position, HeistExtractionZone.ActiveTrunkZone.transform.position) <= 20f)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    // ============================================
     // БОСС И ОПЛАТА
     // ============================================
 
@@ -617,6 +714,11 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator ProcessBossResultRoutine(bool isSuccess)
     {
+        if (HeistLoadoutStorage.Instance != null)
+        {
+            HeistLoadoutStorage.Instance.ReturnAllToMainStorage();
+        }
+
         if (isSuccess)
         {
             int totalEarned = accumulatedOperationMoney;
@@ -654,7 +756,7 @@ public class GameManager : MonoBehaviour
             if (donResultUI != null)
             {
                 int nextTargetQuota = 3000 + (completedQuotas * 1500);
-                donResultUI.ShowResults(totalEarned, operationTargetQuota, cleanMoney, sessionShare, nextTargetQuota, completedQuotas, true);
+                try { donResultUI.ShowResults(totalEarned, operationTargetQuota, cleanMoney, sessionShare, nextTargetQuota, completedQuotas, true); } catch (System.Exception ex) { Debug.LogError(ex); }
                 while (donResultUI.isOpen)
                 {
                     yield return null;
@@ -679,7 +781,7 @@ public class GameManager : MonoBehaviour
 
             if (donResultUI != null)
             {
-                donResultUI.ShowResults(totalEarned, operationTargetQuota, 0, 0, 3000, 1, false);
+                try { donResultUI.ShowResults(totalEarned, operationTargetQuota, 0, 0, 3000, 1, false); } catch (System.Exception ex) { Debug.LogError(ex); }
                 while (donResultUI.isOpen)
                 {
                     yield return null;
@@ -688,6 +790,7 @@ public class GameManager : MonoBehaviour
         }
 
         // Возвращаемся в Лобби
+        isInLobby = true;
         if (lobbySpawnPoint != null)
         {
             yield return StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));

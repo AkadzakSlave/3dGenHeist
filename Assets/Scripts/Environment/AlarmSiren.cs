@@ -7,26 +7,56 @@ public class AlarmSiren : MonoBehaviour
     [Header("Audio (FMOD)")]
     public EventReference sirenEvent;
 
+    [Header("Visual Alarm (Red Flashing Light)")]
+    public Light alarmLight;
+    public float pulseSpeed = 4.0f;
+    public float minIntensity = 0.5f;
+    public float maxIntensity = 3.5f;
+    public float lightRange = 16f;
+
     private EventInstance sirenInstance;
     private bool sirenActive = false;
 
-    void Awake()
-    {
-        // Настройка будет происходить при создании инстанса
-    }
-
     void Start()
     {
-        // Инициализируем инстанс, но не запускаем
-        if (!sirenEvent.IsNull)
+        // Инициализируем инстанс аудио FMOD
+        string path = !sirenEvent.IsNull ? sirenEvent.Path : "event:/Environment/Siren_Bell";
+        if (!string.IsNullOrEmpty(path))
         {
-            sirenInstance = RuntimeManager.CreateInstance(sirenEvent);
-            RuntimeManager.AttachInstanceToGameObject(sirenInstance, gameObject, GetComponent<Rigidbody>());
+            try
+            {
+                sirenInstance = RuntimeManager.CreateInstance(path);
+                RuntimeManager.AttachInstanceToGameObject(sirenInstance, gameObject, GetComponent<Rigidbody>());
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[AlarmSiren] FMOD siren initialization warning: {ex.Message}");
+            }
         }
 
         if (GameManager.Instance != null)
         {
             GameManager.Instance.onHeistStarted.AddListener(StartSiren);
+        }
+
+        // Если лампа не назначена вручную — подготавливаем компонент
+        if (alarmLight == null)
+        {
+            alarmLight = GetComponentInChildren<Light>();
+        }
+        if (alarmLight != null)
+        {
+            alarmLight.enabled = false;
+        }
+    }
+
+    void Update()
+    {
+        if (sirenActive && alarmLight != null && alarmLight.enabled)
+        {
+            // Пульсация красного аварийного маяка
+            float wave = Mathf.PingPong(Time.time * pulseSpeed, 1f);
+            alarmLight.intensity = Mathf.Lerp(minIntensity, maxIntensity, wave);
         }
     }
 
@@ -37,6 +67,24 @@ public class AlarmSiren : MonoBehaviour
             sirenActive = true;
             sirenInstance.start();
             Debug.Log($"[Siren] Сирена на объекте {gameObject.name} запущена через FMOD!");
+        }
+
+        // Активируем визуальный красный свет тревоги
+        if (alarmLight == null)
+        {
+            GameObject lObj = new GameObject("EmergencyAlarmLight");
+            lObj.transform.SetParent(transform, false);
+            lObj.transform.localPosition = new Vector3(0f, 1.2f, 0f);
+            alarmLight = lObj.AddComponent<Light>();
+            alarmLight.type = LightType.Point;
+            alarmLight.color = Color.red;
+            alarmLight.range = lightRange;
+            alarmLight.shadows = LightShadows.None; // 0 просадок FPS
+        }
+
+        if (alarmLight != null)
+        {
+            alarmLight.enabled = true;
         }
     }
 

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Events;
@@ -196,14 +196,20 @@ public class PlayerInventory : MonoBehaviour
 
     private void OnScrollSlot(float scrollValue)
     {
+        if (IsUiOpen) return;
         if (slots == null || slots.Length == 0) return;
         int currentIndex = activeSlotIndex < 0 ? 0 : activeSlotIndex;
         if (scrollValue > 0.1f) SwitchSlot((currentIndex - 1 + slots.Length) % slots.Length);
         else if (scrollValue < -0.1f) SwitchSlot((currentIndex + 1) % slots.Length);
     }
 
+    private bool IsUiOpen => (StoreUI.Instance != null && StoreUI.Instance.IsStoreOpen) ||
+                              (DonResultUI.Instance != null && DonResultUI.Instance.isOpen) ||
+                              (PauseMenuUI.Instance != null && PauseMenuUI.Instance.IsPaused);
+
     private void OnPrimaryActionTriggered()
     {
+        if (Cursor.lockState != CursorLockMode.Locked || IsUiOpen) return;
         if (activeSlotIndex >= 0 && activeSlotIndex < slots.Length && slots[activeSlotIndex] != null)
         {
             if (slots[activeSlotIndex] is WeaponItem weapon && weapon.isAutomatic)
@@ -307,6 +313,7 @@ public class PlayerInventory : MonoBehaviour
 
     private void HandlePrimaryAction()
     {
+        if (Cursor.lockState != CursorLockMode.Locked || IsUiOpen) return;
         if (activeSlotIndex >= 0 && activeSlotIndex < slots.Length && slots[activeSlotIndex] != null)
         {
             bool isHeld = inputReader != null && inputReader.IsPrimaryActionPressed;
@@ -323,6 +330,7 @@ public class PlayerInventory : MonoBehaviour
 
     public void SwitchSlot(int newIndex)
     {
+        if (IsUiOpen) return;
         if (slots == null || slots.Length == 0) return;
 
         // Повторное нажатие на активный слот — убираем предмет (пустые руки)
@@ -449,6 +457,7 @@ public class PlayerInventory : MonoBehaviour
     public void DropCurrentItem()
     {
         if (slots == null || activeSlotIndex < 0 || activeSlotIndex >= slots.Length) return;
+        if (IsUiOpen) return;
         DropItemAtSlot(activeSlotIndex);
         onInventoryChanged?.Invoke();
         UpdateWeaponText();
@@ -619,6 +628,7 @@ public class PlayerInventory : MonoBehaviour
             {
                 if (item != null)
                 {
+                    item.Unequip();
                     item.gameObject.SetActive(false);
                 }
             }

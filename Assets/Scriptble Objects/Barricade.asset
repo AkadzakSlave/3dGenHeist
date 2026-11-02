@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fb9d01ddf9858246a62c027e3a1e6aa, type: 3}
   m_Name: Barricade
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemName: Barricade
+  itemName: "\u0411\u0430\u0440\u0440\u0438\u043A\u0430\u0434\u0430"
   itemType: 2
   fmodMainType: 0
   icon: {fileID: 21300000, guid: 1ca2420dea1a3da41a11ca431e13573e, type: 3}

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -29,16 +29,22 @@ public class HammerTool : EquipableItem
     public string animatorLayerName = "Hammer Layer";
 
     private float nextSwingTime = 0f;
-    [SerializeField] private bool isArmed = true; 
+    public bool isArmed { get; private set; } = false; 
     private bool isTransitioning = false;
+
+    private void Awake()
+    {
+        isArmed = false;
+        if (hammerMesh != null) hammerMesh.SetActive(false);
+        if (animator != null) animator.SetBool("IsArmed", false);
+    }
 
     void Start()
     {
-        if (animator != null) animator.SetBool("IsArmed", isArmed);
-        if (hammerMesh != null) hammerMesh.SetActive(isArmed);
-        
-        // Маленький хак: сбрасываем статус через секунду, на случай если что-то заглючило при старте
-        Invoke("ResetTransition", 1f);
+        isArmed = false;
+        if (animator != null) animator.SetBool("IsArmed", false);
+        if (hammerMesh != null) hammerMesh.SetActive(false);
+        isTransitioning = false;
     }
 
     void ResetTransition() { isTransitioning = false; }
@@ -50,8 +56,8 @@ public class HammerTool : EquipableItem
 
     public override void Equip()
     {
-        // gameObject.SetActive(true); // БОЛЬШЕ НЕ ВЫКЛЮЧАЕМ ВЕСЬ ОБЪЕКТ
         isTransitioning = true;
+        isArmed = true;
         
         if (animator != null) 
         {
@@ -72,18 +78,15 @@ public class HammerTool : EquipableItem
 
     public override void Unequip()
     {
-        isTransitioning = true;
+        isArmed = false;
+        isTransitioning = false;
+        StopAllCoroutines();
+        if (hammerMesh != null) hammerMesh.SetActive(false); 
         if (animator != null) 
         {
             animator.SetBool("IsArmed", false);
-        }
-        
-        StopAllCoroutines();
-        if (isActiveAndEnabled) StartCoroutine(UnequipRoutine());
-        else
-        {
-            if (hammerMesh != null) hammerMesh.SetActive(false); 
-            isTransitioning = false;
+            int layerIndex = animator.GetLayerIndex(animatorLayerName);
+            if (layerIndex != -1) animator.SetLayerWeight(layerIndex, 0f);
         }
     }
 
@@ -135,6 +138,49 @@ public class HammerTool : EquipableItem
             {
                 wall.TakeDamage(damage);
                 Debug.Log($"[Hammer] Нанесен урон {damage} по стене!");
+            }
+
+            VaultDoor vault = hit.collider.GetComponentInParent<VaultDoor>();
+            if (vault != null)
+            {
+                vault.TakeDamage(damage);
+                Debug.Log($"[Hammer] Нанесен силовой урон {damage} по сейфу!");
+            }
+
+            BreakableLight bulb = hit.collider.GetComponentInParent<BreakableLight>();
+            if (bulb == null) bulb = hit.collider.GetComponentInChildren<BreakableLight>();
+
+            if (bulb == null)
+            {
+                Collider[] nearby = Physics.OverlapSphere(hit.point, 0.75f);
+                foreach (var c in nearby)
+                {
+                    BreakableLight cand = c.GetComponentInParent<BreakableLight>();
+                    if (cand == null) cand = c.GetComponentInChildren<BreakableLight>();
+                    if (cand != null && !cand.isBroken)
+                    {
+                        bulb = cand;
+                        break;
+                    }
+                }
+            }
+
+            if (bulb == null)
+            {
+                for (int lIdx = 0; lIdx < BreakableLight.ActiveLights.Count; lIdx++)
+                {
+                    var bl = BreakableLight.ActiveLights[lIdx];
+                    if (bl != null && !bl.isBroken && Vector3.Distance(bl.transform.position, hit.point) <= 0.85f)
+                    {
+                        bulb = bl;
+                        break;
+                    }
+                }
+            }
+
+            if (bulb != null && !bulb.isBroken)
+            {
+                bulb.Break();
             }
         }
         else
