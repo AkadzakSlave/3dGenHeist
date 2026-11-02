@@ -1,4 +1,4 @@
-Shader "Hidden/Heist/NoirComicPostProcess"
+Shader "Heist/NoirComicPostProcess"
 {
     Properties
     {

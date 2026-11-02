@@ -72,11 +72,24 @@ public class NoirPostProcessEffect : MonoBehaviour
     {
         if (noirShader == null)
         {
+            noirShader = Shader.Find("Heist/NoirComicPostProcess");
+        }
+        if (noirShader == null)
+        {
             noirShader = Shader.Find("Hidden/Heist/NoirComicPostProcess");
+        }
+        if (noirShader == null)
+        {
+            Material resMat = Resources.Load<Material>("NoirPostProcessMaterial");
+            if (resMat != null && resMat.shader != null)
+            {
+                noirShader = resMat.shader;
+            }
         }
 
         if (noirShader == null)
         {
+            Debug.LogWarning("[NoirPostProcessEffect] Шейдер фильтра нуара не найден!");
             return false;
         }
 

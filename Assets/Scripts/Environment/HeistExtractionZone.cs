@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class HeistExtractionZone : MonoBehaviour, IInteractable
 {
@@ -32,22 +32,25 @@ public class HeistExtractionZone : MonoBehaviour, IInteractable
         UpdateCargoDisplay();
 
         // Фоновый уличный эмбиент возле фургона (на улице)
-        string ambiencePath = !ambienceEvent.IsNull ? ambienceEvent.Path : "event:/Environment/Ambience_Street";
-        if (!string.IsNullOrEmpty(ambiencePath))
+        try
         {
-            try
+            if (!ambienceEvent.IsNull)
             {
-                ambienceInstance = FMODUnity.RuntimeManager.CreateInstance(ambiencePath);
-                Camera cam = Camera.main;
-                Vector3 listenerPos = cam != null ? cam.transform.position : transform.position;
-                ambienceInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(listenerPos));
-                ambienceInstance.setVolume(0.25f);
-                ambienceInstance.start();
+                ambienceInstance = FMODUnity.RuntimeManager.CreateInstance(ambienceEvent);
             }
-            catch (System.Exception ex)
+            else
             {
-                Debug.LogWarning($"[ExtractionZone] Ambience start warning: {ex.Message}");
+                ambienceInstance = FMODUnity.RuntimeManager.CreateInstance("event:/Environment/Ambience_Street");
             }
+            Camera cam = Camera.main;
+            Vector3 listenerPos = cam != null ? cam.transform.position : transform.position;
+            ambienceInstance.set3DAttributes(FMODUnity.RuntimeUtils.To3DAttributes(listenerPos));
+            ambienceInstance.setVolume(0.25f);
+            ambienceInstance.start();
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning($"[ExtractionZone] Ambience start warning: {ex.Message}");
         }
 
         if (GameManager.Instance != null && GameManager.Instance.onMoneyChanged != null)

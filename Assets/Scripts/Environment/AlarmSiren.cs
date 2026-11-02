@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using FMODUnity;
 using FMOD.Studio;
 
@@ -20,18 +20,21 @@ public class AlarmSiren : MonoBehaviour
     void Start()
     {
         // Инициализируем инстанс аудио FMOD
-        string path = !sirenEvent.IsNull ? sirenEvent.Path : "event:/Environment/Siren_Bell";
-        if (!string.IsNullOrEmpty(path))
+        try
         {
-            try
+            if (!sirenEvent.IsNull)
             {
-                sirenInstance = RuntimeManager.CreateInstance(path);
-                RuntimeManager.AttachInstanceToGameObject(sirenInstance, gameObject, GetComponent<Rigidbody>());
+                sirenInstance = RuntimeManager.CreateInstance(sirenEvent);
             }
-            catch (System.Exception ex)
+            else
             {
-                Debug.LogWarning($"[AlarmSiren] FMOD siren initialization warning: {ex.Message}");
+                sirenInstance = RuntimeManager.CreateInstance("event:/Environment/Siren_Bell");
             }
+            RuntimeManager.AttachInstanceToGameObject(sirenInstance, gameObject, GetComponent<Rigidbody>());
+        }
+        catch (System.Exception ex)
+        {
+            Debug.LogWarning($"[AlarmSiren] FMOD siren initialization warning: {ex.Message}");
         }
 
         if (GameManager.Instance != null)
