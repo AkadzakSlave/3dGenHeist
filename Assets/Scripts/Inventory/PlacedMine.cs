@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using FMODUnity;
 using FMOD.Studio;
@@ -74,13 +75,15 @@ public class PlacedMine : MonoBehaviour
         }
 
         Collider[] hits = Physics.OverlapSphere(transform.position, explosionRadius);
+        HashSet<PlayerHealth> damagedPlayers = new HashSet<PlayerHealth>();
+        HashSet<EnemyHealth> damagedEnemies = new HashSet<EnemyHealth>();
         foreach (var hit in hits)
         {
             if (hit == null) continue;
 
             // Damage Player (reduced damage)
             PlayerHealth player = hit.GetComponentInParent<PlayerHealth>();
-            if (player != null)
+            if (player != null && damagedPlayers.Add(player))
             {
                 player.TakeDamage(playerDamage);
                 Debug.Log($"[Mine] 💥 Mine explosion dealt {playerDamage} DMG to Player '{player.name}'.");
@@ -88,7 +91,7 @@ public class PlacedMine : MonoBehaviour
 
             // Damage Enemy (full damage)
             EnemyHealth enemy = hit.GetComponentInParent<EnemyHealth>();
-            if (enemy != null)
+            if (enemy != null && damagedEnemies.Add(enemy))
             {
                 enemy.TakeDamage(enemyDamage);
                 Debug.Log($"[Mine] 💥 Mine explosion dealt {enemyDamage} DMG to Enemy '{enemy.name}'.");

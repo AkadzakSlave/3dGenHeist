@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -603,11 +603,14 @@ public class GameManager : MonoBehaviour
                 ReviveAllPlayers();
                 isInLobby = false;
             }
-            else isInLobby = true;
-        if (lobbySpawnPoint != null)
+            else if (lobbySpawnPoint != null)
             {
                 yield return StartCoroutine(TeleportPlayer(lobbySpawnPoint.position, lobbySpawnPoint.rotation));
                 ReviveAllPlayers();
+                isInLobby = true;
+            }
+            else
+            {
                 isInLobby = true;
             }
         }

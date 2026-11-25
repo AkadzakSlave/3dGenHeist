@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using FMODUnity;
 using FMOD.Studio;
 
@@ -12,24 +12,27 @@ public class DestructibleWall : MonoBehaviour
     public EventReference wallHitEvent;
     
     [Header("Cooldown Settings")]
-    public float hitCooldown = 2.2f;   // 2.2 секунды между ударами (под анимацию молота)
+    [Tooltip("Минимальная задержка между ударами кувалды (синхронизировано со скоростью взмаха молота)")]
+    public float hitCooldown = 0.5f;
     private float lastHitTime = -1f;
 
     public void TakeDamage(int damage)
     {
         // Защита от ударов после разрушения
         if (isDestroyed) return;
+
+        bool isExplosive = damage >= maxHits;
         
-        // Защита от слишком частых ударов (ждём 2.2 секунды)
-        if (Time.time - lastHitTime < hitCooldown)
+        // Защита от спама ударов кувалды (взрывы динамита проходят без кулдауна)
+        if (!isExplosive && Time.time - lastHitTime < hitCooldown)
         {
-            Debug.Log($"Удар проигнорирован: прошло всего {Time.time - lastHitTime:F2} секунд");
             return;
         }
         
         lastHitTime = Time.time;
-        currentHits++;
-        Debug.Log($"Удар #{currentHits} по стене в {Time.time:F2}");
+        int damageApplied = Mathf.Max(1, damage);
+        currentHits += damageApplied;
+        Debug.Log($"[Wall] Удар по стене (+{damageApplied} урона, всего {currentHits}/{maxHits}) в {Time.time:F2}");
         
         // Создаём и запускаем звук
         EventInstance hitInstance = RuntimeManager.CreateInstance(wallHitEvent);

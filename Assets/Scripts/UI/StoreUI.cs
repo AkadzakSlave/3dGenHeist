@@ -282,6 +282,28 @@ public class StoreUI : MonoBehaviour
             return false;
         }
 
+        // Проверяем, может ли предмет быть принят: в руки или на склад банды
+        bool canEquipInHand = false;
+        if (PlayerInventory.Instance != null && PlayerInventory.Instance.slots != null)
+        {
+            int slotIdx = (int)item.itemType;
+            if (slotIdx >= 0 && slotIdx < PlayerInventory.Instance.slots.Length)
+            {
+                if (PlayerInventory.Instance.slots[slotIdx] == null)
+                {
+                    canEquipInHand = true;
+                }
+            }
+        }
+
+        bool canAddToStorage = TeamStorageManager.Instance != null && TeamStorageManager.Instance.CanAddItem(item, 1);
+
+        if (!canEquipInHand && !canAddToStorage)
+        {
+            Debug.LogWarning($"[StoreUI] Невозможно купить {item.itemName}: слот инвентаря занят, а на складе достигнут лимит вместимости!");
+            return false;
+        }
+
         // Списываем деньги
         if (GameManager.Instance != null)
         {

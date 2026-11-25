@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using FMODUnity;
 using FMOD.Studio;
@@ -62,6 +63,8 @@ public class PlacedDynamite : MonoBehaviour
 
         // Damage nearby players and enemies
         Collider[] colliders = Physics.OverlapSphere(transform.position, explosionRadius);
+        HashSet<PlayerHealth> damagedPlayers = new HashSet<PlayerHealth>();
+        HashSet<EnemyHealth> damagedEnemies = new HashSet<EnemyHealth>();
         foreach (Collider hit in colliders)
         {
             if (hit == null) continue;
@@ -69,7 +72,7 @@ public class PlacedDynamite : MonoBehaviour
             // Damage Player
             PlayerHealth player = hit.GetComponent<PlayerHealth>();
             if (player == null) player = hit.GetComponentInParent<PlayerHealth>();
-            if (player != null)
+            if (player != null && damagedPlayers.Add(player))
             {
                 player.TakeDamage(explosionDamage);
             }
@@ -77,7 +80,7 @@ public class PlacedDynamite : MonoBehaviour
             // Damage Enemy
             EnemyHealth enemy = hit.GetComponent<EnemyHealth>();
             if (enemy == null) enemy = hit.GetComponentInParent<EnemyHealth>();
-            if (enemy != null)
+            if (enemy != null && damagedEnemies.Add(enemy))
             {
                 enemy.TakeDamage(explosionDamage);
             }

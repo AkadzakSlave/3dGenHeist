@@ -57,6 +57,14 @@ public class EnemyHealth : MonoBehaviour
 
     public void TakeDamage(int damage)
     {
+        Vector3 alertPos = (GameManager.Instance != null && GameManager.Instance.playerTransform != null)
+            ? GameManager.Instance.playerTransform.position
+            : transform.position;
+        TakeDamage(damage, alertPos);
+    }
+
+    public void TakeDamage(int damage, Vector3 attackerPosition)
+    {
         if (isDead || damage <= 0)
         {
             return;
@@ -76,7 +84,7 @@ public class EnemyHealth : MonoBehaviour
         // Alert enemy AI of attacker position
         if (enemyController != null)
         {
-            enemyController.OnDamagedAlert(transform.position);
+            enemyController.OnDamagedAlert(attackerPosition);
         }
 
         onDamaged?.Invoke();
