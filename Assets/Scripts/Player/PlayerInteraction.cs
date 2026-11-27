@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 public enum ItemHoldingMode
@@ -69,9 +69,22 @@ public class PlayerInteraction : MonoBehaviour
     private readonly System.Collections.Generic.Dictionary<Transform, Quaternion> baseItemRotations = new System.Collections.Generic.Dictionary<Transform, Quaternion>();
     private Transform lastActiveItemTransform = null;
 
+    public bool IsLocalPlayer()
+    {
+        var netIdentity = GetComponent<Mirror.NetworkIdentity>();
+        if (netIdentity != null)
+        {
+            return netIdentity.isLocalPlayer;
+        }
+        return true;
+    }
+
     private void Awake()
     {
-        Instance = this;
+        if (IsLocalPlayer())
+        {
+            Instance = this;
+        }
     }
 
     private void OnDestroy()

@@ -62,6 +62,12 @@ public class EnemyManager : MonoBehaviour
 
     private void Update()
     {
+        // В сетевом режиме логикой спавна и волн управляет исключительно хост (Server)
+        if (Mirror.NetworkClient.active && !Mirror.NetworkServer.active)
+        {
+            return;
+        }
+
         // Отладочный вызов штурма полиции клавишей F6 для быстрого тестирования
         if (UnityEngine.InputSystem.Keyboard.current != null && UnityEngine.InputSystem.Keyboard.current.f6Key.wasPressedThisFrame)
         {
@@ -531,6 +537,11 @@ public class EnemyManager : MonoBehaviour
             }
 
             GameObject enemyObj = Instantiate(prefab, targetPos, spawnPoint.rotation, transform);
+            if (Mirror.NetworkServer.active)
+            {
+                var netId = enemyObj.GetComponent<Mirror.NetworkIdentity>();
+                if (netId != null) Mirror.NetworkServer.Spawn(enemyObj);
+            }
             EnemyController enemy = enemyObj.GetComponentInChildren<EnemyController>();
 
             if (enemy != null)
@@ -581,6 +592,11 @@ public class EnemyManager : MonoBehaviour
             }
 
             GameObject enemyObj = Instantiate(prefab, targetPos, spawnPoint.rotation, transform);
+            if (Mirror.NetworkServer.active)
+            {
+                var netId = enemyObj.GetComponent<Mirror.NetworkIdentity>();
+                if (netId != null) Mirror.NetworkServer.Spawn(enemyObj);
+            }
             EnemyController enemy = enemyObj.GetComponentInChildren<EnemyController>();
 
             if (enemy != null)

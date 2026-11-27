@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
@@ -43,6 +43,16 @@ public class LevelGenerator : MonoBehaviour
     [Range(0f, 1f)]
     [Tooltip("Шанс переключения на параллельную ветку при генерации (ветвление как в REPO). 0 = одна линия, 0.4 = естественные ветки/корни в разные стороны")]
     public float branchSwitchChance = 0.40f;
+
+    [Header("Network Synchronization Seed")]
+    public int currentSeed = 0;
+    public bool useSpecificSeed = false;
+
+    public void SetSeed(int seed)
+    {
+        currentSeed = seed;
+        useSpecificSeed = true;
+    }
 
     [Tooltip("Целевое количество хранилищ (сейфов) на уровне. Если комнат достаточно (>= 10), спавнится до 2 сейфов в разных ветках!")]
     public int targetVaults = 2;
@@ -320,6 +330,18 @@ public class LevelGenerator : MonoBehaviour
     {
         int currentAttempt = 0;
         bool generationSuccess = false;
+
+        if (useSpecificSeed)
+        {
+            Random.InitState(currentSeed);
+            Debug.Log($"<color=cyan>[Gen] Генерация банка с фиксированным сетевым сидом: {currentSeed}</color>");
+        }
+        else
+        {
+            currentSeed = System.Environment.TickCount;
+            Random.InitState(currentSeed);
+            Debug.Log($"<color=cyan>[Gen] Генерация банка со случайным сидом: {currentSeed}</color>");
+        }
 
         Debug.Log("<color=cyan>[Gen] Запуск генератора уровня...</color>");
 

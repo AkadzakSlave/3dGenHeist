@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Events;
@@ -148,24 +148,36 @@ public class PlayerInventory : MonoBehaviour
     [Header("Events")]
     public UnityEvent onInventoryChanged;
 
+    public bool IsLocalPlayer()
+    {
+        var netIdentity = GetComponent<Mirror.NetworkIdentity>();
+        if (netIdentity != null)
+        {
+            return netIdentity.isLocalPlayer;
+        }
+        return true;
+    }
+
     private void Awake()
     {
-        if (Instance == null)
+        if (IsLocalPlayer())
         {
             Instance = this;
-            if (slots == null || slots.Length < 3)
-            {
-                System.Array.Resize(ref slots, 3);
-            }
         }
-        else
+
+        if (slots == null || slots.Length < 3)
         {
-            Destroy(gameObject);
+            System.Array.Resize(ref slots, 3);
         }
     }
 
     private void OnDestroy()
     {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
+
         if (GameManager.Instance != null && GameManager.Instance.onMoneyChanged != null)
         {
             GameManager.Instance.onMoneyChanged.RemoveListener(RefreshActiveItemUI);
@@ -174,6 +186,11 @@ public class PlayerInventory : MonoBehaviour
 
     private void OnEnable()
     {
+        if (!IsLocalPlayer())
+        {
+            return;
+        }
+
         if (inputReader != null)
         {
             inputReader.SwitchSlotEvent += SwitchSlot;
@@ -247,7 +264,7 @@ public class PlayerInventory : MonoBehaviour
         onInventoryChanged?.Invoke();
         UpdateWeaponText();
 
-        if (GameManager.Instance != null && GameManager.Instance.onMoneyChanged != null)
+        if (IsLocalPlayer() && GameManager.Instance != null && GameManager.Instance.onMoneyChanged != null)
         {
             GameManager.Instance.onMoneyChanged.AddListener(RefreshActiveItemUI);
         }
@@ -688,6 +705,7 @@ public class PlayerInventory : MonoBehaviour
 
     public void UpdateWeaponText()
     {
+        if (!IsLocalPlayer()) return;
         if (GameManager.Instance == null || GameManager.Instance.heistUI == null) return;
 
         EquipableItem activeItem = (slots != null && activeSlotIndex >= 0 && activeSlotIndex < slots.Length) ? slots[activeSlotIndex] : null;

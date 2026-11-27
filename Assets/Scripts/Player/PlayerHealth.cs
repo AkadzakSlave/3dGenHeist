@@ -68,7 +68,7 @@ public class PlayerHealth : MonoBehaviour
         onHealed?.Invoke();
         UpdateHealthUI();
 
-        if (HeistUI.Instance != null && healed > 0)
+        if (IsLocalPlayer() && HeistUI.Instance != null && healed > 0)
         {
             HeistUI.Instance.ShowNotification($"+{healed} HP", new Color(0.2f, 1.0f, 0.55f, 1f));
         }
@@ -136,8 +136,20 @@ public class PlayerHealth : MonoBehaviour
         if (characterController != null) characterController.enabled = isEnabled;
     }
 
+    public bool IsLocalPlayer()
+    {
+        var netIdentity = GetComponent<Mirror.NetworkIdentity>();
+        if (netIdentity != null)
+        {
+            return netIdentity.isLocalPlayer;
+        }
+        return true;
+    }
+
     private void UpdateHealthUI()
     {
+        if (!IsLocalPlayer()) return;
+
         if (GameManager.Instance != null && GameManager.Instance.heistUI != null)
         {
             GameManager.Instance.heistUI.UpdateHealth(currentHealth, maxHealth);

@@ -70,6 +70,16 @@ public class EnemyHealth : MonoBehaviour
             return;
         }
 
+        if (Mirror.NetworkClient.active && !Mirror.NetworkServer.active)
+        {
+            var netId = GetComponentInParent<Mirror.NetworkIdentity>();
+            if (netId != null && WildBunch.Networking.World.NetworkWorldState.Instance != null)
+            {
+                WildBunch.Networking.World.NetworkWorldState.Instance.CmdDamageEnemy(netId.netId, damage, attackerPosition);
+            }
+            return;
+        }
+
         currentHealth = Mathf.Max(0, currentHealth - damage);
         
         // Trigger red flash visual feedback

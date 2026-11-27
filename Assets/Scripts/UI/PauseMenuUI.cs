@@ -189,10 +189,18 @@ public class PauseMenuUI : MonoBehaviour
         }
     }
 
+    private bool IsNetworkSessionActive()
+    {
+        return Mirror.NetworkServer.active || Mirror.NetworkClient.isConnected;
+    }
+
     public void PauseGame()
     {
         isPaused = true;
-        Time.timeScale = 0f;
+        if (!IsNetworkSessionActive())
+        {
+            Time.timeScale = 0f;
+        }
 
         if (darkBackgroundPanel != null) darkBackgroundPanel.SetActive(true);
         if (pauseMenuPanel != null) pauseMenuPanel.SetActive(true);
@@ -218,7 +226,10 @@ public class PauseMenuUI : MonoBehaviour
     public void ResumeGame()
     {
         isPaused = false;
-        Time.timeScale = 1f;
+        if (!IsNetworkSessionActive())
+        {
+            Time.timeScale = 1f;
+        }
 
         if (darkBackgroundPanel != null) darkBackgroundPanel.SetActive(false);
         if (pauseMenuPanel != null) pauseMenuPanel.SetActive(false);

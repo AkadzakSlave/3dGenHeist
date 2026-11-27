@@ -381,6 +381,12 @@ public class EnemyController : MonoBehaviour
 
     private void Start()
     {
+        if (Mirror.NetworkClient.active && !Mirror.NetworkServer.active)
+        {
+            if (agent != null) agent.enabled = false;
+            return;
+        }
+
         patrolOrigin = transform.position;
         patrolWaitTimer = Random.Range(0.5f, 2.0f);
 
@@ -656,6 +662,12 @@ public class EnemyController : MonoBehaviour
 
     private void Update()
     {
+        // В сетевом режиме ИИ охранника симулируется только на хосте/сервере
+        if (Mirror.NetworkClient.active && !Mirror.NetworkServer.active)
+        {
+            return;
+        }
+
         if (soundAlertTimer > 0f) soundAlertTimer -= Time.deltaTime;
 
         if (alertTimer > 0f)

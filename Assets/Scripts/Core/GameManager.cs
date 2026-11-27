@@ -476,6 +476,13 @@ public class GameManager : MonoBehaviour
         accumulatedOperationMoney += depositedMoney;
         depositedMoney = 0;
         onMoneyChanged?.Invoke();
+
+        if (Mirror.NetworkServer.active && WildBunch.Networking.World.NetworkWorldState.Instance != null)
+        {
+            WildBunch.Networking.World.NetworkWorldState.Instance.ServerSyncEconomy(currentDay, operationTargetQuota, accumulatedOperationMoney, depositedMoney);
+            WildBunch.Networking.World.NetworkWorldState.Instance.ServerRegenerateNewSeed();
+        }
+
         Debug.Log($"<color=orange>[Economy] День {currentDay} завершен. Накоплено: ${accumulatedOperationMoney} / ${operationTargetQuota}</color>");
 
         if (EnemyManager.Instance != null) EnemyManager.Instance.ResetForNewHeist();
@@ -759,6 +766,12 @@ public class GameManager : MonoBehaviour
             if (donResultUI != null)
             {
                 int nextTargetQuota = 3000 + (completedQuotas * 1500);
+
+                if (Mirror.NetworkServer.active && WildBunch.Networking.World.NetworkWorldState.Instance != null)
+                {
+                    WildBunch.Networking.World.NetworkWorldState.Instance.RpcShowDonResults(totalEarned, operationTargetQuota, cleanMoney, sessionShare, nextTargetQuota, completedQuotas, true);
+                }
+
                 try { donResultUI.ShowResults(totalEarned, operationTargetQuota, cleanMoney, sessionShare, nextTargetQuota, completedQuotas, true); } catch (System.Exception ex) { Debug.LogError(ex); }
                 while (donResultUI.isOpen)
                 {
@@ -770,6 +783,10 @@ public class GameManager : MonoBehaviour
             }
 
             if (heistUI != null) heistUI.ShowLoadingScreen();
+            if (Mirror.NetworkServer.active && WildBunch.Networking.World.NetworkWorldState.Instance != null)
+            {
+                WildBunch.Networking.World.NetworkWorldState.Instance.RpcShowLoadingScreen(true);
+            }
         }
         else
         {
@@ -784,6 +801,11 @@ public class GameManager : MonoBehaviour
 
             if (donResultUI != null)
             {
+                if (Mirror.NetworkServer.active && WildBunch.Networking.World.NetworkWorldState.Instance != null)
+                {
+                    WildBunch.Networking.World.NetworkWorldState.Instance.RpcShowDonResults(totalEarned, operationTargetQuota, 0, 0, 3000, 1, false);
+                }
+
                 try { donResultUI.ShowResults(totalEarned, operationTargetQuota, 0, 0, 3000, 1, false); } catch (System.Exception ex) { Debug.LogError(ex); }
                 while (donResultUI.isOpen)
                 {
@@ -813,6 +835,12 @@ public class GameManager : MonoBehaviour
         {
             isHeistActive = true;
             Debug.Log("<color=red>[Alarm] Тишина закончилась! Таймер запущен.</color>");
+
+            if (Mirror.NetworkServer.active && WildBunch.Networking.World.NetworkWorldState.Instance != null)
+            {
+                WildBunch.Networking.World.NetworkWorldState.Instance.ServerNotifyHeistStarted();
+            }
+
             if (EnemyManager.Instance != null) EnemyManager.Instance.BeginHeist();
             onHeistStarted?.Invoke();
         }
@@ -882,10 +910,43 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 
-    private IEnumerator TeleportPlayer(Vector3 pos, Quaternion rot)
+    public IEnumerator TeleportPlayer(Vector3 pos, Quaternion rot)
     {
         if (Instance != null && Instance != this) yield break;
 
+        // Если в сетевой сессии есть список игроков — телепортируем всю команду с небольшим смещением
+        if (activePlayers != null && activePlayers.Count > 0)
+        {
+            activePlayers.RemoveAll(p => p == null);
+            for (int i = 0; i < activePlayers.Count; i++)
+            {
+                var player = activePlayers[i];
+                if (player == null) continue;
+
+                var cc = player.GetComponent<CharacterController>();
+                if (cc != null) cc.enabled = false;
+
+                Vector3 offset = new Vector3((i % 2 == 0 ? 1f : -1f) * (i * 0.75f), 0, (i > 1 ? -0.8f : 0f));
+                player.transform.position = pos + offset;
+                player.transform.rotation = rot;
+
+                var pm = player.GetComponent<PlayerMovement>();
+                if (pm != null) pm.ResetVelocity();
+
+                if (cc != null) cc.enabled = true;
+            }
+
+            // В сетевом режиме хост рассылает команду телепортации локальных контроллеров клиентам
+            if (Mirror.NetworkServer.active && WildBunch.Networking.World.NetworkWorldState.Instance != null)
+            {
+                WildBunch.Networking.World.NetworkWorldState.Instance.RpcTeleportTeam(pos, rot);
+            }
+
+            yield return new WaitForEndOfFrame();
+            yield break;
+        }
+
+        // Одиночный режим: fallback
         if (playerTransform == null && playerController != null)
         {
             playerTransform = playerController.transform;
@@ -918,7 +979,6 @@ public class GameManager : MonoBehaviour
 
         yield return new WaitForEndOfFrame();
 
-        // Check if playerController is still valid after the frame (in case a duplicate GameObject was destroyed)
         if (playerController != null)
         {
             playerController.enabled = true;
@@ -934,10 +994,10 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        PlayerMovement pm = FindAnyObjectByType<PlayerMovement>();
-        if (pm != null)
+        PlayerMovement pmSingle = FindAnyObjectByType<PlayerMovement>();
+        if (pmSingle != null)
         {
-            pm.ResetVelocity();
+            pmSingle.ResetVelocity();
         }
     }
 }

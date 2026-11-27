@@ -14,7 +14,15 @@ public class VanConsole : MonoBehaviour, IInteractable
             }
 
             Debug.Log("[Van] Запущена эвакуация на фургоне!");
-            GameManager.Instance.ExtractFromHeist();
+
+            if (Mirror.NetworkClient.active && !Mirror.NetworkServer.active)
+            {
+                WildBunch.Networking.World.NetworkWorldState.Instance?.CmdRequestExtraction();
+            }
+            else
+            {
+                GameManager.Instance.ExtractFromHeist();
+            }
         }
     }
 

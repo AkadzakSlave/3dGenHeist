@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using FMODUnity;
 using FMOD.Studio;
 
@@ -20,6 +20,16 @@ public class DestructibleWall : MonoBehaviour
     {
         // Защита от ударов после разрушения
         if (isDestroyed) return;
+
+        // В мультиплеере клиент перенаправляет запрос на авторитетный сервер
+        if (Mirror.NetworkClient.active && !Mirror.NetworkServer.active)
+        {
+            if (WildBunch.Networking.World.NetworkWorldState.Instance != null)
+            {
+                WildBunch.Networking.World.NetworkWorldState.Instance.CmdDamageWallAtPosition(transform.position, damage);
+            }
+            return;
+        }
 
         bool isExplosive = damage >= maxHits;
         
@@ -50,11 +60,17 @@ public class DestructibleWall : MonoBehaviour
         if (currentHits >= maxHits)
         {
             BreakWall();
+
+            if (Mirror.NetworkServer.active && WildBunch.Networking.World.NetworkWorldState.Instance != null)
+            {
+                WildBunch.Networking.World.NetworkWorldState.Instance.RpcBreakWallAtPosition(transform.position);
+            }
         }
     }
     
-    private void BreakWall()
+    public void BreakWall()
     {
+        if (isDestroyed) return;
         isDestroyed = true;
 
         // Громкий грохот разрушения стены поднимает тревогу у всех охранников сектора

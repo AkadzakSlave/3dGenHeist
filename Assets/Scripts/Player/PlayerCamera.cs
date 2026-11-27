@@ -52,9 +52,30 @@ public class PlayerCamera : MonoBehaviour
     private float currentCrouchOffset = 0f;
     private float landingDipOffset = 0f;
 
+    public bool IsLocalPlayer()
+    {
+        var netIdentity = GetComponentInParent<Mirror.NetworkIdentity>();
+        if (netIdentity != null)
+        {
+            return netIdentity.isLocalPlayer;
+        }
+        return true;
+    }
+
     private void Awake()
     {
-        Instance = this;
+        if (IsLocalPlayer())
+        {
+            Instance = this;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            Instance = null;
+        }
     }
 
     public void AddRecoil(float verticalKick, float horizontalKick)

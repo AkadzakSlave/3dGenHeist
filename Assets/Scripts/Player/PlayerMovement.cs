@@ -108,9 +108,19 @@ public class PlayerMovement : MonoBehaviour
 
     public static PlayerMovement Instance { get; private set; }
 
+    public bool IsLocalPlayer()
+    {
+        var netIdentity = GetComponent<Mirror.NetworkIdentity>();
+        if (netIdentity != null)
+        {
+            return netIdentity.isLocalPlayer;
+        }
+        return true;
+    }
+
     private void Awake()
     {
-        if (Instance == null)
+        if (IsLocalPlayer())
         {
             Instance = this;
         }
